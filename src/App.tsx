@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import RecipesPage from './pages/RecipesPage';
+import RecipeDetailPage from './pages/RecipeDetailPage';
 import IngredientsPage from './pages/IngredientsPage';
 import DiaryPage from './pages/DiaryPage';
 import GoalsPage from './pages/GoalsPage';
@@ -20,6 +21,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path="/recipes" element={<RecipesPage />} />
+          <Route path="/recipes/:id" element={<RecipeDetailPage />} />
           <Route path="/ingredients" element={<IngredientsPage />} />
           <Route path="/diary" element={<DiaryPage />} />
           <Route path="/goals" element={<GoalsPage />} />

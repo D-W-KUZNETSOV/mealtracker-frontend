@@ -77,58 +77,114 @@ export function roundNutrient(value: number): number {
 
 // ---------- Recipes ----------
 
-export interface RecipeDto {
+// ---------- Recipes ----------
+
+/** Краткая карточка рецепта для списков */
+export interface RecipeListItemDto {
   id: number;
   name: string;
-  description?: string;
-  imageUrl?: string;
+  category: string | null;
+  totalCalories: number | null;
+  totalProteins: number | null;
+  totalFats: number | null;
+  totalCarbs: number | null;
   visibility: 'PUBLIC' | 'PRIVATE';
-  ingredients: RecipeIngredientDto[];
-  calories?: number;
-  protein?: number;
-  fat?: number;
-  carbs?: number;
 }
 
+/** Ингредиент внутри полного рецепта */
 export interface RecipeIngredientDto {
   ingredientId: number;
   ingredientName: string;
-  amount: number;
+  weightInGrams: number;
   calories: number;
-  protein: number;
-  fat: number;
+  proteins: number;
+  fats: number;
   carbs: number;
 }
 
-export interface RecipeSummaryDto {
+/** Полный рецепт (POST-ответ, PATCH-ответ) */
+export interface RecipeDto {
   id: number;
   name: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+  category: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  ingredients: RecipeIngredientDto[];
+  totalCalories: number | null;
+  totalProteins: number | null;
+  totalFats: number | null;
+  totalCarbs: number | null;
+  visibility: 'PUBLIC' | 'PRIVATE';
 }
 
+/** Тело запроса на создание рецепта */
 export interface RecipeRequest {
   name: string;
+  category?: string;
   description?: string;
+  imageUrl?: string;
   visibility: 'PUBLIC' | 'PRIVATE';
   ingredients: RecipeIngredientInput[];
 }
 
 export interface RecipeIngredientInput {
   ingredientId: number;
-  amount: number;
+  weightInGrams: number;
 }
 
+/** Детальная карточка (GET /api/recipes/{id}/summary) */
+export interface RecipeSummaryIngredientDto {
+  name: string;
+  caloriesPer100g: number;
+  proteinsPer100g: number;
+  fatsPer100g: number;
+  carbsPer100g: number;
+  quantityGrams: number;
+  itemCalories: number;
+}
+
+export interface RecipeSummaryDto {
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  visibility: 'PUBLIC' | 'PRIVATE';
+  ingredients: RecipeSummaryIngredientDto[];
+  totalCalories: number;
+  totalProteins: number;
+  totalFats: number;
+  totalCarbs: number;
+}
+
+/** Статистика (GET /api/recipes/{recipeId}/stats) */
+export interface RecipeStatsIngredientDto {
+  ingredientName: string;
+  weightInGrams: number;
+  calories: number;
+  proteins: number;
+  fats: number;
+  carbs: number;
+}
+
+export interface RecipeStatsDto {
+  recipeName: string;
+  ingredientsStats: RecipeStatsIngredientDto[];
+  totalCalories: number;
+  totalProteins: number;
+  totalFats: number;
+  totalCarbs: number;
+}
+
+/** Spring Data Page<T> */
 export interface Page<T> {
   content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
+  empty: boolean;
   first: boolean;
   last: boolean;
+  number: number;
+  numberOfElements: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 // ---------- Nutrition (цели) ----------
