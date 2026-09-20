@@ -102,14 +102,15 @@ export default function IngredientsPage() {
   };
 
   return (
-    <Box>
-      <Stack
-        direction="row"
-        sx={{
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-        }}
+   <Box>
+   <Stack
+     direction="row"
+     sx={{
+       justifyContent: 'space-between',
+       alignItems: 'center',
+       mb: 2,
+     }}
+
       >
         <Typography variant="h4">Ингредиенты</Typography>
         {isMyTab && (

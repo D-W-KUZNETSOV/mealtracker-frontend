@@ -212,31 +212,16 @@ export default function RecipeFormDialog({
           />
 
           {/* Категория */}
-         <Autocomplete
-           options={allIngredients}
-           getOptionLabel={(o) => o.name}
-           value={ing ?? null}
-           onChange={(_, v) =>
-             handleRowChange(row.tempId, {
-               ingredientId: v ? v.id : null,
-             })
-           }
-           isOptionEqualToValue={(o, v) => o.id === v.id}
-           renderOption={(props, option) => (
-             <li {...props} key={option.id}>
-               {option.name}
-             </li>
-           )}
-           renderInput={(params) => (
-             <TextField
-               {...params}
-               label="Ингредиент"
-               size="small"
-               fullWidth
-             />
-           )}
-           sx={{ flex: 2 }}
-         />
+      {/* Категория */}
+      <Autocomplete
+        options={CATEGORIES}
+        freeSolo
+        value={category}
+        onChange={(_, v) => setCategory(v)}
+        renderInput={(params) => (
+          <TextField {...params} label="Категория" />
+        )}
+      />
 
           {/* Описание */}
           <TextField
