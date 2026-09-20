@@ -61,6 +61,20 @@ export interface IngredientRequest {
   carbs: number;
 }
 
+/** Расчёт калорий по БЖУ (та же формула, что на бэке) */
+export function calcCaloriesFromMacros(
+  proteins: number,
+  fats: number,
+  carbs: number,
+): number {
+  return 4 * proteins + 9 * fats + 4 * carbs;
+}
+
+/** Округление нутриента до 1 знака для отображения */
+export function roundNutrient(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
 // ---------- Recipes ----------
 
 export interface RecipeDto {
