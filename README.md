@@ -71,5 +71,15 @@ export default defineConfig([
     },
   },
 ])
+## Known Issues / TODO
 
+### Backend
+- [ ] **Синхронизация `activityLevel`** между `user_goals` и `user_profile`.
+  Сейчас это два независимых поля. При обновлении одного — второе остаётся старым.
+  Решение: в `ProfileService.updateProfile()` и `NutritionService.saveGoals()` обновлять оба поля.
+- [ ] **`GET /api/profile/calories/daily`** возвращает `621` — значение кажется некорректным (норма должна быть ~2300–2600 для демо-пользователя). Возможно, формула считает не то, что ожидается.
+- [ ] **`totalCalories` в рецептах** — при создании через `DataInitializer` не считается (`null`). При создании через `POST /api/recipes` — считается. Унифицировать.
+
+### Frontend
+- [ ] **`GET /api/recipes`** возвращает `totalCalories: null` для рецептов из `DataInitializer` — карточки в списке показывают «—» вместо КБЖУ.
 ```

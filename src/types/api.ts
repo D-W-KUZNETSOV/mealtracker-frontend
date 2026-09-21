@@ -203,43 +203,62 @@ export interface AddPortionRequest {
   weightInGrams: number;
 }
 
+// ---------- Общие enum'ы ----------
+
+export type ActivityLevel =
+  | 'SEDENTARY'
+  | 'LIGHT'
+  | 'MODERATE'
+  | 'HIGH'
+  | 'VERY_HIGH';
+
+export type Gender = 'MALE' | 'FEMALE';
+
 // ---------- Nutrition (цели) ----------
 
 export interface UserGoalsDto {
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+  id: number;
+  currentWeightKg: number;
+  proteinPerKg: number;
+  targetCalories: number;
+  activityLevel: ActivityLevel;
+  createdAt: string;
 }
 
 export interface GoalsRequest {
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+  currentWeightKg: number;
+  proteinPerKg: number;
+  targetCalories: number;
+  activityLevel: ActivityLevel;
+}
+
+export interface TargetProteinDto {
+  weightKg: number;
+  targetProteinGramsPerDay: number;
 }
 
 // ---------- Profile ----------
 
 export interface UserProfileDto {
-  id: number;
-  username: string;
-  email: string;
-  age?: number;
-  weight?: number;
-  height?: number;
-  gender?: 'MALE' | 'FEMALE';
-  activityLevel?: string;
+  ageYears: number;
+  heightCm: number;
+  currentWeightKg: number;
+  targetWeightKg: number;
+  gender: Gender;
+  activityLevel: ActivityLevel;
+  bmi: number;
 }
 
 export interface ProfileUpdateRequest {
-  email?: string;
-  age?: number;
-  weight?: number;
-  height?: number;
-  gender?: 'MALE' | 'FEMALE';
-  activityLevel?: string;
+  dateOfBirth?: string;
+  heightCm?: number;
+  currentWeightKg?: number;
+  targetWeightKg?: number;
+  gender?: Gender;
+  activityLevel?: ActivityLevel;
 }
+
+export type DailyCaloriesDto = number;
 
 // ---------- Images ----------
 
