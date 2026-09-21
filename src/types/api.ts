@@ -41,25 +41,7 @@ export interface ApiError {
   path: string;
 }
 
-// ---------- Ingredients ----------
-
-export interface IngredientDto {
-  id: number;
-  name: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-  base: boolean;
-}
-
-export interface IngredientRequest {
-  name: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-}
+// ---------- Утилиты ----------
 
 /** Расчёт калорий по БЖУ (та же формула, что на бэке) */
 export function calcCaloriesFromMacros(
@@ -75,7 +57,23 @@ export function roundNutrient(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-// ---------- Recipes ----------
+// ---------- Ingredients ----------
+
+export interface IngredientDto {
+  id: number;
+  name: string;
+  caloriesPer100g: number;
+  proteinsPer100g: number;
+  fatsPer100g: number;
+  carbsPer100g: number;
+}
+
+export interface IngredientRequest {
+  name: string;
+  proteinsPer100g: number;
+  fatsPer100g: number;
+  carbsPer100g: number;
+}
 
 // ---------- Recipes ----------
 
@@ -187,6 +185,24 @@ export interface Page<T> {
   totalPages: number;
 }
 
+// ---------- Stats (дневник) ----------
+
+/** Сводка за день (GET /api/stats/daily, POST /api/stats/daily/add) */
+export interface DailyStatsDto {
+  calories: number;
+  proteins: number;
+  fats: number;
+  carbs: number;
+  targetProtein: number | null;
+  proteinProgressPercent: number | null;
+}
+
+/** Тело запроса на добавление порции */
+export interface AddPortionRequest {
+  recipeId: number;
+  weightInGrams: number;
+}
+
 // ---------- Nutrition (цели) ----------
 
 export interface UserGoalsDto {
@@ -223,34 +239,6 @@ export interface ProfileUpdateRequest {
   height?: number;
   gender?: 'MALE' | 'FEMALE';
   activityLevel?: string;
-}
-
-// ---------- Stats (дневник) ----------
-
-export interface DailyStatsDto {
-  date: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-  entries: DailyEntryDto[];
-}
-
-export interface DailyEntryDto {
-  id: number;
-  recipeId: number;
-  recipeName: string;
-  amount: number;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-}
-
-export interface AddPortionRequest {
-  recipeId: number;
-  amount: number;
-  date?: string;
 }
 
 // ---------- Images ----------

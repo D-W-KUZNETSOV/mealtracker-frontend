@@ -299,12 +299,14 @@ export default function RecipeFormDialog({
                   : 0;
 
                 return (
-                  <Stack
-                    key={row.tempId}
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                  >
+                <Stack
+                  key={row.tempId}
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: 'center',
+                  }}
+                >
                     <Autocomplete
                       options={allIngredients}
                       getOptionLabel={(o) => o.name}
