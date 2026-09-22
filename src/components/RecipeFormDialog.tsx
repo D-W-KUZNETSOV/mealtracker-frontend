@@ -22,6 +22,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
+import ImageUpload from './ImageUpload';
 
 import { useCreateRecipe } from '../hooks/useRecipes';
 import {
@@ -233,13 +234,12 @@ export default function RecipeFormDialog({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          {/* Картинка (URL) */}
-          <TextField
-            label="URL картинки (опционально)"
-            fullWidth
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
+         {/* Картинка рецепта */}
+         <ImageUpload
+           value={imageUrl || null}
+           onChange={(url) => setImageUrl(url ?? '')}
+           label="Загрузить фото рецепта"
+         />
 
           {/* Видимость */}
           <FormControl>
@@ -317,6 +317,11 @@ export default function RecipeFormDialog({
                         })
                       }
                       isOptionEqualToValue={(o, v) => o.id === v.id}
+                      renderOption={(props, option) => (
+                        <li {...props} key={option.id}>
+                          {option.name}
+                        </li>
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}

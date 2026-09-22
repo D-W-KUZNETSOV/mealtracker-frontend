@@ -7,9 +7,6 @@ export const TOKEN_STORAGE_KEY = 'mealtracker.token';
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
   timeout: 15_000,
 });
 

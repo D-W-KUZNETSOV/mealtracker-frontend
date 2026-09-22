@@ -20,6 +20,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useSnackbar } from 'notistack';
+import { getImageFullUrl } from '../utils/imageUrl';
 
 import {
   useDeleteRecipe,
@@ -146,7 +147,7 @@ export default function RecipeDetailPage() {
         {recipe.imageUrl && (
           <Box
             component="img"
-            src={recipe.imageUrl}
+            src={getImageFullUrl(recipe.imageUrl) ?? undefined}
             alt={recipe.name}
             sx={{
               maxWidth: '100%',

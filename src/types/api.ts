@@ -262,6 +262,9 @@ export type DailyCaloriesDto = number;
 
 // ---------- Images ----------
 
+// ---------- Images ----------
+
+/** Ответ POST /api/images — относительный URL, например "/images/uuid.jpg" */
 export interface ImageUploadResponse {
-  url: string;
+  imageUrl: string;
 }

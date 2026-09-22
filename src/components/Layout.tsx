@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import { useAuthStore } from '../store/authStore';
+import UserAvatar from './UserAvatar';
 
 // Пункты меню навигации
 const navItems = [
@@ -71,9 +72,10 @@ export default function Layout() {
             ))}
           </Stack>
 
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            {user?.username}
-          </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mr: 2 }}>
+            <UserAvatar username={user?.username ?? '?'} size={32} />
+            <Typography variant="body2">{user?.username}</Typography>
+          </Stack>
           <Button color="inherit" onClick={handleLogout}>
             Выйти
           </Button>

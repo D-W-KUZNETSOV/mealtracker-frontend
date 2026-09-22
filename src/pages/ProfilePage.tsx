@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useAuthStore } from '../store/authStore';
 import {
   Alert,
   Box,
@@ -19,7 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-
+import UserAvatar from '../components/UserAvatar';
 import {
   useDailyCalories,
   useProfile,
@@ -74,8 +75,11 @@ const GENDER_LABELS: Record<Gender, string> = {
   FEMALE: 'Женский',
 };
 
+
+
 export default function ProfilePage() {
   const { enqueueSnackbar } = useSnackbar();
+const user = useAuthStore((s) => s.user);
 
   const profileQuery = useProfile();
   const dailyCaloriesQuery = useDailyCalories();
@@ -157,6 +161,20 @@ export default function ProfilePage() {
       <Typography variant="h4" gutterBottom>
         Профиль
       </Typography>
+
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+            <UserAvatar
+              username={user?.username ?? '?'}
+              size={64}
+            />
+            <Box>
+              <Typography variant="h6">{user?.username}</Typography>
+            </Box>
+          </Stack>
+        </CardContent>
+      </Card>
 
       {/* Сводка */}
       <Stack direction="row" spacing={3} sx={{ mb: 3 }}>
