@@ -119,13 +119,17 @@ export default function GoalsPage() {
     );
   }
 
-  if (goalsQuery.isError) {
-    return (
-      <Alert severity="error">
-        Ошибка загрузки целей: {(goalsQuery.error as ApiError)?.message}
-      </Alert>
-    );
-  }
+ const goalsError = goalsQuery.error as ApiError | null;
+ // 404 = целей ещё нет (новый пользователь) — это не ошибка
+ const isGoalsMissing = goalsError?.status === 404;
+
+ if (goalsQuery.isError && !isGoalsMissing) {
+   return (
+     <Alert severity="error">
+       Ошибка загрузки целей: {goalsError?.message}
+     </Alert>
+   );
+ }
 
   return (
     <Box>
