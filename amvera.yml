@@ -1,0 +1,13 @@
+meta:
+  environment: node
+  toolchain:
+    name: browser
+    version: 20
+
+build:
+  additionalCommands: npm run build
+  artifacts:
+    "dist/*": /
+
+run:
+  containerPort: 80
