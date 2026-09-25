@@ -39,15 +39,15 @@ import type {
 const profileSchema = z.object({
   dateOfBirth: z.string().optional(),
   heightCm: z
-    .number({ invalid_type_error: 'Введите число' })
+   .number({ message: 'Введите число' })
     .min(50, 'Минимум 50 см')
     .max(250, 'Максимум 250 см'),
   currentWeightKg: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(20, 'Минимум 20 кг')
     .max(300, 'Максимум 300 кг'),
   targetWeightKg: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(20, 'Минимум 20 кг')
     .max(300, 'Максимум 300 кг'),
   gender: z.enum(['MALE', 'FEMALE']),
@@ -149,7 +149,7 @@ const user = useAuthStore((s) => s.user);
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <Alert severity="error">
-        Ошибка загрузки профиля: {(profileQuery.error as ApiError)?.message}
+        Ошибка загрузки: {(profileQuery.error as unknown as ApiError)?.message}
       </Alert>
     );
   }

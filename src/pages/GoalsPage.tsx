@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,15 +32,15 @@ import type {
 // ============================================================
 const goalsSchema = z.object({
   currentWeightKg: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(20, 'Минимум 20 кг')
     .max(300, 'Максимум 300 кг'),
   proteinPerKg: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(0.5, 'Минимум 0.5 г/кг')
     .max(5, 'Максимум 5 г/кг'),
   targetCalories: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(500, 'Минимум 500 ккал')
     .max(10000, 'Максимум 10000 ккал'),
   activityLevel: z.enum([

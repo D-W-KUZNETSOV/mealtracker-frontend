@@ -23,15 +23,15 @@ import { calcCaloriesFromMacros, roundNutrient } from '../types/api';
 const ingredientSchema = z.object({
   name: z.string().min(1, 'Введите название').max(100, 'Максимум 100 символов'),
   proteinsPer100g: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(0, 'Не может быть отрицательным')
     .max(100, 'Слишком много'),
   fatsPer100g: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(0, 'Не может быть отрицательным')
     .max(100, 'Слишком много'),
   carbsPer100g: z
-    .number({ invalid_type_error: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(0, 'Не может быть отрицательным')
     .max(100, 'Слишком много'),
 });

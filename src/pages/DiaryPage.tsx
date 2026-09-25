@@ -147,7 +147,7 @@ export default function DiaryPage() {
 
       {currentQuery.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Ошибка загрузки: {(currentQuery.error as ApiError)?.message}
+         Ошибка загрузки: {(currentQuery.error as unknown as ApiError)?.message}
         </Alert>
       )}
 
