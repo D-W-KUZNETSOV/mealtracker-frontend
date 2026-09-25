@@ -9,5 +9,4 @@ build:
   artifacts:
     "dist/*": /
 
-run:
-# Для browser-окружения секция run НЕ должна содержать параметров
+run: {}
