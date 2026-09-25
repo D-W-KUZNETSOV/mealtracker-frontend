@@ -73,7 +73,7 @@ export default function RegisterPage() {
         dateOfBirth: data.dateOfBirth,
       });
       enqueueSnackbar('Регистрация успешна!', { variant: 'success' });
-      navigate('/recipes', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       const apiError = err as ApiError;
       enqueueSnackbar(apiError.message || 'Ошибка регистрации', {

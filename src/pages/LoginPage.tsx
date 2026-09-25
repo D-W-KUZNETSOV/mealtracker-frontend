@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,9 +18,6 @@ import { useSnackbar } from 'notistack';
 import { useAuthStore } from '../store/authStore';
 import type { ApiError } from '../types/api';
 
-// ============================================================
-// Схема валидации — как Bean Validation в Java.
-// ============================================================
 const loginSchema = z.object({
   username: z.string().min(1, 'Введите имя пользователя'),
   password: z.string().min(1, 'Введите пароль'),
@@ -30,9 +27,14 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { enqueueSnackbar } = useSnackbar();
   const login = useAuthStore((s) => s.login);
   const [submitting, setSubmitting] = useState(false);
+
+  // Куда вернуть пользователя после логина
+  const from =
+    (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
   const {
     register,
@@ -48,7 +50,7 @@ export default function LoginPage() {
     try {
       await login(data);
       enqueueSnackbar('Вход выполнен', { variant: 'success' });
-      navigate('/recipes', { replace: true });
+      navigate(from, { replace: true });   // ← возвращаем туда, откуда пришли
     } catch (err) {
       const apiError = err as ApiError;
       enqueueSnackbar(apiError.message || 'Ошибка входа', {
