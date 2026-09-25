@@ -145,7 +145,7 @@ export default function Layout() {
         <Box sx={{ width: 260 }} role="presentation">
           <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <RestaurantMenuIcon color="primary" />
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
               MealTracker
             </Typography>
           </Box>
