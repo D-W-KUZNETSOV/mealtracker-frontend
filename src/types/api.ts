@@ -26,8 +26,9 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   username: string;
-  email: string;
   password: string;
+  email: string;
+  dateOfBirth: string;  // ← ISO format: "1990-01-15"
 }
 
 // ---------- Единый формат ошибок ----------
