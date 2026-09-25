@@ -196,7 +196,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     Белки
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {Math.round(proteins)} г
                   </Typography>
                 </Stack>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     Жиры
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {Math.round(stats?.fats ?? 0)} г
                   </Typography>
                 </Stack>
@@ -212,7 +212,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     Углеводы
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {Math.round(stats?.carbs ?? 0)} г
                   </Typography>
                 </Stack>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     Текущий вес
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {currentWeight} кг
                   </Typography>
                 </Stack>
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                   <Typography variant="body2" color="text.secondary">
                     Целевой вес
                   </Typography>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {targetWeight} кг
                   </Typography>
                 </Stack>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
                     ИМТ
                   </Typography>
                   <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                    <Typography variant="body2" fontWeight={600}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       {bmi.toFixed(1)}
                     </Typography>
                     <Chip
