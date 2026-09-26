@@ -217,11 +217,16 @@ export type Gender = 'MALE' | 'FEMALE';
 
 // ---------- Nutrition (цели) ----------
 
+export type GoalType = 'LOSE_WEIGHT' | 'MAINTAIN' | 'GAIN_MUSCLE';
+
 export interface UserGoalsDto {
   id: number;
   currentWeightKg: number;
   proteinPerKg: number;
   targetCalories: number;
+  goalType: GoalType;                    // ← новое
+  targetProteinOverride: number | null;  // ← новое
+  targetCaloriesOverride: number | null; // ← новое
   activityLevel: ActivityLevel;
   createdAt: string;
 }
@@ -231,6 +236,9 @@ export interface GoalsRequest {
   proteinPerKg: number;
   targetCalories: number;
   activityLevel: ActivityLevel;
+  goalType: GoalType;                    // ← новое
+  targetProteinOverride: number | null;  // ← новое
+  targetCaloriesOverride: number | null; // ← новое
 }
 
 export interface TargetProteinDto {
