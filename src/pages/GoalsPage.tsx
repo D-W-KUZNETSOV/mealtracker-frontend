@@ -210,8 +210,7 @@ export default function GoalsPage() {
               <TextField
                 label="Целевые калории, ккал/день"
                 type="number"
-                fullWidth
-                slotProps={{ htmlInput: { step: '50', min: 500, max: 10000 } }}
+                slotProps={{ htmlInput: { step: '1', min: 500, max: 10000 } }}
                 {...register('targetCalories', { valueAsNumber: true })}
                 error={!!errors.targetCalories}
                 helperText={errors.targetCalories?.message}

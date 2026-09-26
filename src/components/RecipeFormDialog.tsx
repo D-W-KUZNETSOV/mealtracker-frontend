@@ -18,6 +18,8 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -41,7 +43,7 @@ import { roundNutrient } from '../types/api';
 // Строка ингредиента в форме (локальная структура)
 // ============================================================
 interface IngredientRow {
-  tempId: number;              // для React key
+  tempId: number;
   ingredientId: number | null;
   weightInGrams: number;
 }
@@ -66,6 +68,8 @@ export default function RecipeFormDialog({
 }: RecipeFormDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const createMutation = useCreateRecipe();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Загружаем ингредиенты: мои + базовые
   const myIngredientsQuery = useMyIngredients();
@@ -84,9 +88,7 @@ export default function RecipeFormDialog({
   const [category, setCategory] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>(
-    'PRIVATE',
-  );
+  const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE');
   const [rows, setRows] = useState<IngredientRow[]>([]);
 
   // ---------- Сброс формы при открытии ----------
@@ -158,9 +160,7 @@ export default function RecipeFormDialog({
   const canSubmit =
     name.trim().length > 0 &&
     rows.length > 0 &&
-    rows.every(
-      (r) => r.ingredientId !== null && r.weightInGrams > 0,
-    );
+    rows.every((r) => r.ingredientId !== null && r.weightInGrams > 0);
 
   // ---------- Отправка ----------
   const handleSubmit = async () => {
@@ -213,16 +213,15 @@ export default function RecipeFormDialog({
           />
 
           {/* Категория */}
-      {/* Категория */}
-      <Autocomplete
-        options={CATEGORIES}
-        freeSolo
-        value={category}
-        onChange={(_, v) => setCategory(v)}
-        renderInput={(params) => (
-          <TextField {...params} label="Категория" />
-        )}
-      />
+          <Autocomplete
+            options={CATEGORIES}
+            freeSolo
+            value={category}
+            onChange={(_, v) => setCategory(v)}
+            renderInput={(params) => (
+              <TextField {...params} label="Категория" />
+            )}
+          />
 
           {/* Описание */}
           <TextField
@@ -234,12 +233,12 @@ export default function RecipeFormDialog({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-         {/* Картинка рецепта */}
-         <ImageUpload
-           value={imageUrl || null}
-           onChange={(url) => setImageUrl(url ?? '')}
-           label="Загрузить фото рецепта"
-         />
+          {/* Картинка рецепта */}
+          <ImageUpload
+            value={imageUrl || null}
+            onChange={(url) => setImageUrl(url ?? '')}
+            label="Загрузить фото рецепта"
+          />
 
           {/* Видимость */}
           <FormControl>
@@ -266,14 +265,14 @@ export default function RecipeFormDialog({
 
           <Divider />
 
-          {/* Ингредиенты */}
-       <Stack
-         direction="row"
-         sx={{
-           justifyContent: 'space-between',
-           alignItems: 'center',
-         }}
-       >
+          {/* Заголовок ингредиентов */}
+          <Stack
+            direction="row"
+            sx={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <Typography variant="h6">Ингредиенты</Typography>
             <Button
               startIcon={<AddIcon />}
@@ -284,6 +283,7 @@ export default function RecipeFormDialog({
             </Button>
           </Stack>
 
+          {/* Строки ингредиентов */}
           {rows.length === 0 ? (
             <Typography color="text.secondary">
               Добавьте хотя бы один ингредиент
@@ -299,67 +299,77 @@ export default function RecipeFormDialog({
                   : 0;
 
                 return (
-                <Stack
-                  key={row.tempId}
-                  direction="row"
-                  spacing={1}
-                  sx={{
-                    alignItems: 'center',
-                  }}
-                >
-                    <Autocomplete
-                      options={allIngredients}
-                      getOptionLabel={(o) => o.name}
-                      value={ing ?? null}
-                      onChange={(_, v) =>
-                        handleRowChange(row.tempId, {
-                          ingredientId: v ? v.id : null,
-                        })
-                      }
-                      isOptionEqualToValue={(o, v) => o.id === v.id}
-                      renderOption={(props, option) => (
-                        <li {...props} key={option.id}>
-                          {option.name}
-                        </li>
-                      )}
-                      renderInput={(params) => (
+                  <Paper key={row.tempId} variant="outlined" sx={{ p: 1.5 }}>
+                    <Stack
+                      direction={isMobile ? 'column' : 'row'}
+                      spacing={1}
+                      sx={{ alignItems: isMobile ? 'stretch' : 'center' }}
+                    >
+                      <Autocomplete
+                        options={allIngredients}
+                        getOptionLabel={(o) => o.name}
+                        value={ing ?? null}
+                        onChange={(_, v) =>
+                          handleRowChange(row.tempId, {
+                            ingredientId: v ? v.id : null,
+                          })
+                        }
+                        isOptionEqualToValue={(o, v) => o.id === v.id}
+                        renderOption={(props, option) => (
+                          <li {...props} key={option.id}>
+                            {option.name}
+                          </li>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Ингредиент"
+                            size="small"
+                            fullWidth
+                          />
+                        )}
+                        sx={{ flex: isMobile ? undefined : 2, width: '100%' }}
+                      />
+
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ alignItems: 'center' }}
+                      >
                         <TextField
-                          {...params}
-                          label="Ингредиент"
+                          label="Вес, г"
+                          type="number"
                           size="small"
-                          fullWidth
+                          value={row.weightInGrams}
+                          onChange={(e) =>
+                            handleRowChange(row.tempId, {
+                              weightInGrams: Number(e.target.value) || 0,
+                            })
+                          }
+                          slotProps={{ htmlInput: { step: '1', min: 1 } }}
+                          sx={{ width: isMobile ? 120 : 100 }}
                         />
-                      )}
-                      sx={{ flex: 2 }}
-                    />
-                    <TextField
-                      label="Вес, г"
-                      type="number"
-                      size="small"
-                      value={row.weightInGrams}
-                      onChange={(e) =>
-                        handleRowChange(row.tempId, {
-                          weightInGrams: Number(e.target.value) || 0,
-                        })
-                      }
-                      slotProps={{ htmlInput: { step: '1', min: 1 } }}
-                      sx={{ flex: 1 }}
-                    />
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ minWidth: 80, textAlign: 'right' }}
-                    >
-                      {roundNutrient(itemCalories)} ккал
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => handleRemoveRow(row.tempId)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Stack>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            minWidth: 70,
+                            textAlign: 'right',
+                            flexGrow: isMobile ? 1 : 0,
+                          }}
+                        >
+                          {roundNutrient(itemCalories)} ккал
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleRemoveRow(row.tempId)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    </Stack>
+                  </Paper>
                 );
               })}
             </Stack>
