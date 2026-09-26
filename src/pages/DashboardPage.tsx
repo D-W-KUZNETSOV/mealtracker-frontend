@@ -26,6 +26,7 @@ import { useAuthStore } from '../store/authStore';
 import { useTodayStats } from '../hooks/useStats';
 import { useGoals } from '../hooks/useNutrition';
 import { useProfile } from '../hooks/useProfile';
+import MiniProgressWidget from '../components/MiniProgressWidget';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -116,6 +117,8 @@ export default function DashboardPage() {
         </Typography>
       </Box>
 
+      {/* ============ Мини-виджет прогресса ============ */}
+            <MiniProgressWidget />
       {/* ============ Сетка карточек ============ */}
       <Grid container spacing={3}>
         {/* Калории */}
