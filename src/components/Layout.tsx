@@ -121,7 +121,11 @@ export default function Layout() {
           {/* Аватар + имя: на десктопе показываем имя, на мобильном только аватар */}
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', ml: 'auto' }}>
             <IconButton onClick={handleUserMenuOpen} color="inherit" size="small">
-              <UserAvatar username={user?.username ?? '?'} size={32} />
+              <UserAvatar
+                username={user?.username ?? '?'}
+                avatarUrl={user?.avatarUrl}
+                size={32}
+              />
             </IconButton>
             {!isMobile && (
               <Typography variant="body2">{user?.username}</Typography>

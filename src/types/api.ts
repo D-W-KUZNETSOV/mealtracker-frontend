@@ -17,6 +17,7 @@ export interface UserResponse {
   username: string;
   email: string;
   role: string;
+ avatarUrl: string | null;
 }
 
 export interface LoginRequest {
@@ -247,6 +248,7 @@ export interface TargetProteinDto {
 // ---------- Profile ----------
 
 export interface UserProfileDto {
+    avatarUrl: string | null;
   ageYears: number;
   heightCm: number;
   currentWeightKg: number;
@@ -257,6 +259,7 @@ export interface UserProfileDto {
 }
 
 export interface ProfileUpdateRequest {
+    avatarUrl?: string;
   dateOfBirth?: string;
   heightCm?: number;
   currentWeightKg?: number;

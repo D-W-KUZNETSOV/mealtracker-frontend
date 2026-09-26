@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import UserAvatar from '../components/UserAvatar';
+import ImageUpload from '../components/ImageUpload';
 import {
   useDailyCalories,
   useProfile,
@@ -37,6 +38,7 @@ import type {
 // Схема валидации
 // ============================================================
 const profileSchema = z.object({
+  avatarUrl: z.string().optional(),
   dateOfBirth: z.string().optional(),
   heightCm: z
     .number({ message: 'Введите число' })
@@ -92,6 +94,7 @@ export default function ProfilePage() {
   } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      avatarUrl: '',
       dateOfBirth: '',
       heightCm: 170,
       currentWeightKg: 70,
@@ -106,6 +109,7 @@ export default function ProfilePage() {
     if (profileQuery.data) {
       const p = profileQuery.data;
       reset({
+        avatarUrl: p.avatarUrl ?? '',
         dateOfBirth: '',
         heightCm: p.heightCm ?? 170,
         currentWeightKg: p.currentWeightKg ?? 70,
@@ -119,6 +123,7 @@ export default function ProfilePage() {
   const onSubmit = async (data: ProfileForm) => {
     try {
       const payload: ProfileUpdateRequest = {
+        avatarUrl: data.avatarUrl || undefined,
         dateOfBirth: data.dateOfBirth || undefined,
         heightCm: data.heightCm,
         currentWeightKg: data.currentWeightKg,
@@ -127,6 +132,8 @@ export default function ProfilePage() {
         activityLevel: data.activityLevel,
       };
       await updateMutation.mutateAsync(payload);
+      // Обновляем user в authStore, чтобы шапка (Layout) увидела новый avatarUrl
+      await useAuthStore.getState().fetchMe();
       enqueueSnackbar('Профиль обновлён', { variant: 'success' });
     } catch (err) {
       const apiError = err as ApiError;
@@ -163,7 +170,11 @@ export default function ProfilePage() {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <UserAvatar username={user?.username ?? '?'} size={64} />
+           <UserAvatar
+             username={user?.username ?? '?'}
+             avatarUrl={profile.avatarUrl}
+             size={64}
+           />
             <Box>
               <Typography variant="h6">{user?.username}</Typography>
             </Box>
@@ -217,9 +228,21 @@ export default function ProfilePage() {
           </Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <TextField
-                label="Дата рождения"
+           <Stack spacing={3} sx={{ mt: 2 }}>
+             <Controller
+               name="avatarUrl"
+               control={control}
+               render={({ field }) => (
+                 <ImageUpload
+                   value={field.value || null}
+                   onChange={(url) => field.onChange(url ?? '')}
+                   label="Аватар"
+                 />
+               )}
+             />
+
+             <TextField
+               label="Дата рождения"
                 type="date"
                 fullWidth
                 slotProps={{ inputLabel: { shrink: true } }}
