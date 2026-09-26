@@ -275,3 +275,33 @@ export type DailyCaloriesDto = number;
 export interface ImageUploadResponse {
   imageUrl: string;
 }
+
+// ---------- Measurements (замеры тела) ----------
+
+export interface BodyMeasurementDto {
+  id: number;
+  measuredAt: string;
+  weightKg: number | null;
+  chestCm: number | null;
+  waistCm: number | null;
+  bellyCm: number | null;
+  hipsCm: number | null;
+  thighCm: number | null;
+  armCm: number | null;
+  neckCm: number | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface CreateBodyMeasurementRequest {
+  measuredAt: string;
+  weightKg?: number | null;
+  chestCm?: number | null;
+  waistCm?: number | null;
+  bellyCm?: number | null;
+  hipsCm?: number | null;
+  thighCm?: number | null;
+  armCm?: number | null;
+  neckCm?: number | null;
+  note?: string | null;
+}

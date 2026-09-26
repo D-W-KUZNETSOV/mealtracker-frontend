@@ -31,6 +31,7 @@ const navItems = [
   { label: 'Рецепты', path: '/recipes' },
   { label: 'Ингредиенты', path: '/ingredients' },
   { label: 'Дневник', path: '/diary' },
+  { label: 'Замеры', path: '/measurements' },   // ← новое
   { label: 'Цели', path: '/goals' },
   { label: 'Профиль', path: '/profile' },
 ];
