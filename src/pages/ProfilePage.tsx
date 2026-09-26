@@ -39,7 +39,7 @@ import type {
 const profileSchema = z.object({
   dateOfBirth: z.string().optional(),
   heightCm: z
-   .number({ message: 'Введите число' })
+    .number({ message: 'Введите число' })
     .min(50, 'Минимум 50 см')
     .max(250, 'Максимум 250 см'),
   currentWeightKg: z
@@ -75,11 +75,9 @@ const GENDER_LABELS: Record<Gender, string> = {
   FEMALE: 'Женский',
 };
 
-
-
 export default function ProfilePage() {
   const { enqueueSnackbar } = useSnackbar();
-const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((s) => s.user);
 
   const profileQuery = useProfile();
   const dailyCaloriesQuery = useDailyCalories();
@@ -109,11 +107,11 @@ const user = useAuthStore((s) => s.user);
       const p = profileQuery.data;
       reset({
         dateOfBirth: '',
-        heightCm: p.heightCm,
-        currentWeightKg: p.currentWeightKg,
-        targetWeightKg: p.targetWeightKg,
-        gender: p.gender,
-        activityLevel: p.activityLevel,
+        heightCm: p.heightCm ?? 170,
+        currentWeightKg: p.currentWeightKg ?? 70,
+        targetWeightKg: p.targetWeightKg ?? 70,
+        gender: p.gender ?? 'MALE',
+        activityLevel: p.activityLevel ?? 'MODERATE',
       });
     }
   }, [profileQuery.data, reset]);
@@ -149,7 +147,7 @@ const user = useAuthStore((s) => s.user);
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <Alert severity="error">
-        Ошибка загрузки: {(profileQuery.error as unknown as ApiError)?.message}
+        Ошибка загрузки: {(profileQuery.error as unknown as ApiError)?.message ?? 'Профиль не заполнен'}
       </Alert>
     );
   }
@@ -165,10 +163,7 @@ const user = useAuthStore((s) => s.user);
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <UserAvatar
-              username={user?.username ?? '?'}
-              size={64}
-            />
+            <UserAvatar username={user?.username ?? '?'} size={64} />
             <Box>
               <Typography variant="h6">{user?.username}</Typography>
             </Box>
@@ -177,26 +172,30 @@ const user = useAuthStore((s) => s.user);
       </Card>
 
       {/* Сводка */}
-      <Stack direction="row" spacing={3} sx={{ mb: 3 }}>
-        <Card sx={{ flex: 1 }}>
+      <Stack direction="row" spacing={3} sx={{ mb: 3, flexWrap: 'wrap' }}>
+        <Card sx={{ flex: 1, minWidth: 150 }}>
           <CardContent>
             <Typography variant="subtitle2" color="text.secondary">
               Возраст
             </Typography>
-            <Typography variant="h5">{profile.ageYears} лет</Typography>
+            <Typography variant="h5">
+              {profile.ageYears != null ? `${profile.ageYears} лет` : '—'}
+            </Typography>
           </CardContent>
         </Card>
 
-        <Card sx={{ flex: 1 }}>
+        <Card sx={{ flex: 1, minWidth: 150 }}>
           <CardContent>
             <Typography variant="subtitle2" color="text.secondary">
               ИМТ (BMI)
             </Typography>
-            <Typography variant="h5">{profile.bmi.toFixed(1)}</Typography>
+            <Typography variant="h5">
+              {profile.bmi != null ? profile.bmi.toFixed(1) : '—'}
+            </Typography>
           </CardContent>
         </Card>
 
-        <Card sx={{ flex: 1 }}>
+        <Card sx={{ flex: 1, minWidth: 150 }}>
           <CardContent>
             <Typography variant="subtitle2" color="text.secondary">
               Дневная норма
@@ -228,11 +227,12 @@ const user = useAuthStore((s) => s.user);
                 helperText="Формат: ГГГГ-ММ-ДД"
               />
 
-              <Stack direction="row" spacing={2}>
+              <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
                 <TextField
                   label="Рост, см"
                   type="number"
                   fullWidth
+                  sx={{ minWidth: 120 }}
                   slotProps={{ htmlInput: { step: '1', min: 50, max: 250 } }}
                   {...register('heightCm', { valueAsNumber: true })}
                   error={!!errors.heightCm}
@@ -242,6 +242,7 @@ const user = useAuthStore((s) => s.user);
                   label="Текущий вес, кг"
                   type="number"
                   fullWidth
+                  sx={{ minWidth: 120 }}
                   slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
                   {...register('currentWeightKg', { valueAsNumber: true })}
                   error={!!errors.currentWeightKg}
@@ -251,6 +252,7 @@ const user = useAuthStore((s) => s.user);
                   label="Целевой вес, кг"
                   type="number"
                   fullWidth
+                  sx={{ minWidth: 120 }}
                   slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
                   {...register('targetWeightKg', { valueAsNumber: true })}
                   error={!!errors.targetWeightKg}
@@ -259,25 +261,25 @@ const user = useAuthStore((s) => s.user);
               </Stack>
 
               {/* Пол */}
-               <FormControl>
-                 <FormLabel>Пол</FormLabel>
-                 <Controller
-                   name="gender"
-                   control={control}
-                   render={({ field }) => (
-                     <RadioGroup row {...field}>
-                       {(Object.keys(GENDER_LABELS) as Gender[]).map((g) => (
-                         <FormControlLabel
-                           key={g}
-                           value={g}
-                           control={<Radio />}
-                           label={GENDER_LABELS[g]}
-                         />
-                       ))}
-                     </RadioGroup>
-                   )}
-                 />
-               </FormControl>
+              <FormControl>
+                <FormLabel>Пол</FormLabel>
+                <Controller
+                  name="gender"
+                  control={control}
+                  render={({ field }) => (
+                    <RadioGroup row {...field}>
+                      {(Object.keys(GENDER_LABELS) as Gender[]).map((g) => (
+                        <FormControlLabel
+                          key={g}
+                          value={g}
+                          control={<Radio />}
+                          label={GENDER_LABELS[g]}
+                        />
+                      ))}
+                    </RadioGroup>
+                  )}
+                />
+              </FormControl>
 
               {/* Уровень активности */}
               <FormControl>
