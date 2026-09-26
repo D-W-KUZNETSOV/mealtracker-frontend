@@ -1,9 +1,9 @@
 // MealTracker Service Worker
-// Минимальный SW для установки PWA и офлайн-доступа к статике
+// Правильная стратегия обновления + офлайн-доступ к статике
 
-const CACHE_NAME = 'mealtracker-v1';
+const CACHE_VERSION = 'v2';                    // ← меняй при каждом деплое
+const CACHE_NAME = `mealtracker-${CACHE_VERSION}`;
 
-// Файлы, которые кэшируем при установке
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -13,20 +13,22 @@ const PRECACHE_URLS = [
   '/favicon.svg',
 ];
 
+// ============================================================
 // Установка: кэшируем статику
+// ============================================================
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing...');
+  console.log('[SW] Installing', CACHE_VERSION);
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_URLS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
-  self.skipWaiting();
+  self.skipWaiting();   // ← активируем сразу
 });
 
+// ============================================================
 // Активация: чистим старые кэши
+// ============================================================
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating', CACHE_VERSION);
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -36,34 +38,46 @@ self.addEventListener('activate', (event) => {
       )
     )
   );
-  self.clients.claim();
+  self.clients.claim();  // ← перехватываем контроль сразу
 });
 
-// Fetch: сначала сеть, при офлайне — кэш
+// ============================================================
+// Fetch: network-first для HTML, cache-first для статики
+// ============================================================
 self.addEventListener('fetch', (event) => {
-  // Пропускаем API-запросы (не кэшируем)
   const url = new URL(event.request.url);
+
+  // Пропускаем API-запросы
   if (url.pathname.startsWith('/api/')) {
     return;
   }
 
+  // Для навигации (HTML) — network-first, чтобы всегда свежий index.html
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Для остальных GET — network-first с fallback на cache
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Кэшируем успешные GET-запросы
         if (event.request.method === 'GET' && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return response;
       })
-      .catch(() => {
-        // Офлайн — отдаём из кэша
-        return caches.match(event.request).then((cached) => {
-          return cached || caches.match('/index.html');
-        });
-      })
+      .catch(() =>
+        caches.match(event.request).then((cached) => cached || caches.match('/index.html'))
+      )
   );
 });
