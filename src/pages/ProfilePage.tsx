@@ -301,10 +301,7 @@ const user = useAuthStore((s) => s.user);
                   )}
                 />
               </FormControl>
-              {/* TODO(backend): синхронизировать activityLevel между user_goals и user_profile */}
-              <Alert severity="info" sx={{ mt: 1 }}>
-                Уровень активности в профиле и целях — <b>независимые</b>. Меняйте его в обоих разделах отдельно.
-              </Alert>
+
               <Button
                 type="submit"
                 variant="contained"
