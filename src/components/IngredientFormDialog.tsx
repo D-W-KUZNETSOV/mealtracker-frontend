@@ -40,19 +40,19 @@ type IngredientForm = z.infer<typeof ingredientSchema>;
 
 interface IngredientFormDialogProps {
   open: boolean;
-  /** Если передан — режим редактирования */
   ingredient?: IngredientDto | null;
+  initialName?: string;
   loading?: boolean;
   onSubmit: (data: IngredientRequest) => void;
   onClose: () => void;
 }
-
 // ============================================================
 // Модалка создания / редактирования ингредиента.
 // ============================================================
 export default function IngredientFormDialog({
   open,
   ingredient,
+  initialName,
   loading = false,
   onSubmit,
   onClose,
@@ -76,25 +76,25 @@ export default function IngredientFormDialog({
   });
 
   // При открытии с ингредиентом — заполняем форму, иначе сбрасываем
-  useEffect(() => {
-    if (open) {
-      if (ingredient) {
-        reset({
-          name: ingredient.name,
-          proteinsPer100g: ingredient.proteinsPer100g,
-          fatsPer100g: ingredient.fatsPer100g,
-          carbsPer100g: ingredient.carbsPer100g,
-        });
-      } else {
-        reset({
-          name: '',
-          proteinsPer100g: 0,
-          fatsPer100g: 0,
-          carbsPer100g: 0,
-        });
-      }
-    }
-  }, [open, ingredient, reset]);
+   useEffect(() => {
+     if (open) {
+       if (ingredient) {
+         reset({
+           name: ingredient.name,
+           proteinsPer100g: ingredient.proteinsPer100g,
+           fatsPer100g: ingredient.fatsPer100g,
+           carbsPer100g: ingredient.carbsPer100g,
+         });
+       } else {
+         reset({
+           name: initialName ?? '',
+           proteinsPer100g: 0,
+           fatsPer100g: 0,
+           carbsPer100g: 0,
+         });
+       }
+     }
+   }, [open, ingredient, initialName, reset]);
 
   // Живой предпросмотр калорий
   const [p, f, c] = watch(['proteinsPer100g', 'fatsPer100g', 'carbsPer100g']);

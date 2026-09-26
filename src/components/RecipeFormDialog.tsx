@@ -25,10 +25,12 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
 import ImageUpload from './ImageUpload';
+import IngredientFormDialog from './IngredientFormDialog';
 
 import { useCreateRecipe } from '../hooks/useRecipes';
 import {
   useBaseIngredients,
+  useCreateIngredient,
   useMyIngredients,
 } from '../hooks/useIngredients';
 import type {
@@ -68,6 +70,7 @@ export default function RecipeFormDialog({
 }: RecipeFormDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const createMutation = useCreateRecipe();
+  const createIngredientMutation = useCreateIngredient();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -91,6 +94,14 @@ export default function RecipeFormDialog({
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE');
   const [rows, setRows] = useState<IngredientRow[]>([]);
 
+  // ---------- Состояние для создания ингредиента «на лету» ----------
+  const [ingredientDialogOpen, setIngredientDialogOpen] = useState(false);
+  const [newIngredientName, setNewIngredientName] = useState('');
+  const [targetRowTempId, setTargetRowTempId] = useState<number | null>(null);
+  const [inputValueByRow, setInputValueByRow] = useState<
+    Record<number, string>
+  >({});
+
   // ---------- Сброс формы при открытии ----------
   useEffect(() => {
     if (open) {
@@ -106,6 +117,7 @@ export default function RecipeFormDialog({
           weightInGrams: 100,
         },
       ]);
+      setInputValueByRow({});
     }
   }, [open]);
 
@@ -123,6 +135,11 @@ export default function RecipeFormDialog({
 
   const handleRemoveRow = (tempId: number) => {
     setRows((prev) => prev.filter((r) => r.tempId !== tempId));
+    setInputValueByRow((prev) => {
+      const copy = { ...prev };
+      delete copy[tempId];
+      return copy;
+    });
   };
 
   const handleRowChange = (
@@ -198,241 +215,323 @@ export default function RecipeFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Создать рецепт</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          {/* Название */}
-          <TextField
-            label="Название"
-            fullWidth
-            required
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+    <>
+      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+        <DialogTitle>Создать рецепт</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            {/* Название */}
+            <TextField
+              label="Название"
+              fullWidth
+              required
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-          {/* Категория */}
-          <Autocomplete
-            options={CATEGORIES}
-            freeSolo
-            value={category}
-            onChange={(_, v) => setCategory(v)}
-            renderInput={(params) => (
-              <TextField {...params} label="Категория" />
-            )}
-          />
+            {/* Категория */}
+            <Autocomplete
+              options={CATEGORIES}
+              freeSolo
+              value={category}
+              onChange={(_, v) => setCategory(v)}
+              renderInput={(params) => (
+                <TextField {...params} label="Категория" />
+              )}
+            />
 
-          {/* Описание */}
-          <TextField
-            label="Описание"
-            fullWidth
-            multiline
-            minRows={2}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+            {/* Описание */}
+            <TextField
+              label="Описание"
+              fullWidth
+              multiline
+              minRows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
 
-          {/* Картинка рецепта */}
-          <ImageUpload
-            value={imageUrl || null}
-            onChange={(url) => setImageUrl(url ?? '')}
-            label="Загрузить фото рецепта"
-          />
+            {/* Картинка рецепта */}
+            <ImageUpload
+              value={imageUrl || null}
+              onChange={(url) => setImageUrl(url ?? '')}
+              label="Загрузить фото рецепта"
+            />
 
-          {/* Видимость */}
-          <FormControl>
-            <FormLabel>Видимость</FormLabel>
-            <RadioGroup
-              row
-              value={visibility}
-              onChange={(e) =>
-                setVisibility(e.target.value as 'PUBLIC' | 'PRIVATE')
-              }
+            {/* Видимость */}
+            <FormControl>
+              <FormLabel>Видимость</FormLabel>
+              <RadioGroup
+                row
+                value={visibility}
+                onChange={(e) =>
+                  setVisibility(e.target.value as 'PUBLIC' | 'PRIVATE')
+                }
+              >
+                <FormControlLabel
+                  value="PRIVATE"
+                  control={<Radio />}
+                  label="Приватный (только я)"
+                />
+                <FormControlLabel
+                  value="PUBLIC"
+                  control={<Radio />}
+                  label="Публичный (всем)"
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <Divider />
+
+            {/* Заголовок ингредиентов */}
+            <Stack
+              direction="row"
+              sx={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
             >
-              <FormControlLabel
-                value="PRIVATE"
-                control={<Radio />}
-                label="Приватный (только я)"
-              />
-              <FormControlLabel
-                value="PUBLIC"
-                control={<Radio />}
-                label="Публичный (всем)"
-              />
-            </RadioGroup>
-          </FormControl>
+              <Typography variant="h6">Ингредиенты</Typography>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handleAddRow}
+                size="small"
+              >
+                Добавить ингредиент
+              </Button>
+            </Stack>
 
-          <Divider />
+            {/* Строки ингредиентов */}
+            {rows.length === 0 ? (
+              <Typography color="text.secondary">
+                Добавьте хотя бы один ингредиент
+              </Typography>
+            ) : (
+              <Stack spacing={1}>
+                {rows.map((row) => {
+                  const ing = allIngredients.find(
+                    (i) => i.id === row.ingredientId,
+                  );
+                  const itemCalories = ing
+                    ? (ing.caloriesPer100g * row.weightInGrams) / 100
+                    : 0;
 
-          {/* Заголовок ингредиентов */}
-          <Stack
-            direction="row"
-            sx={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Typography variant="h6">Ингредиенты</Typography>
-            <Button
-              startIcon={<AddIcon />}
-              onClick={handleAddRow}
-              size="small"
-            >
-              Добавить ингредиент
-            </Button>
-          </Stack>
-
-          {/* Строки ингредиентов */}
-          {rows.length === 0 ? (
-            <Typography color="text.secondary">
-              Добавьте хотя бы один ингредиент
-            </Typography>
-          ) : (
-            <Stack spacing={1}>
-              {rows.map((row) => {
-                const ing = allIngredients.find(
-                  (i) => i.id === row.ingredientId,
-                );
-                const itemCalories = ing
-                  ? (ing.caloriesPer100g * row.weightInGrams) / 100
-                  : 0;
-
-                return (
-                  <Paper key={row.tempId} variant="outlined" sx={{ p: 1.5 }}>
-                    <Stack
-                      direction={isMobile ? 'column' : 'row'}
-                      spacing={1}
-                      sx={{ alignItems: isMobile ? 'stretch' : 'center' }}
+                  return (
+                    <Paper
+                      key={row.tempId}
+                      variant="outlined"
+                      sx={{ p: 1.5 }}
                     >
-                      <Autocomplete
-                        options={allIngredients}
-                        getOptionLabel={(o) => o.name}
-                        value={ing ?? null}
-                        onChange={(_, v) =>
-                          handleRowChange(row.tempId, {
-                            ingredientId: v ? v.id : null,
-                          })
-                        }
-                        isOptionEqualToValue={(o, v) => o.id === v.id}
-                        renderOption={(props, option) => (
-                          <li {...props} key={option.id}>
-                            {option.name}
-                          </li>
-                        )}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Ингредиент"
-                            size="small"
-                            fullWidth
-                          />
-                        )}
-                        sx={{ flex: isMobile ? undefined : 2, width: '100%' }}
-                      />
-
                       <Stack
-                        direction="row"
+                        direction={isMobile ? 'column' : 'row'}
                         spacing={1}
-                        sx={{ alignItems: 'center' }}
+                        sx={{ alignItems: isMobile ? 'stretch' : 'center' }}
                       >
-                        <TextField
-                          label="Вес, г"
-                          type="number"
-                          size="small"
-                          value={row.weightInGrams}
-                          onChange={(e) =>
+                        <Autocomplete
+                          options={allIngredients}
+                          getOptionLabel={(o) => o.name}
+                          value={ing ?? null}
+                          onChange={(_, v) =>
                             handleRowChange(row.tempId, {
-                              weightInGrams: Number(e.target.value) || 0,
+                              ingredientId: v ? v.id : null,
                             })
                           }
-                          slotProps={{ htmlInput: { step: '1', min: 1 } }}
-                          sx={{ width: isMobile ? 120 : 100 }}
-                        />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
+                          isOptionEqualToValue={(o, v) => o.id === v.id}
+                          renderOption={(props, option) => (
+                            <li {...props} key={option.id}>
+                              {option.name}
+                            </li>
+                          )}
+                          inputValue={inputValueByRow[row.tempId] ?? ''}
+                          onInputChange={(_, value) =>
+                            setInputValueByRow((prev) => ({
+                              ...prev,
+                              [row.tempId]: value,
+                            }))
+                          }
+                          noOptionsText={
+                            <Box sx={{ p: 1 }}>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: 1 }}
+                              >
+                                Ингредиент не найден
+                              </Typography>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<AddIcon />}
+                                onClick={() => {
+                                  setNewIngredientName(
+                                    inputValueByRow[row.tempId] ?? '',
+                                  );
+                                  setTargetRowTempId(row.tempId);
+                                  setIngredientDialogOpen(true);
+                                }}
+                              >
+                                Создать «
+                                {inputValueByRow[row.tempId] || 'новый'}
+                                »
+                              </Button>
+                            </Box>
+                          }
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Ингредиент"
+                              size="small"
+                              fullWidth
+                            />
+                          )}
                           sx={{
-                            minWidth: 70,
-                            textAlign: 'right',
-                            flexGrow: isMobile ? 1 : 0,
+                            flex: isMobile ? undefined : 2,
+                            width: '100%',
                           }}
-                        >
-                          {roundNutrient(itemCalories)} ккал
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleRemoveRow(row.tempId)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                    </Stack>
-                  </Paper>
-                );
-              })}
-            </Stack>
-          )}
+                        />
 
-          {/* Итого КБЖУ */}
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              gutterBottom
-            >
-              Итого по рецепту
-            </Typography>
-            <Stack direction="row" spacing={4}>
-              <Box>
-                <Typography variant="h6">
-                  {roundNutrient(totals.calories)} ккал
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Калории
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h6">
-                  {roundNutrient(totals.proteins)} г
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Белки
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h6">
-                  {roundNutrient(totals.fats)} г
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Жиры
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h6">
-                  {roundNutrient(totals.carbs)} г
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Углеводы
-                </Typography>
-              </Box>
-            </Stack>
-          </Paper>
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={createMutation.isPending}>
-          Отмена
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={!canSubmit || createMutation.isPending}
-        >
-          {createMutation.isPending ? 'Создание...' : 'Создать'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          sx={{ alignItems: 'center' }}
+                        >
+                          <TextField
+                            label="Вес, г"
+                            type="number"
+                            size="small"
+                            value={row.weightInGrams}
+                            onChange={(e) =>
+                              handleRowChange(row.tempId, {
+                                weightInGrams: Number(e.target.value) || 0,
+                              })
+                            }
+                            slotProps={{ htmlInput: { step: '1', min: 1 } }}
+                            sx={{ width: isMobile ? 120 : 100 }}
+                          />
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              minWidth: 70,
+                              textAlign: 'right',
+                              flexGrow: isMobile ? 1 : 0,
+                            }}
+                          >
+                            {roundNutrient(itemCalories)} ккал
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRemoveRow(row.tempId)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </Stack>
+                    </Paper>
+                  );
+                })}
+              </Stack>
+            )}
+
+            {/* Итого КБЖУ */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                gutterBottom
+              >
+                Итого по рецепту
+              </Typography>
+              <Stack direction="row" spacing={4}>
+                <Box>
+                  <Typography variant="h6">
+                    {roundNutrient(totals.calories)} ккал
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Калории
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="h6">
+                    {roundNutrient(totals.proteins)} г
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Белки
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="h6">
+                    {roundNutrient(totals.fats)} г
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Жиры
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="h6">
+                    {roundNutrient(totals.carbs)} г
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Углеводы
+                  </Typography>
+                </Box>
+              </Stack>
+            </Paper>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} disabled={createMutation.isPending}>
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!canSubmit || createMutation.isPending}
+          >
+            {createMutation.isPending ? 'Создание...' : 'Создать'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Диалог создания нового ингредиента */}
+      <IngredientFormDialog
+        open={ingredientDialogOpen}
+        initialName={newIngredientName}
+        loading={createIngredientMutation.isPending}
+        onClose={() => {
+          setIngredientDialogOpen(false);
+          setNewIngredientName('');
+          setTargetRowTempId(null);
+        }}
+        onSubmit={async (data) => {
+          try {
+            const result = await createIngredientMutation.mutateAsync(data);
+            const newIngredient = result.data;
+            enqueueSnackbar(`Ингредиент «${newIngredient.name}» создан`, {
+              variant: 'success',
+            });
+            if (targetRowTempId !== null) {
+              handleRowChange(targetRowTempId, {
+                ingredientId: newIngredient.id,
+              });
+              setInputValueByRow((prev) => ({
+                ...prev,
+                [targetRowTempId]: newIngredient.name,
+              }));
+            }
+            setIngredientDialogOpen(false);
+            setNewIngredientName('');
+            setTargetRowTempId(null);
+          } catch (err) {
+            const apiError = err as ApiError;
+            enqueueSnackbar(
+              apiError.message || 'Ошибка создания ингредиента',
+              { variant: 'error' },
+            );
+          }
+        }}
+      />
+    </>
   );
 }
