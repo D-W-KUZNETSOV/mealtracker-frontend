@@ -14,8 +14,6 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Radio,
-  RadioGroup,
   Stack,
   TextField,
   Typography,
@@ -27,11 +25,7 @@ import {
   useSaveGoals,
   useTargetProtein,
 } from '../hooks/useNutrition';
-import type {
-  ActivityLevel,
-  ApiError,
-  GoalType,
-} from '../types/api';
+import type { ApiError, GoalType } from '../types/api';
 
 // ============================================================
 // Схема валидации
@@ -41,35 +35,14 @@ const goalsSchema = z.object({
     .number({ message: 'Введите число' })
     .min(20, 'Минимум 20 кг')
     .max(300, 'Максимум 300 кг'),
-  proteinPerKg: z
-    .number({ message: 'Введите число' })
-    .min(0.5, 'Минимум 0.5 г/кг')
-    .max(5, 'Максимум 5 г/кг'),
-  targetCalories: z
-    .number({ message: 'Введите число' })
-    .min(500, 'Минимум 500 ккал')
-    .max(10000, 'Максимум 10000 ккал'),
-  activityLevel: z.enum([
-    'SEDENTARY',
-    'LIGHT',
-    'MODERATE',
-    'HIGH',
-    'VERY_HIGH',
-  ]),
+  proteinPerKg: z.number().optional(),       // для совместимости
+  targetCalories: z.number().optional(),     // для совместимости
   goalType: z.enum(['LOSE_WEIGHT', 'MAINTAIN', 'GAIN_MUSCLE']),
   targetProteinOverride: z.number().nullable(),
   targetCaloriesOverride: z.number().nullable(),
 });
 
 type GoalsForm = z.infer<typeof goalsSchema>;
-
-const ACTIVITY_LABELS: Record<ActivityLevel, string> = {
-  SEDENTARY: 'Сидячий образ жизни',
-  LIGHT: 'Лёгкая активность (1–2 раза в неделю)',
-  MODERATE: 'Умеренная активность (3–4 раза в неделю)',
-  HIGH: 'Высокая активность (5–6 раз в неделю)',
-  VERY_HIGH: 'Очень высокая (ежедневно / физическая работа)',
-};
 
 const GOAL_LABELS: Record<GoalType, string> = {
   LOSE_WEIGHT: 'Похудеть',
@@ -84,7 +57,6 @@ export default function GoalsPage() {
   const targetProteinQuery = useTargetProtein();
   const saveMutation = useSaveGoals();
 
-  // Чекбоксы «авто/ручной» для калорий и белка
   const [autoCalories, setAutoCalories] = useState(true);
   const [autoProtein, setAutoProtein] = useState(true);
 
@@ -101,14 +73,12 @@ export default function GoalsPage() {
       currentWeightKg: 70,
       proteinPerKg: 1.6,
       targetCalories: 2000,
-      activityLevel: 'MODERATE',
       goalType: 'MAINTAIN',
       targetProteinOverride: null,
       targetCaloriesOverride: null,
     },
   });
 
-  // Заполняем форму, когда приходят текущие цели
   useEffect(() => {
     if (goalsQuery.data) {
       const g = goalsQuery.data;
@@ -116,30 +86,30 @@ export default function GoalsPage() {
         currentWeightKg: g.currentWeightKg ?? 70,
         proteinPerKg: g.proteinPerKg ?? 1.6,
         targetCalories: g.targetCalories ?? 2000,
-        activityLevel: g.activityLevel ?? 'MODERATE',
         goalType: g.goalType ?? 'MAINTAIN',
         targetProteinOverride: g.targetProteinOverride ?? null,
         targetCaloriesOverride: g.targetCaloriesOverride ?? null,
       });
-      // Если override задан — значит, вручную
       setAutoProtein(g.targetProteinOverride == null);
       setAutoCalories(g.targetCaloriesOverride == null);
     }
   }, [goalsQuery.data, reset]);
 
-  // Следим за формой, чтобы показывать правильные значения
   const goalType = watch('goalType');
   const currentWeight = watch('currentWeightKg');
 
   const onSubmit = async (data: GoalsForm) => {
     try {
-      // Если авто — обнуляем override
       const payload = {
-        ...data,
+        currentWeightKg: data.currentWeightKg,
+        proteinPerKg: data.proteinPerKg ?? 1.6,
+        targetCalories: data.targetCalories ?? 2000,
+        goalType: data.goalType,
         targetProteinOverride: autoProtein ? null : data.targetProteinOverride,
         targetCaloriesOverride: autoCalories ? null : data.targetCaloriesOverride,
       };
       await saveMutation.mutateAsync(payload);
+
       enqueueSnackbar('Цели сохранены', { variant: 'success' });
     } catch (err) {
       const apiError = err as ApiError;
@@ -241,7 +211,11 @@ export default function GoalsPage() {
                   name="goalType"
                   control={control}
                   render={({ field }) => (
-                    <Stack direction="row" spacing={1} sx={{ mt: 1, flexWrap: 'wrap' }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mt: 1, flexWrap: 'wrap' }}
+                    >
                       {(Object.keys(GOAL_LABELS) as GoalType[]).map((g) => (
                         <Chip
                           key={g}
@@ -252,29 +226,6 @@ export default function GoalsPage() {
                         />
                       ))}
                     </Stack>
-                  )}
-                />
-              </FormControl>
-
-              {/* Уровень активности */}
-              <FormControl>
-                <FormLabel>Уровень активности</FormLabel>
-                <Controller
-                  name="activityLevel"
-                  control={control}
-                  render={({ field }) => (
-                    <RadioGroup {...field}>
-                      {(Object.keys(ACTIVITY_LABELS) as ActivityLevel[]).map(
-                        (level) => (
-                          <FormControlLabel
-                            key={level}
-                            value={level}
-                            control={<Radio />}
-                            label={ACTIVITY_LABELS[level]}
-                          />
-                        ),
-                      )}
-                    </RadioGroup>
                   )}
                 />
               </FormControl>
@@ -293,7 +244,8 @@ export default function GoalsPage() {
                 {autoCalories ? (
                   <Alert severity="info" sx={{ mt: 1 }}>
                     Калории рассчитываются по формуле Миффлина–Сан Жеора
-                    с учётом вашего пола, возраста, роста, веса и активности.
+                    с учётом вашего пола, возраста, роста, веса и уровня
+                    активности <b>из профиля</b>.
                   </Alert>
                 ) : (
                   <TextField
@@ -301,8 +253,12 @@ export default function GoalsPage() {
                     type="number"
                     fullWidth
                     sx={{ mt: 1 }}
-                    slotProps={{ htmlInput: { step: '1', min: 500, max: 10000 } }}
-                    {...register('targetCaloriesOverride', { valueAsNumber: true })}
+                    slotProps={{
+                      htmlInput: { step: '1', min: 500, max: 10000 },
+                    }}
+                    {...register('targetCaloriesOverride', {
+                      valueAsNumber: true,
+                    })}
                     error={!!errors.targetCaloriesOverride}
                     helperText={errors.targetCaloriesOverride?.message}
                   />
@@ -327,8 +283,14 @@ export default function GoalsPage() {
                     {goalType === 'MAINTAIN' && '1.6 г/кг (поддержание)'}
                     {goalType === 'GAIN_MUSCLE' && '1.8 г/кг (набор массы)'}
                     {' '}→ ~
-                    {Math.round((currentWeight || 0) *
-                      (goalType === 'LOSE_WEIGHT' ? 2.0 : goalType === 'GAIN_MUSCLE' ? 1.8 : 1.6))}{' '}
+                    {Math.round(
+                      (currentWeight || 0) *
+                        (goalType === 'LOSE_WEIGHT'
+                          ? 2.0
+                          : goalType === 'GAIN_MUSCLE'
+                            ? 1.8
+                            : 1.6),
+                    )}{' '}
                     г/день
                   </Alert>
                 ) : (
@@ -338,20 +300,28 @@ export default function GoalsPage() {
                     fullWidth
                     sx={{ mt: 1 }}
                     slotProps={{ htmlInput: { step: '1', min: 10, max: 500 } }}
-                    {...register('targetProteinOverride', { valueAsNumber: true })}
+                    {...register('targetProteinOverride', {
+                      valueAsNumber: true,
+                    })}
                     error={!!errors.targetProteinOverride}
                     helperText={errors.targetProteinOverride?.message}
                   />
                 )}
               </Box>
 
-              {/* Старое поле proteinPerKg — оставляем скрытым для совместимости */}
-              <input type="hidden" {...register('proteinPerKg', { valueAsNumber: true })} />
-              <input type="hidden" {...register('targetCalories', { valueAsNumber: true })} />
+              {/* Скрытые поля для совместимости с API */}
+              <input
+                type="hidden"
+                {...register('proteinPerKg', { valueAsNumber: true })}
+              />
+              <input
+                type="hidden"
+                {...register('targetCalories', { valueAsNumber: true })}
+              />
 
               <Alert severity="info">
-                Уровень активности в профиле и целях — <b>независимые</b>.
-                Меняйте его в обоих разделах отдельно.
+                Уровень активности настраивается в разделе{' '}
+                <b>«Профиль»</b> и используется при расчёте калорий.
               </Alert>
 
               <Button

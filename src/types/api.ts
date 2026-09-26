@@ -227,7 +227,6 @@ export interface UserGoalsDto {
   goalType: GoalType;                    // ← новое
   targetProteinOverride: number | null;  // ← новое
   targetCaloriesOverride: number | null; // ← новое
-  activityLevel: ActivityLevel;
   createdAt: string;
 }
 
@@ -235,7 +234,6 @@ export interface GoalsRequest {
   currentWeightKg: number;
   proteinPerKg: number;
   targetCalories: number;
-  activityLevel: ActivityLevel;
   goalType: GoalType;                    // ← новое
   targetProteinOverride: number | null;  // ← новое
   targetCaloriesOverride: number | null; // ← новое
