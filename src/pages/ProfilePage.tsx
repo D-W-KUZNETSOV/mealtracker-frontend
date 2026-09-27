@@ -13,6 +13,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Grid,
   Radio,
   RadioGroup,
   Stack,
@@ -155,7 +156,9 @@ export default function ProfilePage() {
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <Alert severity="error">
-        Ошибка загрузки: {(profileQuery.error as unknown as ApiError)?.message ?? 'Профиль не заполнен'}
+        Ошибка загрузки:{' '}
+        {(profileQuery.error as unknown as ApiError)?.message ??
+          'Профиль не заполнен'}
       </Alert>
     );
   }
@@ -168,14 +171,15 @@ export default function ProfilePage() {
         Профиль
       </Typography>
 
+      {/* ============ Аватар + имя ============ */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-           <UserAvatar
-             username={user?.username ?? '?'}
-             avatarUrl={profile.avatarUrl}
-             size={64}
-           />
+            <UserAvatar
+              username={user?.username ?? '?'}
+              avatarUrl={profile.avatarUrl}
+              size={64}
+            />
             <Box>
               <Typography variant="h6">{user?.username}</Typography>
             </Box>
@@ -183,48 +187,58 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
-      {/* Сводка */}
-      <Stack direction="row" spacing={3} sx={{ mb: 3, flexWrap: 'wrap' }}>
-        <Card sx={{ flex: 1, minWidth: 150 }}>
-          <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Возраст
-            </Typography>
-            <Typography variant="h5">
-              {profile.ageYears != null ? `${profile.ageYears} лет` : '—'}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ flex: 1, minWidth: 150 }}>
-          <CardContent>
-            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+      {/* ============ Сводка ============ */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
               <Typography variant="subtitle2" color="text.secondary">
-                ИМТ (BMI)
+                Возраст
               </Typography>
-              <InfoTooltip title={tooltips.bmi} />
-            </Stack>
-            <Typography variant="h5">
-              {profile.bmi != null ? profile.bmi.toFixed(1) : '—'}
-            </Typography>
-          </CardContent>
-        </Card>
+              <Typography variant="h5">
+                {profile.ageYears != null ? `${profile.ageYears} лет` : '—'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <Card sx={{ flex: 1, minWidth: 150 }}>
-          <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Дневная норма
-            </Typography>
-            <Typography variant="h5">
-              {dailyCaloriesQuery.data != null
-                ? `${dailyCaloriesQuery.data} ккал`
-                : '—'}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Stack>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{ alignItems: 'center' }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  ИМТ (BMI)
+                </Typography>
+                <InfoTooltip title={tooltips.bmi} />
+              </Stack>
+              <Typography variant="h5">
+                {profile.bmi != null ? profile.bmi.toFixed(1) : '—'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-      {/* Форма */}
+        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Дневная норма
+              </Typography>
+              <Typography variant="h5">
+                {dailyCaloriesQuery.data != null
+                  ? `${dailyCaloriesQuery.data} ккал`
+                  : '—'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* ============ Форма ============ */}
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -232,21 +246,21 @@ export default function ProfilePage() {
           </Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-           <Stack spacing={3} sx={{ mt: 2 }}>
-             <Controller
-               name="avatarUrl"
-               control={control}
-               render={({ field }) => (
-                 <ImageUpload
-                   value={field.value || null}
-                   onChange={(url) => field.onChange(url ?? '')}
-                   label="Аватар"
-                 />
-               )}
-             />
+            <Stack spacing={3} sx={{ mt: 2 }}>
+              <Controller
+                name="avatarUrl"
+                control={control}
+                render={({ field }) => (
+                  <ImageUpload
+                    value={field.value || null}
+                    onChange={(url) => field.onChange(url ?? '')}
+                    label="Аватар"
+                  />
+                )}
+              />
 
-             <TextField
-               label="Дата рождения"
+              <TextField
+                label="Дата рождения"
                 type="date"
                 fullWidth
                 slotProps={{ inputLabel: { shrink: true } }}
