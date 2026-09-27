@@ -27,6 +27,7 @@ import { useTodayStats } from '../hooks/useStats';
 import { useGoals } from '../hooks/useNutrition';
 import { useProfile } from '../hooks/useProfile';
 import MiniProgressWidget from '../components/MiniProgressWidget';
+import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -126,8 +127,9 @@ export default function DashboardPage() {
           <Card>
             <CardContent>
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-                <FireIcon color="error" />
-                <Typography variant="h6">Калории сегодня</Typography>
+               <FireIcon color="error" />
+               <Typography variant="h6">Калории сегодня</Typography>
+               <InfoTooltip title={tooltips.calories} />
               </Stack>
 
               <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
@@ -162,6 +164,7 @@ export default function DashboardPage() {
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
                 <ProteinIcon color="success" />
                 <Typography variant="h6">Белки</Typography>
+                <InfoTooltip title={tooltips.protein} />
               </Stack>
 
               <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>

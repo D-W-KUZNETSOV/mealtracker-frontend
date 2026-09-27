@@ -21,6 +21,7 @@ import {
 } from 'recharts';
 
 import { useMeasurements } from '../hooks/useMeasurements';
+import InfoTooltip, { tooltips } from './InfoTooltip';
 
 // ============================================================
 // Мини-виджет прогресса веса для дашборда.
@@ -78,12 +79,15 @@ export default function MiniProgressWidget() {
               gap: 2,
             }}
           >
-            <Box>
-              <Typography variant="h6">Прогресс веса</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Добавь первый замер, чтобы видеть прогресс
-              </Typography>
-            </Box>
+           <Box>
+             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+               <Typography variant="h6">Прогресс веса</Typography>
+               <InfoTooltip title={tooltips.weightProgress} />
+             </Stack>
+             <Typography variant="caption" color="text.secondary">
+               Добавь первый замер, чтобы видеть прогресс
+             </Typography>
+           </Box>
             <Button
               variant="contained"
               endIcon={<ArrowForwardIcon />}
@@ -134,10 +138,11 @@ export default function MiniProgressWidget() {
           }}
         >
           <Box>
-            <Typography variant="h6">Прогресс веса</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Последние {weightData.length} {getMeasurementWord(weightData.length)}
-            </Typography>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+              <Typography variant="h6">Прогресс веса</Typography>
+              <InfoTooltip title={tooltips.weightProgress} />
+            </Stack>
+            {/* caption убираем — при 0 замерах он не нужен */}
           </Box>
 
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -202,14 +207,4 @@ export default function MiniProgressWidget() {
       </CardContent>
     </Card>
   );
-}
-// ============================================================
-// Склонение слова «замер»
-// ============================================================
-function getMeasurementWord(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return 'замер';
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'замера';
-  return 'замеров';
 }

@@ -33,6 +33,7 @@ import type {
   Gender,
   ProfileUpdateRequest,
 } from '../types/api';
+import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 
 // ============================================================
 // Схема валидации
@@ -197,9 +198,12 @@ export default function ProfilePage() {
 
         <Card sx={{ flex: 1, minWidth: 150 }}>
           <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              ИМТ (BMI)
-            </Typography>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                ИМТ (BMI)
+              </Typography>
+              <InfoTooltip title={tooltips.bmi} />
+            </Stack>
             <Typography variant="h5">
               {profile.bmi != null ? profile.bmi.toFixed(1) : '—'}
             </Typography>

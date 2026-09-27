@@ -26,6 +26,7 @@ import {
   useTargetProtein,
 } from '../hooks/useNutrition';
 import type { ApiError, GoalType } from '../types/api';
+import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 
 // ============================================================
 // Схема валидации
@@ -232,15 +233,18 @@ export default function GoalsPage() {
 
               {/* Калории */}
               <Box>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={autoCalories}
-                      onChange={(e) => setAutoCalories(e.target.checked)}
-                    />
-                  }
-                  label="Рассчитать калории автоматически"
-                />
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={autoCalories}
+                        onChange={(e) => setAutoCalories(e.target.checked)}
+                      />
+                    }
+                    label="Рассчитать калории автоматически"
+                  />
+                  <InfoTooltip title={tooltips.calories} />
+                </Stack>
                 {autoCalories ? (
                   <Alert severity="info" sx={{ mt: 1 }}>
                     Калории рассчитываются по формуле Миффлина–Сан Жеора
@@ -267,15 +271,18 @@ export default function GoalsPage() {
 
               {/* Белок */}
               <Box>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={autoProtein}
-                      onChange={(e) => setAutoProtein(e.target.checked)}
-                    />
-                  }
-                  label="Рассчитать белок автоматически"
-                />
+                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={autoProtein}
+                        onChange={(e) => setAutoProtein(e.target.checked)}
+                      />
+                    }
+                    label="Рассчитать белок автоматически"
+                  />
+                  <InfoTooltip title={tooltips.protein} />
+                </Stack>
                 {autoProtein ? (
                   <Alert severity="info" sx={{ mt: 1 }}>
                     Белок рассчитывается по цели:{' '}
