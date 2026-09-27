@@ -28,6 +28,7 @@ import UserAvatar from './UserAvatar';
 
 // Пункты меню навигации
 const navItems = [
+    { label: 'Главная', path: '/' },
   { label: 'Рецепты', path: '/recipes' },
   { label: 'Ингредиенты', path: '/ingredients' },
   { label: 'Дневник', path: '/diary' },
@@ -81,20 +82,21 @@ export default function Layout() {
           )}
 
           <RestaurantMenuIcon sx={{ mr: 1 }} />
-          <Typography
-            variant="h6"
-            component={RouterLink}
-            to="/recipes"
-            sx={{
-              color: 'inherit',
-              textDecoration: 'none',
-              mr: 4,
-              fontWeight: 600,
-              flexGrow: isMobile ? 1 : 0,
-            }}
-          >
-            MealTracker
-          </Typography>
+        <RestaurantMenuIcon sx={{ mr: 1 }} />
+        <Typography
+          variant="h6"
+          component={RouterLink}
+          to="/"
+          sx={{
+            color: 'inherit',
+            textDecoration: 'none',
+            mr: 4,
+            fontWeight: 600,
+            flexGrow: isMobile ? 1 : 0,
+          }}
+        >
+          MealTracker
+        </Typography>
 
           {/* Меню только на десктопе */}
           {!isMobile && (
