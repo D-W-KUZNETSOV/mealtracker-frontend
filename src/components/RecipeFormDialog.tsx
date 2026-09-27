@@ -17,6 +17,8 @@ import {
   RadioGroup,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   useMediaQuery,
   useTheme,
@@ -38,6 +40,7 @@ import type {
   IngredientDto,
   RecipeIngredientInput,
   RecipeRequest,
+   UnitType,
 } from '../types/api';
 import { roundNutrient } from '../types/api';
 
@@ -47,7 +50,9 @@ import { roundNutrient } from '../types/api';
 interface IngredientRow {
   tempId: number;
   ingredientId: number | null;
-  weightInGrams: number;
+  weightInGrams: number;       // всегда в граммах (для API)
+  quantity?: number;           // в выбранной единице (для UI)
+  unit?: UnitType;             // текущая единица (GRAM, PIECE, ML, ...)
 }
 
 interface RecipeFormDialogProps {
@@ -110,29 +115,32 @@ export default function RecipeFormDialog({
       setDescription('');
       setImageUrl('');
       setVisibility('PRIVATE');
-      setRows([
-        {
-          tempId: Date.now(),
-          ingredientId: null,
-          weightInGrams: 100,
-        },
-      ]);
+     setRows([
+       {
+         tempId: Date.now(),
+         ingredientId: null,
+         weightInGrams: 100,
+         quantity: 100,
+         unit: 'GRAM',
+       },
+     ]);
       setInputValueByRow({});
     }
   }, [open]);
 
   // ---------- Работа со строками ингредиентов ----------
-  const handleAddRow = () => {
-    setRows((prev) => [
-      ...prev,
-      {
-        tempId: Date.now() + Math.random(),
-        ingredientId: null,
-        weightInGrams: 100,
-      },
-    ]);
-  };
-
+ const handleAddRow = () => {
+   setRows((prev) => [
+     ...prev,
+     {
+       tempId: Date.now() + Math.random(),
+       ingredientId: null,
+       weightInGrams: 100,
+       quantity: 100,
+       unit: 'GRAM',
+     },
+   ]);
+ };
   const handleRemoveRow = (tempId: number) => {
     setRows((prev) => prev.filter((r) => r.tempId !== tempId));
     setInputValueByRow((prev) => {
@@ -150,6 +158,73 @@ export default function RecipeFormDialog({
       prev.map((r) => (r.tempId === tempId ? { ...r, ...patch } : r)),
     );
   };
+    // ============================================================
+    // Единицы измерения
+    // ============================================================
+
+    const getUnitLabel = (row: IngredientRow, ing?: IngredientDto): string => {
+      const unit = row.unit ?? ing?.unitType ?? 'GRAM';
+      switch (unit) {
+        case 'GRAM':
+          return 'Вес, г';
+        case 'ML':
+          return 'Объём, мл';
+        case 'PIECE':
+          return 'Кол-во, шт';
+        case 'TBSP':
+          return 'Кол-во, ст.л.';
+        case 'TSP':
+          return 'Кол-во, ч.л.';
+        default:
+          return 'Кол-во';
+      }
+    };
+
+    const handleQuantityChange = (
+      tempId: number,
+      quantity: number,
+      ing?: IngredientDto,
+    ) => {
+      const row = rows.find((r) => r.tempId === tempId);
+      const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
+
+      let weightInGrams = quantity;
+
+      if (unit !== 'GRAM' && ing?.unitWeightGrams != null) {
+        weightInGrams = quantity * ing.unitWeightGrams;
+      }
+
+      handleRowChange(tempId, {
+        quantity,
+        unit,
+        weightInGrams,
+      });
+    };
+
+    const handleUnitChange = (
+      tempId: number,
+      newUnit: UnitType,
+      ing?: IngredientDto,
+    ) => {
+      const row = rows.find((r) => r.tempId === tempId);
+      if (!row) return;
+
+      let quantity: number;
+
+      if (newUnit === 'GRAM') {
+        quantity = row.weightInGrams;
+      } else if (ing?.unitWeightGrams != null) {
+        quantity = row.weightInGrams / ing.unitWeightGrams;
+        quantity = Math.round(quantity * 100) / 100;
+      } else {
+        quantity = row.weightInGrams;
+      }
+
+      handleRowChange(tempId, {
+        unit: newUnit,
+        quantity,
+      });
+    };
 
   // ---------- Живой предпросмотр КБЖУ ----------
   const totals = useMemo(() => {
@@ -331,11 +406,14 @@ export default function RecipeFormDialog({
                           options={allIngredients}
                           getOptionLabel={(o) => o.name}
                           value={ing ?? null}
-                          onChange={(_, v) =>
+                          onChange={(_, v) => {
+                            const initialUnit = v?.unitType ?? 'GRAM';
                             handleRowChange(row.tempId, {
                               ingredientId: v ? v.id : null,
-                            })
-                          }
+                              unit: initialUnit,
+                              quantity: initialUnit === 'GRAM' ? row.weightInGrams : 1,
+                            });
+                          }}
                           isOptionEqualToValue={(o, v) => o.id === v.id}
                           renderOption={(props, option) => (
                             <li {...props} key={option.id}>
@@ -390,44 +468,95 @@ export default function RecipeFormDialog({
                           }}
                         />
 
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          sx={{ alignItems: 'center' }}
-                        >
-                          <TextField
-                            label="Вес, г"
-                            type="number"
-                            size="small"
-                            value={row.weightInGrams}
-                            onChange={(e) =>
-                              handleRowChange(row.tempId, {
-                                weightInGrams: Number(e.target.value) || 0,
-                              })
-                            }
-                            slotProps={{ htmlInput: { step: '1', min: 1 } }}
-                            sx={{ width: isMobile ? 120 : 100 }}
-                          />
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{
-                              minWidth: 70,
-                              textAlign: 'right',
-                              flexGrow: isMobile ? 1 : 0,
-                            }}
-                          >
-                            {roundNutrient(itemCalories)} ккал
-                          </Typography>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleRemoveRow(row.tempId)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Stack>
-                      </Stack>
+                           <Stack
+                                                direction="row"
+                                                spacing={1}
+                                                sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                                              >
+                                                <Stack
+                                                  direction="row"
+                                                  spacing={0.5}
+                                                  sx={{ alignItems: 'center' }}
+                                                >
+                                                  <TextField
+                                                    label={getUnitLabel(row, ing)}
+                                                    size="small"
+                                                    value={row.quantity ?? row.weightInGrams}
+                                                    onChange={(e) => {
+                                                      const raw = e.target.value;
+                                                      // пустая строка → 0 (для валидности), но не перезаписываем сразу
+                                                      if (raw === '') {
+                                                        handleQuantityChange(row.tempId, 0, ing);
+                                                        return;
+                                                      }
+                                                      const val = Number(raw.replace(',', '.'));
+                                                      if (!Number.isNaN(val)) {
+                                                        handleQuantityChange(row.tempId, val, ing);
+                                                      }
+                                                    }}
+                                                    onFocus={(e) => e.target.select()}
+                                                    slotProps={{
+                                                      htmlInput: {
+                                                        step: '0.1',
+                                                        min: 0.1,
+                                                        inputMode: 'decimal',
+                                                      },
+                                                    }}
+                                                    sx={{ width: isMobile ? 110 : 100 }}
+                                                  />
+
+                                                  {/* Переключатель единиц — только если у ингредиента задан unitWeightGrams */}
+                                                  {ing?.unitWeightGrams != null && (
+                                                    <ToggleButtonGroup
+                                                      size="small"
+                                                      exclusive
+                                                      value={row.unit ?? ing.unitType ?? 'GRAM'}
+                                                      onChange={(_, v) => {
+                                                        if (v) {
+                                                          handleUnitChange(row.tempId, v, ing);
+                                                        }
+                                                      }}
+                                                    >
+                                                      <ToggleButton value="GRAM">г</ToggleButton>
+                                                      {ing.unitType === 'ML' && (
+                                                        <ToggleButton value="ML">мл</ToggleButton>
+                                                      )}
+                                                      {ing.unitType === 'PIECE' && (
+                                                        <ToggleButton value="PIECE">шт</ToggleButton>
+                                                      )}
+                                                      {ing.unitType === 'TBSP' && (
+                                                        <ToggleButton value="TBSP">ст.л.</ToggleButton>
+                                                      )}
+                                                      {ing.unitType === 'TSP' && (
+                                                        <ToggleButton value="TSP">ч.л.</ToggleButton>
+                                                      )}
+                                                    </ToggleButtonGroup>
+                                                  )}
+                                                </Stack>
+
+                                                <Typography
+                                                  variant="body2"
+                                                  color="text.secondary"
+                                                  sx={{
+                                                    minWidth: 70,
+                                                    textAlign: 'right',
+                                                    flexGrow: isMobile ? 1 : 0,
+                                                  }}
+                                                >
+                                                  {roundNutrient(itemCalories)} ккал
+                                                </Typography>
+                                                <IconButton
+                                                  size="small"
+                                                  color="error"
+                                                  onClick={() => handleRemoveRow(row.tempId)}
+                                                >
+                                                  <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                                </Stack>
+
+                                             </Stack>
+
+
                     </Paper>
                   );
                 })}

@@ -68,6 +68,8 @@ export interface IngredientDto {
   proteinsPer100g: number;
   fatsPer100g: number;
   carbsPer100g: number;
+  unitType: UnitType;
+  unitWeightGrams: number | null;
 }
 
 export interface IngredientRequest {
@@ -75,6 +77,8 @@ export interface IngredientRequest {
   proteinsPer100g: number;
   fatsPer100g: number;
   carbsPer100g: number;
+  unitType?: UnitType;
+  unitWeightGrams?: number | null;
 }
 
 // ---------- Recipes ----------
@@ -214,7 +218,11 @@ export type ActivityLevel =
   | 'HIGH'
   | 'VERY_HIGH';
 
+  export type UnitType = 'GRAM' | 'ML' | 'PIECE' | 'TBSP' | 'TSP' | 'CUP';
+
 export type Gender = 'MALE' | 'FEMALE';
+
+
 
 // ---------- Nutrition (цели) ----------
 
