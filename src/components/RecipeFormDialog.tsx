@@ -192,7 +192,7 @@ export default function RecipeFormDialog({
 
       if (unit !== 'GRAM' && ing?.unitWeightGrams != null) {
         weightInGrams = quantity * ing.unitWeightGrams;
-      }
+}
 
       handleRowChange(tempId, {
         quantity,
@@ -478,32 +478,32 @@ export default function RecipeFormDialog({
                                                   spacing={0.5}
                                                   sx={{ alignItems: 'center' }}
                                                 >
-                                                  <TextField
-                                                    label={getUnitLabel(row, ing)}
-                                                    size="small"
-                                                    value={row.quantity ?? row.weightInGrams}
-                                                    onChange={(e) => {
-                                                      const raw = e.target.value;
-                                                      // пустая строка → 0 (для валидности), но не перезаписываем сразу
-                                                      if (raw === '') {
-                                                        handleQuantityChange(row.tempId, 0, ing);
-                                                        return;
-                                                      }
-                                                      const val = Number(raw.replace(',', '.'));
-                                                      if (!Number.isNaN(val)) {
-                                                        handleQuantityChange(row.tempId, val, ing);
-                                                      }
-                                                    }}
-                                                    onFocus={(e) => e.target.select()}
-                                                    slotProps={{
-                                                      htmlInput: {
-                                                        step: '0.1',
-                                                        min: 0.1,
-                                                        inputMode: 'decimal',
-                                                      },
-                                                    }}
-                                                    sx={{ width: isMobile ? 110 : 100 }}
-                                                  />
+                                                 <TextField
+                                                   label={getUnitLabel(row, ing)}
+                                                   placeholder="0"
+                                                   size="small"
+                                                   value={row.quantity === 0 || row.quantity == null ? '' : row.quantity}
+                                                   onChange={(e) => {
+                                                     const raw = e.target.value;
+                                                     if (raw === '') {
+                                                       handleQuantityChange(row.tempId, 0, ing);
+                                                       return;
+                                                     }
+                                                     const val = Number(raw.replace(',', '.'));
+                                                     if (!Number.isNaN(val)) {
+                                                       handleQuantityChange(row.tempId, val, ing);
+                                                     }
+                                                   }}
+                                                   onFocus={(e) => e.target.select()}
+                                                   slotProps={{
+                                                     htmlInput: {
+                                                       step: '0.1',
+                                                       min: 0.1,
+                                                       inputMode: 'decimal',
+                                                     },
+                                                   }}
+                                                   sx={{ width: isMobile ? 110 : 100 }}
+                                                 />
 
                                                   {/* Переключатель единиц — только если у ингредиента задан unitWeightGrams */}
                                                   {ing?.unitWeightGrams != null && (
