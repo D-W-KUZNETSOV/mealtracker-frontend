@@ -17,6 +17,7 @@ const DiaryPage = lazy(() => import('./pages/DiaryPage'));
 const GoalsPage = lazy(() => import('./pages/GoalsPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const MeasurementsPage = lazy(() => import('./pages/MeasurementsPage'));
+const GuidePage = lazy(() => import('./pages/GuidePage'));
 
 function PageLoader() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/goals" element={<GoalsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/measurements" element={<MeasurementsPage />} />
+            <Route path="/guide" element={<GuidePage />} />
           </Route>
         </Route>
 
