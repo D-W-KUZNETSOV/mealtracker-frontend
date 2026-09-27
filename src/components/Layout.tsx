@@ -81,7 +81,7 @@ export default function Layout() {
             </IconButton>
           )}
 
-          <RestaurantMenuIcon sx={{ mr: 1 }} />
+
         <RestaurantMenuIcon sx={{ mr: 1 }} />
         <Typography
           variant="h6"
