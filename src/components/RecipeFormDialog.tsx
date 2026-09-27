@@ -408,10 +408,19 @@ export default function RecipeFormDialog({
                           value={ing ?? null}
                           onChange={(_, v) => {
                             const initialUnit = v?.unitType ?? 'GRAM';
+                            const initialQuantity = initialUnit === 'GRAM' ? row.weightInGrams : 1;
+
+                            // Пересчитываем weightInGrams сразу
+                            let initialWeightInGrams = row.weightInGrams;
+                            if (v && initialUnit !== 'GRAM' && v.unitWeightGrams != null) {
+                              initialWeightInGrams = initialQuantity * v.unitWeightGrams;
+                            }
+
                             handleRowChange(row.tempId, {
                               ingredientId: v ? v.id : null,
                               unit: initialUnit,
-                              quantity: initialUnit === 'GRAM' ? row.weightInGrams : 1,
+                              quantity: initialQuantity,
+                              weightInGrams: initialWeightInGrams,
                             });
                           }}
                           isOptionEqualToValue={(o, v) => o.id === v.id}
