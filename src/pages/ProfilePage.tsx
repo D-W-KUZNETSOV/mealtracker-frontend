@@ -268,38 +268,41 @@ export default function ProfilePage() {
                 helperText="Формат: ГГГГ-ММ-ДД"
               />
 
-              <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
-                <TextField
-                  label="Рост, см"
-                  type="number"
-                  fullWidth
-                  sx={{ minWidth: 120 }}
-                  slotProps={{ htmlInput: { step: '1', min: 50, max: 250 } }}
-                  {...register('heightCm', { valueAsNumber: true })}
-                  error={!!errors.heightCm}
-                  helperText={errors.heightCm?.message}
-                />
-                <TextField
-                  label="Текущий вес, кг"
-                  type="number"
-                  fullWidth
-                  sx={{ minWidth: 120 }}
-                  slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                  {...register('currentWeightKg', { valueAsNumber: true })}
-                  error={!!errors.currentWeightKg}
-                  helperText={errors.currentWeightKg?.message}
-                />
-                <TextField
-                  label="Целевой вес, кг"
-                  type="number"
-                  fullWidth
-                  sx={{ minWidth: 120 }}
-                  slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                  {...register('targetWeightKg', { valueAsNumber: true })}
-                  error={!!errors.targetWeightKg}
-                  helperText={errors.targetWeightKg?.message}
-                />
-              </Stack>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <TextField
+                    label="Рост, см"
+                    type="number"
+                    fullWidth
+                    slotProps={{ htmlInput: { step: '1', min: 50, max: 250 } }}
+                    {...register('heightCm', { valueAsNumber: true })}
+                    error={!!errors.heightCm}
+                    helperText={errors.heightCm?.message}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <TextField
+                    label="Текущий вес, кг"
+                    type="number"
+                    fullWidth
+                    slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
+                    {...register('currentWeightKg', { valueAsNumber: true })}
+                    error={!!errors.currentWeightKg}
+                    helperText={errors.currentWeightKg?.message}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <TextField
+                    label="Целевой вес, кг"
+                    type="number"
+                    fullWidth
+                    slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
+                    {...register('targetWeightKg', { valueAsNumber: true })}
+                    error={!!errors.targetWeightKg}
+                    helperText={errors.targetWeightKg?.message}
+                  />
+                </Grid>
+              </Grid>
 
               {/* Пол */}
               <FormControl>
