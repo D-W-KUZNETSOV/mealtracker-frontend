@@ -34,7 +34,19 @@ export function useAddPortion() {
   return useMutation({
     mutationFn: (data: AddPortionRequest) => statsApi.addPortion(data),
     onSuccess: () => {
-      // Инвалидируем все запросы статистики
+      queryClient.invalidateQueries({ queryKey: statsKeys.all });
+    },
+  });
+}
+
+// ---------- Удалить запись из дневника ----------
+export function useDeleteDiaryEntry() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (entryId: number) => {
+      await statsApi.deleteEntry(entryId);
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: statsKeys.all });
     },
   });

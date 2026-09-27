@@ -15,4 +15,8 @@ export const statsApi = {
   /** Добавить порцию рецепта */
   addPortion: (data: AddPortionRequest) =>
     apiClient.post<DailyStatsDto>('/api/stats/daily/add', data),
+
+  /** Удалить запись из дневника */
+  deleteEntry: (entryId: number) =>
+    apiClient.delete(`/api/stats/entries/${entryId}`),
 };

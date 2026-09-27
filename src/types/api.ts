@@ -194,6 +194,16 @@ export interface Page<T> {
 // ---------- Stats (дневник) ----------
 
 /** Сводка за день (GET /api/stats/daily, POST /api/stats/daily/add) */
+export interface FoodEntryDto {
+  id: number;
+  recipeName: string;
+  weightInGrams: number;
+  calories: number;
+  proteins: number;
+  fats: number;
+  carbs: number;
+}
+
 export interface DailyStatsDto {
   calories: number;
   proteins: number;
@@ -201,6 +211,7 @@ export interface DailyStatsDto {
   carbs: number;
   targetProtein: number | null;
   proteinProgressPercent: number | null;
+  entries: FoodEntryDto[];
 }
 
 /** Тело запроса на добавление порции */

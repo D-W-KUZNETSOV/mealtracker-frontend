@@ -21,6 +21,8 @@ import { useStatsByDate, useTodayStats } from '../hooks/useStats';
 import type { ApiError } from '../types/api';
 import { roundNutrient } from '../types/api';
 import AddPortionDialog from '../components/AddPortionDialog';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDeleteDiaryEntry } from '../hooks/useStats';
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -42,6 +44,7 @@ function isToday(d: Date): boolean {
 export default function DiaryPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
+  const deleteEntry = useDeleteDiaryEntry();
 
   const isTodaySelected = isToday(selectedDate);
 
@@ -198,6 +201,7 @@ export default function DiaryPage() {
               </Box>
             </Stack>
 
+
             {/* Прогресс по белку */}
             {stats.targetProtein != null &&
             stats.proteinProgressPercent != null ? (
@@ -230,6 +234,58 @@ export default function DiaryPage() {
             )}
           </CardContent>
         </Card>
+      )}
+      {/* Список приёмов пищи */}
+      {stats && stats.entries && stats.entries.length > 0 && (
+        <Stack spacing={1} sx={{ mt: 2 }}>
+          <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+            Приёмы пищи
+          </Typography>
+          {stats.entries.map((entry) => (
+            <Paper key={entry.id} sx={{ p: 2 }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+              >
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                    {entry.recipeName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {entry.weightInGrams} г
+                  </Typography>
+                  <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+                    <Typography variant="caption">
+                      {roundNutrient(entry.calories)} ккал
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Б: {roundNutrient(entry.proteins)} г
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Ж: {roundNutrient(entry.fats)} г
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      У: {roundNutrient(entry.carbs)} г
+                    </Typography>
+                  </Stack>
+                </Box>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    if (window.confirm(`Удалить "${entry.recipeName}"?`)) {
+                      deleteEntry.mutate(entry.id);
+                    }
+                  }}
+                  title="Удалить запись"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            </Paper>
+          ))}
+        </Stack>
       )}
 
       {!currentQuery.isLoading && !stats && !currentQuery.isError && (
