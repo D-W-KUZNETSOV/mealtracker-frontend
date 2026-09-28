@@ -64,7 +64,7 @@ export function roundNutrient(value: number): number {
 export interface IngredientDto {
   id: number;
   name: string;
-  caloriesPer100g: number;
+  caloriesPer100g: number | null;   // ← было number
   proteinsPer100g: number;
   fatsPer100g: number;
   carbsPer100g: number;
@@ -77,6 +77,7 @@ export interface IngredientRequest {
   proteinsPer100g: number;
   fatsPer100g: number;
   carbsPer100g: number;
+  caloriesPer100g?: number | null;   // ← добавить
   unitType?: UnitType;
   unitWeightGrams?: number | null;
 }

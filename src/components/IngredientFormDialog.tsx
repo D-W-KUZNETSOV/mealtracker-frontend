@@ -34,6 +34,12 @@ const ingredientSchema = z.object({
     .number({ message: 'Введите число' })
     .min(0, 'Не может быть отрицательным')
     .max(100, 'Слишком много'),
+  caloriesPer100g: z
+    .number({ message: 'Введите число' })
+    .min(0, 'Не может быть отрицательным')
+    .max(1000, 'Слишком много')
+    .nullable()
+    .optional(),
 });
 
 type IngredientForm = z.infer<typeof ingredientSchema>;
@@ -72,6 +78,7 @@ export default function IngredientFormDialog({
       proteinsPer100g: 0,
       fatsPer100g: 0,
       carbsPer100g: 0,
+      caloriesPer100g: null,
     },
   });
 
@@ -84,6 +91,7 @@ export default function IngredientFormDialog({
            proteinsPer100g: ingredient.proteinsPer100g,
            fatsPer100g: ingredient.fatsPer100g,
            carbsPer100g: ingredient.carbsPer100g,
+           caloriesPer100g: ingredient.caloriesPer100g ?? null,
          });
        } else {
          reset({
@@ -97,21 +105,34 @@ export default function IngredientFormDialog({
    }, [open, ingredient, initialName, reset]);
 
   // Живой предпросмотр калорий
-  const [p, f, c] = watch(['proteinsPer100g', 'fatsPer100g', 'carbsPer100g']);
-  const previewCalories = calcCaloriesFromMacros(
-    Number(p) || 0,
-    Number(f) || 0,
-    Number(c) || 0,
-  );
+ // Живой предпросмотр калорий
+ const [p, f, c, cal] = watch([
+   'proteinsPer100g',
+   'fatsPer100g',
+   'carbsPer100g',
+   'caloriesPer100g',   // ← добавили
+ ]);
 
-  const handleFormSubmit = (data: IngredientForm) => {
-    onSubmit({
-      name: data.name.trim(),
-      proteinsPer100g: data.proteinsPer100g,
-      fatsPer100g: data.fatsPer100g,
-      carbsPer100g: data.carbsPer100g,
-    });
-  };
+ // Если калории указаны вручную — используем их
+ // Иначе — считаем из БЖУ
+ const previewCalories =
+   cal != null && Number(cal) > 0
+     ? Number(cal)
+     : calcCaloriesFromMacros(
+         Number(p) || 0,
+         Number(f) || 0,
+         Number(c) || 0,
+       );
+
+ const handleFormSubmit = (data: IngredientForm) => {
+   onSubmit({
+     name: data.name.trim(),
+     proteinsPer100g: data.proteinsPer100g,
+     fatsPer100g: data.fatsPer100g,
+     carbsPer100g: data.carbsPer100g,
+     caloriesPer100g: data.caloriesPer100g ?? null,   // ←
+   });
+ };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -164,6 +185,15 @@ export default function IngredientFormDialog({
                error={!!errors.carbsPer100g}
                helperText={errors.carbsPer100g?.message}
              />
+            <TextField
+              label="Калории, ккал/100г (опционально)"
+              type="number"
+              fullWidth
+              slotProps={{ htmlInput: { step: '0.1', min: 0 } }}
+              {...register('caloriesPer100g', { valueAsNumber: true })}
+              error={!!errors.caloriesPer100g}
+              helperText={errors.caloriesPer100g?.message ?? 'Если пусто — посчитается из БЖУ'}
+            />
            </Stack>
 
             <Box
@@ -174,15 +204,17 @@ export default function IngredientFormDialog({
                 textAlign: 'center',
               }}
             >
-              <Typography variant="body2" color="text.secondary">
-                Калорийность (на 100 г)
-              </Typography>
-              <Typography variant="h5" color="primary.main">
-                {roundNutrient(previewCalories)} ккал
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Считается автоматически по формуле 4×Б + 9×Ж + 4×У
-              </Typography>
+             <Typography variant="body2" color="text.secondary">
+               Калорийность (на 100 г)
+             </Typography>
+             <Typography variant="h5" color="primary.main">
+               {roundNutrient(previewCalories)} ккал
+             </Typography>
+             <Typography variant="caption" color="text.secondary">
+               {cal != null && Number(cal) > 0
+                 ? 'Указано вручную'
+                 : 'Считается автоматически по формуле 4×Б + 9×Ж + 4×У'}
+             </Typography>
             </Box>
           </Stack>
         </DialogContent>

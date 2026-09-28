@@ -169,7 +169,9 @@ export default function IngredientsPage() {
                 <TableRow key={item.id} hover>
                   <TableCell>{item.name}</TableCell>
                   <TableCell align="right">
-                    {roundNutrient(item.caloriesPer100g)}
+                  {item.caloriesPer100g != null
+                    ? `${roundNutrient(item.caloriesPer100g)} ккал`
+                    : '—'}
                   </TableCell>
                   <TableCell align="right">
                     {roundNutrient(item.proteinsPer100g)}

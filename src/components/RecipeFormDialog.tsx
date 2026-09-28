@@ -239,7 +239,7 @@ export default function RecipeFormDialog({
       if (!ing) continue;
 
       const k = row.weightInGrams / 100;
-      calories += ing.caloriesPer100g * k;
+      calories += (ing.caloriesPer100g ?? 0) * k;
       proteins += ing.proteinsPer100g * k;
       fats += ing.fatsPer100g * k;
       carbs += ing.carbsPer100g * k;
@@ -388,7 +388,7 @@ export default function RecipeFormDialog({
                     (i) => i.id === row.ingredientId,
                   );
                   const itemCalories = ing
-                    ? (ing.caloriesPer100g * row.weightInGrams) / 100
+                    ? ((ing.caloriesPer100g ?? 0) * row.weightInGrams) / 100
                     : 0;
 
                   return (
