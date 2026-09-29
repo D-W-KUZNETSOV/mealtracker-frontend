@@ -62,10 +62,7 @@ export default function DashboardPage() {
   const calories = stats?.calories ?? 0;
   const targetCalories = goals?.targetCalories ?? 2000;
   const remaining = Math.max(0, targetCalories - calories);
-  const caloriesPercent = Math.min(
-    100,
-    Math.round((calories / targetCalories) * 100),
-  );
+  const caloriesPercent = Math.round((calories / targetCalories) * 100);
 
   // Белки
   const proteins = stats?.proteins ?? 0;
