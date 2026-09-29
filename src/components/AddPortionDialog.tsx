@@ -52,16 +52,18 @@ export default function AddPortionDialog({
   // Живой предпросмотр КБЖУ
   // Внимание: /api/recipes возвращает total* на null,
   // поэтому предпросмотр может быть неточным. Показываем только если есть данные.
-  const preview = useMemo(() => {
-    if (!selected || selected.totalCalories == null) return null;
-    const k = weight / 100;
-    return {
-      calories: (selected.totalCalories ?? 0) * k,
-      proteins: (selected.totalProteins ?? 0) * k,
-      fats: (selected.totalFats ?? 0) * k,
-      carbs: (selected.totalCarbs ?? 0) * k,
-    };
-  }, [selected, weight]);
+ const preview = useMemo(() => {
+   if (!selected || selected.totalCalories == null) return null;
+   if (!selected.totalWeight || selected.totalWeight <= 0) return null;   // ← защита
+   const k = weight / selected.totalWeight;                                // ← было / 100
+   return {
+     calories: (selected.totalCalories ?? 0) * k,
+     proteins: (selected.totalProteins ?? 0) * k,
+     fats: (selected.totalFats ?? 0) * k,
+     carbs: (selected.totalCarbs ?? 0) * k,
+   };
+ }, [selected, weight]);
+
 
   const canSubmit =
     selected !== null && weight > 0 && !addMutation.isPending;

@@ -93,6 +93,7 @@ export interface RecipeListItemDto {
   totalProteins: number | null;
   totalFats: number | null;
   totalCarbs: number | null;
+   totalWeight: number;
   visibility: 'PUBLIC' | 'PRIVATE';
 }
 
@@ -119,6 +120,7 @@ export interface RecipeDto {
   totalProteins: number | null;
   totalFats: number | null;
   totalCarbs: number | null;
+   totalWeight: number;
   visibility: 'PUBLIC' | 'PRIVATE';
 }
 
