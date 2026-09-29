@@ -141,16 +141,19 @@ export default function DashboardPage() {
                 </Typography>
               </Stack>
 
-              <LinearProgress
-                variant="determinate"
-                value={caloriesPercent}
-                sx={{ height: 10, borderRadius: 1, mb: 1 }}
-                color={caloriesPercent > 100 ? 'error' : 'primary'}
-              />
+             <LinearProgress
+               variant="determinate"
+               value={Math.min(100, caloriesPercent)}
+               sx={{ height: 12, borderRadius: 6, mb: 1 }}
+               color={caloriesPercent > 100 ? 'error' : 'primary'}
+             />
 
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color={caloriesPercent > 100 ? 'error' : 'text.secondary'}
+              >
                 {caloriesPercent > 100
-                  ? `Превышение на ${Math.round(calories - targetCalories)} ккал`
+                  ? `⚠️ Превышение на ${Math.round(calories - targetCalories)} ккал`
                   : `Осталось ${Math.round(remaining)} ккал`}
               </Typography>
             </CardContent>
@@ -176,15 +179,20 @@ export default function DashboardPage() {
                 </Typography>
               </Stack>
 
-              <LinearProgress
-                variant="determinate"
-                value={Math.min(100, proteinPercent)}
-                sx={{ height: 10, borderRadius: 1, mb: 1 }}
-                color="success"
-              />
+             <LinearProgress
+               variant="determinate"
+               value={Math.min(100, proteinPercent)}
+               sx={{ height: 12, borderRadius: 6, mb: 1 }}
+               color={proteinPercent > 100 ? 'error' : 'success'}
+             />
 
-              <Typography variant="body2" color="text.secondary">
-                {Math.round(proteinPercent)}% от цели
+              <Typography
+                variant="body2"
+                color={proteinPercent > 100 ? 'error' : 'text.secondary'}
+              >
+                {proteinPercent > 100
+                  ? `⚠️ Превышение на ${Math.round(proteins - targetProtein)} г`
+                  : `${Math.round(proteinPercent)}% от цели`}
               </Typography>
             </CardContent>
           </Card>
