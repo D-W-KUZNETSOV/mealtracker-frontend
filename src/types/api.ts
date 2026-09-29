@@ -141,6 +141,7 @@ export interface RecipeIngredientInput {
 
 /** Детальная карточка (GET /api/recipes/{id}/summary) */
 export interface RecipeSummaryIngredientDto {
+  ingredientId: number;         // 🆕
   name: string;
   caloriesPer100g: number;
   proteinsPer100g: number;
@@ -151,7 +152,9 @@ export interface RecipeSummaryIngredientDto {
 }
 
 export interface RecipeSummaryDto {
+  id: number;                   // 🆕
   name: string;
+  category: string | null;      // 🆕
   description: string | null;
   imageUrl: string | null;
   visibility: 'PUBLIC' | 'PRIVATE';
@@ -160,6 +163,7 @@ export interface RecipeSummaryDto {
   totalProteins: number;
   totalFats: number;
   totalCarbs: number;
+  totalWeight: number;          // 🆕
 }
 
 /** Статистика (GET /api/recipes/{recipeId}/stats) */

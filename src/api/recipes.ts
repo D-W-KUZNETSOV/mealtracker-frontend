@@ -30,4 +30,7 @@ export const recipesApi = {
     apiClient.patch<RecipeDto>(`/api/recipes/${id}/visibility`),
 
   remove: (id: number) => apiClient.delete(`/api/recipes/${id}`),
+
+  update: (id: number, data: RecipeRequest) =>
+    apiClient.put<RecipeDto>(`/api/recipes/${id}`, data),
 };

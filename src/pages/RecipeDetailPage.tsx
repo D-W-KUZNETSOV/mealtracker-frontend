@@ -21,6 +21,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 import { useSnackbar } from 'notistack';
 import { getImageFullUrl } from '../utils/imageUrl';
 
@@ -32,6 +33,7 @@ import {
 import type { ApiError } from '../types/api';
 import { roundNutrient } from '../types/api';
 import ConfirmDialog from '../components/ConfirmDialog';
+import RecipeFormDialog from '../components/RecipeFormDialog';
 
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +44,7 @@ export default function RecipeDetailPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const summaryQuery = useRecipeSummary(recipeId);
   const toggleMutation = useToggleRecipeVisibility();
@@ -135,6 +138,14 @@ export default function RecipeDetailPage() {
             spacing={1}
             sx={{ flexShrink: 0 }}
           >
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={() => setEditOpen(true)}
+              fullWidth={isMobile}
+            >
+              Редактировать
+            </Button>
             <Button
               variant="outlined"
               startIcon={<VisibilityIcon />}
@@ -288,6 +299,13 @@ export default function RecipeDetailPage() {
         loading={deleteMutation.isPending}
         onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmDelete(false)}
+      />
+
+      <RecipeFormDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        recipeId={recipeId}
+        initialData={recipe}
       />
     </Box>
   );

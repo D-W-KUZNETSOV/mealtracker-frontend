@@ -29,7 +29,7 @@ import { useSnackbar } from 'notistack';
 import ImageUpload from './ImageUpload';
 import IngredientFormDialog from './IngredientFormDialog';
 
-import { useCreateRecipe } from '../hooks/useRecipes';
+import { useCreateRecipe, useUpdateRecipe } from '../hooks/useRecipes';
 import {
   useBaseIngredients,
   useCreateIngredient,
@@ -40,7 +40,8 @@ import type {
   IngredientDto,
   RecipeIngredientInput,
   RecipeRequest,
-   UnitType,
+  RecipeSummaryDto,
+  UnitType,
 } from '../types/api';
 import { roundNutrient } from '../types/api';
 
@@ -50,14 +51,16 @@ import { roundNutrient } from '../types/api';
 interface IngredientRow {
   tempId: number;
   ingredientId: number | null;
-  weightInGrams: number;       // всегда в граммах (для API)
-  quantity?: number;           // в выбранной единице (для UI)
-  unit?: UnitType;             // текущая единица (GRAM, PIECE, ML, ...)
+  weightInGrams: number;
+  quantity?: number;
+  unit?: UnitType;
 }
 
 interface RecipeFormDialogProps {
   open: boolean;
   onClose: () => void;
+  recipeId?: number;
+  initialData?: RecipeSummaryDto | null;
 }
 
 const CATEGORIES = [
@@ -72,9 +75,14 @@ const CATEGORIES = [
 export default function RecipeFormDialog({
   open,
   onClose,
+  recipeId,
+  initialData,
 }: RecipeFormDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
+  const isEdit = recipeId != null;
   const createMutation = useCreateRecipe();
+  const updateMutation = useUpdateRecipe();
+  const activeMutation = isEdit ? updateMutation : createMutation;
   const createIngredientMutation = useCreateIngredient();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -107,40 +115,58 @@ export default function RecipeFormDialog({
     Record<number, string>
   >({});
 
-  // ---------- Сброс формы при открытии ----------
-  useEffect(() => {
-    if (open) {
-      setName('');
-      setCategory(null);
-      setDescription('');
-      setImageUrl('');
-      setVisibility('PRIVATE');
-     setRows([
-       {
-         tempId: Date.now(),
-         ingredientId: null,
-         weightInGrams: 100,
-         quantity: 100,
-         unit: 'GRAM',
-       },
-     ]);
+    // ---------- Сброс формы при открытии ----------
+    useEffect(() => {
+      if (!open) return;
+
+      if (isEdit && initialData) {
+        setName(initialData.name);
+        setCategory(initialData.category ?? null);
+        setDescription(initialData.description ?? '');
+        setImageUrl(initialData.imageUrl ?? '');
+        setVisibility(initialData.visibility);
+        setRows(
+          initialData.ingredients.map((ing, idx) => ({
+            tempId: Date.now() + idx,
+            ingredientId: ing.ingredientId,
+            weightInGrams: ing.quantityGrams,
+            quantity: ing.quantityGrams,
+            unit: 'GRAM',
+          })),
+        );
+      } else {
+        setName('');
+        setCategory(null);
+        setDescription('');
+        setImageUrl('');
+        setVisibility('PRIVATE');
+        setRows([
+          {
+            tempId: Date.now(),
+            ingredientId: null,
+            weightInGrams: 100,
+            quantity: 100,
+            unit: 'GRAM',
+          },
+        ]);
+      }
       setInputValueByRow({});
-    }
-  }, [open]);
+    }, [open, isEdit, initialData]);
 
   // ---------- Работа со строками ингредиентов ----------
- const handleAddRow = () => {
-   setRows((prev) => [
-     ...prev,
-     {
-       tempId: Date.now() + Math.random(),
-       ingredientId: null,
-       weightInGrams: 100,
-       quantity: 100,
-       unit: 'GRAM',
-     },
-   ]);
- };
+  const handleAddRow = () => {
+    setRows((prev) => [
+      ...prev,
+      {
+        tempId: Date.now() + Math.random(),
+        ingredientId: null,
+        weightInGrams: 100,
+        quantity: 100,
+        unit: 'GRAM',
+      },
+    ]);
+  };
+
   const handleRemoveRow = (tempId: number) => {
     setRows((prev) => prev.filter((r) => r.tempId !== tempId));
     setInputValueByRow((prev) => {
@@ -158,73 +184,73 @@ export default function RecipeFormDialog({
       prev.map((r) => (r.tempId === tempId ? { ...r, ...patch } : r)),
     );
   };
-    // ============================================================
-    // Единицы измерения
-    // ============================================================
 
-    const getUnitLabel = (row: IngredientRow, ing?: IngredientDto): string => {
-      const unit = row.unit ?? ing?.unitType ?? 'GRAM';
-      switch (unit) {
-        case 'GRAM':
-          return 'Вес, г';
-        case 'ML':
-          return 'Объём, мл';
-        case 'PIECE':
-          return 'Кол-во, шт';
-        case 'TBSP':
-          return 'Кол-во, ст.л.';
-        case 'TSP':
-          return 'Кол-во, ч.л.';
-        default:
-          return 'Кол-во';
-      }
-    };
+  // ============================================================
+  // Единицы измерения
+  // ============================================================
+  const getUnitLabel = (row: IngredientRow, ing?: IngredientDto): string => {
+    const unit = row.unit ?? ing?.unitType ?? 'GRAM';
+    switch (unit) {
+      case 'GRAM':
+        return 'Вес, г';
+      case 'ML':
+        return 'Объём, мл';
+      case 'PIECE':
+        return 'Кол-во, шт';
+      case 'TBSP':
+        return 'Кол-во, ст.л.';
+      case 'TSP':
+        return 'Кол-во, ч.л.';
+      default:
+        return 'Кол-во';
+    }
+  };
 
-    const handleQuantityChange = (
-      tempId: number,
-      quantity: number,
-      ing?: IngredientDto,
-    ) => {
-      const row = rows.find((r) => r.tempId === tempId);
-      const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
+  const handleQuantityChange = (
+    tempId: number,
+    quantity: number,
+    ing?: IngredientDto,
+  ) => {
+    const row = rows.find((r) => r.tempId === tempId);
+    const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
 
-      let weightInGrams = quantity;
+    let weightInGrams = quantity;
 
-      if (unit !== 'GRAM' && ing?.unitWeightGrams != null) {
-        weightInGrams = quantity * ing.unitWeightGrams;
-}
+    if (unit !== 'GRAM' && ing?.unitWeightGrams != null) {
+      weightInGrams = quantity * ing.unitWeightGrams;
+    }
 
-      handleRowChange(tempId, {
-        quantity,
-        unit,
-        weightInGrams,
-      });
-    };
+    handleRowChange(tempId, {
+      quantity,
+      unit,
+      weightInGrams,
+    });
+  };
 
-    const handleUnitChange = (
-      tempId: number,
-      newUnit: UnitType,
-      ing?: IngredientDto,
-    ) => {
-      const row = rows.find((r) => r.tempId === tempId);
-      if (!row) return;
+  const handleUnitChange = (
+    tempId: number,
+    newUnit: UnitType,
+    ing?: IngredientDto,
+  ) => {
+    const row = rows.find((r) => r.tempId === tempId);
+    if (!row) return;
 
-      let quantity: number;
+    let quantity: number;
 
-      if (newUnit === 'GRAM') {
-        quantity = row.weightInGrams;
-      } else if (ing?.unitWeightGrams != null) {
-        quantity = row.weightInGrams / ing.unitWeightGrams;
-        quantity = Math.round(quantity * 100) / 100;
-      } else {
-        quantity = row.weightInGrams;
-      }
+    if (newUnit === 'GRAM') {
+      quantity = row.weightInGrams;
+    } else if (ing?.unitWeightGrams != null) {
+      quantity = row.weightInGrams / ing.unitWeightGrams;
+      quantity = Math.round(quantity * 100) / 100;
+    } else {
+      quantity = row.weightInGrams;
+    }
 
-      handleRowChange(tempId, {
-        unit: newUnit,
-        quantity,
-      });
-    };
+    handleRowChange(tempId, {
+      unit: newUnit,
+      quantity,
+    });
+  };
 
   // ---------- Живой предпросмотр КБЖУ ----------
   const totals = useMemo(() => {
@@ -255,44 +281,49 @@ export default function RecipeFormDialog({
     rows.every((r) => r.ingredientId !== null && r.weightInGrams > 0);
 
   // ---------- Отправка ----------
-  const handleSubmit = async () => {
-    if (!canSubmit) {
-      enqueueSnackbar('Заполните название и все ингредиенты', {
-        variant: 'warning',
-      });
-      return;
-    }
+   const handleSubmit = async () => {
+     if (!canSubmit) {
+       enqueueSnackbar('Заполните название и все ингредиенты', {
+         variant: 'warning',
+       });
+       return;
+     }
 
-    const ingredients: RecipeIngredientInput[] = rows.map((r) => ({
-      ingredientId: r.ingredientId!,
-      weightInGrams: r.weightInGrams,
-    }));
+     const ingredients: RecipeIngredientInput[] = rows.map((r) => ({
+       ingredientId: r.ingredientId!,
+       weightInGrams: r.weightInGrams,
+     }));
 
-    const payload: RecipeRequest = {
-      name: name.trim(),
-      category: category ?? undefined,
-      description: description.trim() || undefined,
-      imageUrl: imageUrl.trim() || undefined,
-      visibility,
-      ingredients,
-    };
+     const payload: RecipeRequest = {
+       name: name.trim(),
+       category: category ?? undefined,
+       description: description.trim() || undefined,
+       imageUrl: imageUrl.trim() || undefined,
+       visibility,
+       ingredients,
+     };
 
-    try {
-      await createMutation.mutateAsync(payload);
-      enqueueSnackbar('Рецепт создан', { variant: 'success' });
-      onClose();
-    } catch (err) {
-      const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка создания', {
-        variant: 'error',
-      });
-    }
-  };
+     try {
+       if (isEdit) {
+         await updateMutation.mutateAsync({ id: recipeId!, data: payload });
+         enqueueSnackbar('Рецепт обновлён', { variant: 'success' });
+       } else {
+         await createMutation.mutateAsync(payload);
+         enqueueSnackbar('Рецепт создан', { variant: 'success' });
+       }
+       onClose();
+     } catch (err) {
+       const apiError = err as ApiError;
+       enqueueSnackbar(apiError.message || 'Ошибка сохранения', {
+         variant: 'error',
+       });
+     }
+   };
 
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>Создать рецепт</DialogTitle>
+        <DialogTitle>{isEdit ? 'Редактировать рецепт' : 'Создать рецепт'}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             {/* Название */}
@@ -408,12 +439,17 @@ export default function RecipeFormDialog({
                           value={ing ?? null}
                           onChange={(_, v) => {
                             const initialUnit = v?.unitType ?? 'GRAM';
-                            const initialQuantity = initialUnit === 'GRAM' ? row.weightInGrams : 1;
+                            const initialQuantity =
+                              initialUnit === 'GRAM' ? row.weightInGrams : 1;
 
-                            // Пересчитываем weightInGrams сразу
                             let initialWeightInGrams = row.weightInGrams;
-                            if (v && initialUnit !== 'GRAM' && v.unitWeightGrams != null) {
-                              initialWeightInGrams = initialQuantity * v.unitWeightGrams;
+                            if (
+                              v &&
+                              initialUnit !== 'GRAM' &&
+                              v.unitWeightGrams != null
+                            ) {
+                              initialWeightInGrams =
+                                initialQuantity * v.unitWeightGrams;
                             }
 
                             handleRowChange(row.tempId, {
@@ -477,95 +513,95 @@ export default function RecipeFormDialog({
                           }}
                         />
 
-                           <Stack
-                                                direction="row"
-                                                spacing={1}
-                                                sx={{ alignItems: 'center', flexWrap: 'wrap' }}
-                                              >
-                                                <Stack
-                                                  direction="row"
-                                                  spacing={0.5}
-                                                  sx={{ alignItems: 'center' }}
-                                                >
-                                                 <TextField
-                                                   label={getUnitLabel(row, ing)}
-                                                   placeholder="0"
-                                                   size="small"
-                                                   value={row.quantity === 0 || row.quantity == null ? '' : row.quantity}
-                                                   onChange={(e) => {
-                                                     const raw = e.target.value;
-                                                     if (raw === '') {
-                                                       handleQuantityChange(row.tempId, 0, ing);
-                                                       return;
-                                                     }
-                                                     const val = Number(raw.replace(',', '.'));
-                                                     if (!Number.isNaN(val)) {
-                                                       handleQuantityChange(row.tempId, val, ing);
-                                                     }
-                                                   }}
-                                                   onFocus={(e) => e.target.select()}
-                                                   slotProps={{
-                                                     htmlInput: {
-                                                       step: '0.1',
-                                                       min: 0.1,
-                                                       inputMode: 'decimal',
-                                                     },
-                                                   }}
-                                                   sx={{ width: isMobile ? 110 : 100 }}
-                                                 />
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            sx={{ alignItems: 'center' }}
+                          >
+                            <TextField
+                              label={getUnitLabel(row, ing)}
+                              placeholder="0"
+                              size="small"
+                              value={
+                                row.quantity === 0 || row.quantity == null
+                                  ? ''
+                                  : row.quantity
+                              }
+                              onChange={(e) => {
+                                const raw = e.target.value;
+                                if (raw === '') {
+                                  handleQuantityChange(row.tempId, 0, ing);
+                                  return;
+                                }
+                                const val = Number(raw.replace(',', '.'));
+                                if (!Number.isNaN(val)) {
+                                  handleQuantityChange(row.tempId, val, ing);
+                                }
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              slotProps={{
+                                htmlInput: {
+                                  step: '0.1',
+                                  min: 0.1,
+                                  inputMode: 'decimal',
+                                },
+                              }}
+                              sx={{ width: isMobile ? 110 : 100 }}
+                            />
 
-                                                  {/* Переключатель единиц — только если у ингредиента задан unitWeightGrams */}
-                                                  {ing?.unitWeightGrams != null && (
-                                                    <ToggleButtonGroup
-                                                      size="small"
-                                                      exclusive
-                                                      value={row.unit ?? ing.unitType ?? 'GRAM'}
-                                                      onChange={(_, v) => {
-                                                        if (v) {
-                                                          handleUnitChange(row.tempId, v, ing);
-                                                        }
-                                                      }}
-                                                    >
-                                                      <ToggleButton value="GRAM">г</ToggleButton>
-                                                      {ing.unitType === 'ML' && (
-                                                        <ToggleButton value="ML">мл</ToggleButton>
-                                                      )}
-                                                      {ing.unitType === 'PIECE' && (
-                                                        <ToggleButton value="PIECE">шт</ToggleButton>
-                                                      )}
-                                                      {ing.unitType === 'TBSP' && (
-                                                        <ToggleButton value="TBSP">ст.л.</ToggleButton>
-                                                      )}
-                                                      {ing.unitType === 'TSP' && (
-                                                        <ToggleButton value="TSP">ч.л.</ToggleButton>
-                                                      )}
-                                                    </ToggleButtonGroup>
-                                                  )}
-                                                </Stack>
+                            {ing?.unitWeightGrams != null && (
+                              <ToggleButtonGroup
+                                size="small"
+                                exclusive
+                                value={row.unit ?? ing.unitType ?? 'GRAM'}
+                                onChange={(_, v) => {
+                                  if (v) {
+                                    handleUnitChange(row.tempId, v, ing);
+                                  }
+                                }}
+                              >
+                                <ToggleButton value="GRAM">г</ToggleButton>
+                                {ing.unitType === 'ML' && (
+                                  <ToggleButton value="ML">мл</ToggleButton>
+                                )}
+                                {ing.unitType === 'PIECE' && (
+                                  <ToggleButton value="PIECE">шт</ToggleButton>
+                                )}
+                                {ing.unitType === 'TBSP' && (
+                                  <ToggleButton value="TBSP">ст.л.</ToggleButton>
+                                )}
+                                {ing.unitType === 'TSP' && (
+                                  <ToggleButton value="TSP">ч.л.</ToggleButton>
+                                )}
+                              </ToggleButtonGroup>
+                            )}
+                          </Stack>
 
-                                                <Typography
-                                                  variant="body2"
-                                                  color="text.secondary"
-                                                  sx={{
-                                                    minWidth: 70,
-                                                    textAlign: 'right',
-                                                    flexGrow: isMobile ? 1 : 0,
-                                                  }}
-                                                >
-                                                  {roundNutrient(itemCalories)} ккал
-                                                </Typography>
-                                                <IconButton
-                                                  size="small"
-                                                  color="error"
-                                                  onClick={() => handleRemoveRow(row.tempId)}
-                                                >
-                                                  <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                                </Stack>
-
-                                             </Stack>
-
-
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              minWidth: 70,
+                              textAlign: 'right',
+                              flexGrow: isMobile ? 1 : 0,
+                            }}
+                          >
+                            {roundNutrient(itemCalories)} ккал
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleRemoveRow(row.tempId)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </Stack>
                     </Paper>
                   );
                 })}
@@ -618,18 +654,22 @@ export default function RecipeFormDialog({
             </Paper>
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} disabled={createMutation.isPending}>
-            Отмена
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSubmit}
-            disabled={!canSubmit || createMutation.isPending}
-          >
-            {createMutation.isPending ? 'Создание...' : 'Создать'}
-          </Button>
-        </DialogActions>
+               <DialogActions>
+                 <Button onClick={onClose} disabled={activeMutation.isPending}>
+                   Отмена
+                 </Button>
+                 <Button
+                   variant="contained"
+                   onClick={handleSubmit}
+                   disabled={!canSubmit || activeMutation.isPending}
+                 >
+                   {activeMutation.isPending
+                     ? 'Сохранение...'
+                     : isEdit
+                       ? 'Сохранить'
+                       : 'Создать'}
+                 </Button>
+               </DialogActions>
       </Dialog>
 
       {/* Диалог создания нового ингредиента */}

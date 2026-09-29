@@ -87,3 +87,15 @@ export function useDeleteRecipe() {
     },
   });
 }
+
+export function useUpdateRecipe() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: RecipeRequest }) =>
+      recipesApi.update(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: recipesKeys.all });
+      queryClient.invalidateQueries({ queryKey: recipesKeys.summary(id) });
+    },
+  });
+}
