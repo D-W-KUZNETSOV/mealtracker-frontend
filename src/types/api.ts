@@ -212,6 +212,8 @@ export interface DailyStatsDto {
   proteins: number;
   fats: number;
   carbs: number;
+  targetCalories: number | null;
+  caloriesProgressPercent: number | null;
   targetProtein: number | null;
   proteinProgressPercent: number | null;
   entries: FoodEntryDto[];

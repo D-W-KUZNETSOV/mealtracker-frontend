@@ -202,40 +202,79 @@ export default function DiaryPage() {
             </Stack>
 
 
+            {/* Прогресс по калориям */}
+            {stats.targetCalories != null && stats.caloriesProgressPercent != null ? (
+              <Box sx={{ mb: 2 }}>
+                <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="body2">
+                    Калории: {roundNutrient(stats.calories)} /{' '}
+                    {roundNutrient(stats.targetCalories)} ккал
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color={stats.caloriesProgressPercent > 100 ? 'error' : 'text.secondary'}
+                  >
+                    {roundNutrient(stats.caloriesProgressPercent)}%
+                  </Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(stats.caloriesProgressPercent, 100)}
+                  color={stats.caloriesProgressPercent > 100 ? 'error' : 'primary'}
+                  sx={{ height: 12, borderRadius: 6 }}
+                />
+                {stats.caloriesProgressPercent > 100 && (
+                  <Alert severity="warning" sx={{ mt: 1 }}>
+                    ⚠️ Превышение калорий на{' '}
+                    {roundNutrient(stats.calories - stats.targetCalories)} ккал
+                  </Alert>
+                )}
+              </Box>
+            ) : (
+              <Alert severity="info" sx={{ mt: 1, mb: 2 }}>
+                Цель по калориям не задана. Установите цели в разделе «Цели».
+              </Alert>
+            )}
+
             {/* Прогресс по белку */}
-            {stats.targetProtein != null &&
-            stats.proteinProgressPercent != null ? (
+            {stats.targetProtein != null && stats.proteinProgressPercent != null ? (
               <Box>
-              <Stack
-                direction="row"
-                sx={{
-                  justifyContent: 'space-between',
-                  mb: 0.5,
-                }}
-              >
+                <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.5 }}>
                   <Typography variant="body2">
                     Белок: {roundNutrient(stats.proteins)} /{' '}
                     {roundNutrient(stats.targetProtein)} г
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    color={stats.proteinProgressPercent > 100 ? 'error' : 'text.secondary'}
+                  >
                     {roundNutrient(stats.proteinProgressPercent)}%
                   </Typography>
                 </Stack>
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(stats.proteinProgressPercent, 100)}
-                  sx={{ height: 8, borderRadius: 4 }}
+                  color={stats.proteinProgressPercent > 100 ? 'error' : 'primary'}
+                  sx={{ height: 12, borderRadius: 6 }}
                 />
+                {stats.proteinProgressPercent > 100 && (
+                  <Alert severity="warning" sx={{ mt: 1 }}>
+                    ⚠️ Превышение белка на{' '}
+                    {roundNutrient(stats.proteins - stats.targetProtein)} г
+                  </Alert>
+                )}
               </Box>
-            ) : (
-              <Alert severity="info" sx={{ mt: 1 }}>
-                Цель по белку не задана. Установите цели в разделе «Цели».
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-      )}
-      {/* Список приёмов пищи */}
+                      ) : (
+                        <Alert severity="info" sx={{ mt: 1 }}>
+                          Цель по белку не задана. Установите цели в разделе «Цели».
+                        </Alert>
+                      )}
+
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Список приёмов пищи */}
       {stats && stats.entries && stats.entries.length > 0 && (
         <Stack spacing={1} sx={{ mt: 2 }}>
           <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
