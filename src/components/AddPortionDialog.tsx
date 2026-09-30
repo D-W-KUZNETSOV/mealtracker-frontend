@@ -39,23 +39,27 @@ export default function AddPortionDialog({
   const recipes: RecipeListItemDto[] = myRecipesQuery.data?.content ?? [];
 
   const [selected, setSelected] = useState<RecipeListItemDto | null>(null);
-  const [weight, setWeight] = useState<number>(100);
+  const [weightStr, setWeightStr] = useState<string>('100');
 
   // Сброс при открытии
   useEffect(() => {
     if (open) {
       setSelected(null);
-      setWeight(100);
+      setWeightStr('100');
     }
-  }, [open]);
+   }, [open]);
+
+   const weight = Number(weightStr.replace(',', '.')) || 0;
+
 
   // Живой предпросмотр КБЖУ
   // Внимание: /api/recipes возвращает total* на null,
   // поэтому предпросмотр может быть неточным. Показываем только если есть данные.
  const preview = useMemo(() => {
    if (!selected || selected.totalCalories == null) return null;
-   if (!selected.totalWeight || selected.totalWeight <= 0) return null;   // ← защита
-   const k = weight / selected.totalWeight;                                // ← было / 100
+   if (!selected.totalWeight || selected.totalWeight <= 0) return null;
+   if (weight <= 0) return null;
+   const k = weight / selected.totalWeight;
    return {
      calories: (selected.totalCalories ?? 0) * k,
      proteins: (selected.totalProteins ?? 0) * k,
@@ -111,21 +115,16 @@ export default function AddPortionDialog({
            label="Вес порции, г"
            type="text"
            fullWidth
-           value={weight === 0 ? '' : weight}
+           value={weightStr}
            onChange={(e) => {
              const raw = e.target.value;
-             if (raw === '') {
-               setWeight(0);
-               return;
-             }
-             const val = Number(raw.replace(',', '.'));
-             if (!Number.isNaN(val)) {
-               setWeight(val);
+             if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
+               setWeightStr(raw);
              }
            }}
            onFocus={(e) => e.target.select()}
            placeholder="0"
-           slotProps={{ htmlInput: { inputMode: 'decimal', min: 1 } }}
+           slotProps={{ htmlInput: { inputMode: 'decimal' } }}
          />
 
           {preview && (
