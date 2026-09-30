@@ -64,13 +64,14 @@ interface RecipeFormDialogProps {
 }
 
 const CATEGORIES = [
-  'Завтрак',
-  'Обед',
-  'Ужин',
-  'Перекус',
-  'Десерт',
-  'Напиток',
-];
+  { value: 'BREAKFAST', label: 'Завтрак' },
+  { value: 'LUNCH', label: 'Обед' },
+  { value: 'DINNER', label: 'Ужин' },
+  { value: 'SNACK', label: 'Перекус' },
+  { value: 'DESSERT', label: 'Десерт' },
+  { value: 'DRINK', label: 'Напиток' },
+] as const;
+
 
 export default function RecipeFormDialog({
   open,
@@ -121,7 +122,9 @@ export default function RecipeFormDialog({
 
       if (isEdit && initialData) {
         setName(initialData.name);
-        setCategory(initialData.category ?? null);
+        setCategory(
+            CATEGORIES.find((c) => c.label === initialData.category)?.value ?? null
+          );
         setDescription(initialData.description ?? '');
         setImageUrl(initialData.imageUrl ?? '');
         setVisibility(initialData.visibility);
@@ -337,11 +340,23 @@ export default function RecipeFormDialog({
             />
 
             {/* Категория */}
-            <Autocomplete
-              options={CATEGORIES}
-              freeSolo
-              value={category}
-              onChange={(_, v) => setCategory(v)}
+           <Autocomplete
+             options={CATEGORIES}
+             getOptionLabel={(o) => (typeof o === 'string' ? o : o.label)}
+             value={CATEGORIES.find((c) => c.value === category) ?? null}
+             onChange={(_, v) => {
+               if (v == null || typeof v === 'string') {
+                 setCategory(null);
+               } else {
+                 setCategory(v.value);
+               }
+             }}
+             isOptionEqualToValue={(o, v) => o.value === v.value}
+             renderInput={(params) => (
+               <TextField {...params} label="Категория" />
+             )}
+           />
+              isOptionEqualToValue={(o, v) => o.value === v.value}
               renderInput={(params) => (
                 <TextField {...params} label="Категория" />
               )}

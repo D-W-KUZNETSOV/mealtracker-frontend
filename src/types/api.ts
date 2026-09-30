@@ -239,6 +239,13 @@ export type ActivityLevel =
   | 'VERY_HIGH';
 
   export type UnitType = 'GRAM' | 'ML' | 'PIECE' | 'TBSP' | 'TSP' | 'CUP';
+  export type MealType =
+    | 'BREAKFAST'
+    | 'LUNCH'
+    | 'DINNER'
+    | 'SNACK'
+    | 'DESSERT'
+    | 'DRINK';
 
 export type Gender = 'MALE' | 'FEMALE';
 
