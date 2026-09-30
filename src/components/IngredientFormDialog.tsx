@@ -20,29 +20,28 @@ import { calcCaloriesFromMacros, roundNutrient } from '../types/api';
 // ============================================================
 // Схема валидации формы ингредиента.
 // ============================================================
+// Вспомогательная проверка: строка → число
+const numberString = (min: number, max: number, required = false) =>
+  z.string().refine(
+    (val) => {
+      if (val === '' || val == null) return !required;
+      const n = Number(val.replace(',', '.'));
+      return !Number.isNaN(n) && n >= min && n <= max;
+    },
+    { message: `Введите число от ${min} до ${max}` },
+  );
+
 const ingredientSchema = z.object({
   name: z.string().min(1, 'Введите название').max(100, 'Максимум 100 символов'),
-  proteinsPer100g: z
-    .number({ message: 'Введите число' })
-    .min(0, 'Не может быть отрицательным')
-    .max(100, 'Слишком много'),
-  fatsPer100g: z
-    .number({ message: 'Введите число' })
-    .min(0, 'Не может быть отрицательным')
-    .max(100, 'Слишком много'),
-  carbsPer100g: z
-    .number({ message: 'Введите число' })
-    .min(0, 'Не может быть отрицательным')
-    .max(100, 'Слишком много'),
-  caloriesPer100g: z
-    .number({ message: 'Введите число' })
-    .min(0, 'Не может быть отрицательным')
-    .max(1000, 'Слишком много')
-    .nullable()
-    .optional(),
+  proteinsPer100g: numberString(0, 100, true),
+  fatsPer100g: numberString(0, 100, true),
+  carbsPer100g: numberString(0, 100, true),
+  caloriesPer100g: numberString(0, 1000, false),
 });
 
 type IngredientForm = z.infer<typeof ingredientSchema>;
+
+
 
 interface IngredientFormDialogProps {
   open: boolean;
@@ -75,13 +74,13 @@ export default function IngredientFormDialog({
     formState: { errors },
   } = useForm<IngredientForm>({
     resolver: zodResolver(ingredientSchema),
-    defaultValues: {
-      name: '',
-      proteinsPer100g: 0,
-      fatsPer100g: 0,
-      carbsPer100g: 0,
-      caloriesPer100g: null,
-    },
+  defaultValues: {
+    name: '',
+    proteinsPer100g: '',
+    fatsPer100g: '',
+    carbsPer100g: '',
+    caloriesPer100g: '',
+  },
   });
 
   // При открытии с ингредиентом — заполняем форму, иначе сбрасываем
@@ -90,18 +89,21 @@ export default function IngredientFormDialog({
       if (ingredient) {
         reset({
           name: ingredient.name,
-          proteinsPer100g: ingredient.proteinsPer100g,
-          fatsPer100g: ingredient.fatsPer100g,
-          carbsPer100g: ingredient.carbsPer100g,
-          caloriesPer100g: ingredient.caloriesPer100g ?? null,
+          proteinsPer100g: String(ingredient.proteinsPer100g ?? ''),
+          fatsPer100g: String(ingredient.fatsPer100g ?? ''),
+          carbsPer100g: String(ingredient.carbsPer100g ?? ''),
+          caloriesPer100g:
+            ingredient.caloriesPer100g != null
+              ? String(ingredient.caloriesPer100g)
+              : '',
         });
       } else {
         reset({
           name: initialName ?? '',
-          proteinsPer100g: 0,
-          fatsPer100g: 0,
-          carbsPer100g: 0,
-          caloriesPer100g: null,   // ← добавил
+          proteinsPer100g: '',
+          fatsPer100g: '',
+          carbsPer100g: '',
+          caloriesPer100g: '',
         });
       }
     }
@@ -115,24 +117,35 @@ export default function IngredientFormDialog({
     'caloriesPer100g',
   ]);
 
-  const previewCalories =
-    cal != null && Number(cal) > 0
-      ? Number(cal)
-      : calcCaloriesFromMacros(
-          Number(p) || 0,
-          Number(f) || 0,
-          Number(c) || 0,
-        );
+ const parseNum = (v: unknown): number => {
+   if (v == null || v === '') return 0;
+   const n = Number(String(v).replace(',', '.'));
+   return Number.isNaN(n) ? 0 : n;
+ };
 
-  const handleFormSubmit = (data: IngredientForm) => {
-    onSubmit({
-      name: data.name.trim(),
-      proteinsPer100g: data.proteinsPer100g,
-      fatsPer100g: data.fatsPer100g,
-      carbsPer100g: data.carbsPer100g,
-      caloriesPer100g: data.caloriesPer100g ?? null,
+ const pNum = parseNum(p);
+ const fNum = parseNum(f);
+ const cNum = parseNum(c);
+ const calNum = parseNum(cal);
+
+ const previewCalories =
+   calNum > 0 ? calNum : calcCaloriesFromMacros(pNum, fNum, cNum);
+
+ const handleFormSubmit = (data: IngredientForm) => {
+   const toNum = (v: string): number =>
+     Number(v.replace(',', '.')) || 0;
+
+   const calStr = data.caloriesPer100g ?? '';
+   const calParsed = calStr === '' ? null : Number(calStr.replace(',', '.'));
+
+   onSubmit({
+     name: data.name.trim(),
+     proteinsPer100g: toNum(data.proteinsPer100g),
+     fatsPer100g: toNum(data.fatsPer100g),
+     carbsPer100g: toNum(data.carbsPer100g),
+     caloriesPer100g: calParsed != null && !Number.isNaN(calParsed) ? calParsed : null,
     });
-  };
+ };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -151,102 +164,105 @@ export default function IngredientFormDialog({
               helperText={errors.name?.message}
             />
 
-            <Stack direction="row" spacing={2}>
-              <Controller
-                name="proteinsPer100g"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    label="Белки, г/100г"
-                    type="text"
-                    fullWidth
-                    value={field.value === 0 || field.value == null ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === '') { field.onChange(0); return; }
-                      const val = Number(raw.replace(',', '.'));
-                      if (!Number.isNaN(val)) field.onChange(val);
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    placeholder="0"
-                    slotProps={{ htmlInput: { step: '0.1', min: 0, inputMode: 'decimal' } }}
-                    error={!!errors.proteinsPer100g}
-                    helperText={errors.proteinsPer100g?.message}
-                  />
-                )}
-              />
 
-              <Controller
-                name="fatsPer100g"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    label="Жиры, г/100г"
-                    type="text"
-                    fullWidth
-                    value={field.value === 0 || field.value == null ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === '') { field.onChange(0); return; }
-                      const val = Number(raw.replace(',', '.'));
-                      if (!Number.isNaN(val)) field.onChange(val);
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    placeholder="0"
-                    slotProps={{ htmlInput: { step: '0.1', min: 0, inputMode: 'decimal' } }}
-                    error={!!errors.fatsPer100g}
-                    helperText={errors.fatsPer100g?.message}
-                  />
-                )}
-              />
+                         <Stack direction="row" spacing={2}>
+                           <Controller
+                             name="proteinsPer100g"
+             control={control}
+             render={({ field }) => (
+               <TextField
+                 label="Белки, г/100г"
+                 type="text"
+                 fullWidth
+                 value={field.value ?? ''}
+                 onChange={(e) => {
+                   const raw = e.target.value;
+                   if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
+                     field.onChange(raw);
+                   }
+                 }}
+                 onFocus={(e) => e.target.select()}
+                 placeholder="0"
+                 slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                 error={!!errors.proteinsPer100g}
+                 helperText={errors.proteinsPer100g?.message}
+               />
+             )}
+           />
 
-              <Controller
-                name="carbsPer100g"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    label="Углеводы, г/100г"
-                    type="text"
-                    fullWidth
-                    value={field.value === 0 || field.value == null ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === '') { field.onChange(0); return; }
-                      const val = Number(raw.replace(',', '.'));
-                      if (!Number.isNaN(val)) field.onChange(val);
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    placeholder="0"
-                    slotProps={{ htmlInput: { step: '0.1', min: 0, inputMode: 'decimal' } }}
-                    error={!!errors.carbsPer100g}
-                    helperText={errors.carbsPer100g?.message}
-                  />
-                )}
-              />
+             <Controller
+               name="fatsPer100g"
+               control={control}
+               render={({ field }) => (
+                 <TextField
+                   label="Жиры, г/100г"
+                   type="text"
+                   fullWidth
+                   value={field.value ?? ''}
+                   onChange={(e) => {
+                     const raw = e.target.value;
+                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
+                       field.onChange(raw);
+                     }
+                   }}
+                   onFocus={(e) => e.target.select()}
+                   placeholder="0"
+                   slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                   error={!!errors.fatsPer100g}
+                   helperText={errors.fatsPer100g?.message}
+                 />
+               )}
+             />
 
-              <Controller
-                name="caloriesPer100g"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    label="Калории, ккал/100г"
-                    type="text"
-                    fullWidth
-                    value={field.value === 0 || field.value == null ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === '') { field.onChange(null); return; }
-                      const val = Number(raw.replace(',', '.'));
-                      if (!Number.isNaN(val)) field.onChange(val);
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    placeholder="0"
-                    slotProps={{ htmlInput: { step: '0.1', min: 0, inputMode: 'decimal' } }}
-                    error={!!errors.caloriesPer100g}
-                    helperText={errors.caloriesPer100g?.message ?? 'Если пусто — посчитается из БЖУ'}
-                  />
-                )}
-              />
+             <Controller
+               name="carbsPer100g"
+               control={control}
+               render={({ field }) => (
+                 <TextField
+                   label="Углеводы, г/100г"
+                   type="text"
+                   fullWidth
+                   value={field.value ?? ''}
+                   onChange={(e) => {
+                     const raw = e.target.value;
+                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
+                       field.onChange(raw);
+                     }
+                   }}
+                   onFocus={(e) => e.target.select()}
+                   placeholder="0"
+                   slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                   error={!!errors.carbsPer100g}
+                   helperText={errors.carbsPer100g?.message}
+                 />
+               )}
+             />
+
+             <Controller
+               name="caloriesPer100g"
+               control={control}
+               render={({ field }) => (
+                 <TextField
+                   label="Калории, ккал/100г"
+                   type="text"
+                   fullWidth
+                   value={field.value ?? ''}
+                   onChange={(e) => {
+                     const raw = e.target.value;
+                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
+                       field.onChange(raw);
+                     }
+                   }}
+                   onFocus={(e) => e.target.select()}
+                   placeholder="0"
+                   slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                   error={!!errors.caloriesPer100g}
+                   helperText={
+                     errors.caloriesPer100g?.message ?? 'Если пусто — посчитается из БЖУ'
+                   }
+                 />
+               )}
+             />
             </Stack>
 
             <Box
@@ -264,9 +280,9 @@ export default function IngredientFormDialog({
                 {roundNutrient(previewCalories)} ккал
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {cal != null && Number(cal) > 0
-                  ? 'Указано вручную'
-                  : 'Считается автоматически по формуле 4×Б + 9×Ж + 4×У'}
+               {calNum > 0
+                 ? 'Указано вручную'
+                 : 'Считается автоматически...'}
               </Typography>
             </Box>
           </Stack>

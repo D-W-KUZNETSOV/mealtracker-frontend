@@ -1,7 +1,7 @@
 // MealTracker Service Worker
 // Правильная стратегия обновления + офлайн-доступ к статике
 
-const CACHE_VERSION = 'v29';                    // ← меняй при каждом деплое
+const CACHE_VERSION = 'v32';                    // ← меняй при каждом деплое
 const CACHE_NAME = `mealtracker-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
