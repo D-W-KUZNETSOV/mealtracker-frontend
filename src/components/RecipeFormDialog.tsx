@@ -356,11 +356,6 @@ export default function RecipeFormDialog({
                <TextField {...params} label="Категория" />
              )}
            />
-              isOptionEqualToValue={(o, v) => o.value === v.value}
-              renderInput={(params) => (
-                <TextField {...params} label="Категория" />
-              )}
-            />
 
             {/* Описание */}
             <TextField
