@@ -158,7 +158,7 @@ export default function IngredientFormDialog({
                 render={({ field }) => (
                   <TextField
                     label="Белки, г/100г"
-                    type="number"
+                    type="text"
                     fullWidth
                     value={field.value === 0 || field.value == null ? '' : field.value}
                     onChange={(e) => {
@@ -182,7 +182,7 @@ export default function IngredientFormDialog({
                 render={({ field }) => (
                   <TextField
                     label="Жиры, г/100г"
-                    type="number"
+                    type="text"
                     fullWidth
                     value={field.value === 0 || field.value == null ? '' : field.value}
                     onChange={(e) => {
@@ -206,7 +206,7 @@ export default function IngredientFormDialog({
                 render={({ field }) => (
                   <TextField
                     label="Углеводы, г/100г"
-                    type="number"
+                    type="text"
                     fullWidth
                     value={field.value === 0 || field.value == null ? '' : field.value}
                     onChange={(e) => {
@@ -230,7 +230,7 @@ export default function IngredientFormDialog({
                 render={({ field }) => (
                   <TextField
                     label="Калории, ккал/100г"
-                    type="number"
+                    type="text"
                     fullWidth
                     value={field.value === 0 || field.value == null ? '' : field.value}
                     onChange={(e) => {

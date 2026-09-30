@@ -107,14 +107,26 @@ export default function AddPortionDialog({
             )}
           />
 
-          <TextField
-            label="Вес порции, г"
-            type="number"
-            fullWidth
-            value={weight}
-            onChange={(e) => setWeight(Number(e.target.value) || 0)}
-            slotProps={{ htmlInput: { step: '1', min: 1 } }}
-          />
+         <TextField
+           label="Вес порции, г"
+           type="text"
+           fullWidth
+           value={weight === 0 ? '' : weight}
+           onChange={(e) => {
+             const raw = e.target.value;
+             if (raw === '') {
+               setWeight(0);
+               return;
+             }
+             const val = Number(raw.replace(',', '.'));
+             if (!Number.isNaN(val)) {
+               setWeight(val);
+             }
+           }}
+           onFocus={(e) => e.target.select()}
+           placeholder="0"
+           slotProps={{ htmlInput: { inputMode: 'decimal', min: 1 } }}
+         />
 
           {preview && (
             <Paper variant="outlined" sx={{ p: 2 }}>
