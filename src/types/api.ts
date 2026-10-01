@@ -94,6 +94,8 @@ export interface RecipeListItemDto {
   totalFats: number | null;
   totalCarbs: number | null;
    totalWeight: number;
+   servings: number;              // 🆕
+     servingSizeGrams: number;      // 🆕
   visibility: 'PUBLIC' | 'PRIVATE';
 }
 
@@ -121,6 +123,8 @@ export interface RecipeDto {
   totalFats: number | null;
   totalCarbs: number | null;
    totalWeight: number;
+   servings: number;              // 🆕
+     servingSizeGrams: number;      // 🆕
   visibility: 'PUBLIC' | 'PRIVATE';
 }
 
@@ -131,6 +135,7 @@ export interface RecipeRequest {
   description?: string;
   imageUrl?: string;
   visibility: 'PUBLIC' | 'PRIVATE';
+    servings?: number;             // 🆕
   ingredients: RecipeIngredientInput[];
 }
 
@@ -164,6 +169,8 @@ export interface RecipeSummaryDto {
   totalFats: number;
   totalCarbs: number;
   totalWeight: number;          // 🆕
+    servings: number;              // 🆕
+    servingSizeGrams: number;      // 🆕
 }
 
 /** Статистика (GET /api/recipes/{recipeId}/stats) */
@@ -209,6 +216,7 @@ export interface FoodEntryDto {
   proteins: number;
   fats: number;
   carbs: number;
+   servings: number;              // 🆕
 }
 
 export interface DailyStatsDto {

@@ -73,6 +73,7 @@ const CATEGORIES = [
 ] as const;
 
 
+
 export default function RecipeFormDialog({
   open,
   onClose,
@@ -103,6 +104,7 @@ export default function RecipeFormDialog({
   // ---------- Состояние формы ----------
   const [name, setName] = useState('');
   const [category, setCategory] = useState<string | null>(null);
+  const [servings, setServings] = useState<number>(1);
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE');
@@ -128,6 +130,7 @@ export default function RecipeFormDialog({
         setDescription(initialData.description ?? '');
         setImageUrl(initialData.imageUrl ?? '');
         setVisibility(initialData.visibility);
+         setServings(initialData.servings ?? 1);
         setRows(
           initialData.ingredients.map((ing, idx) => ({
             tempId: Date.now() + idx,
@@ -143,6 +146,7 @@ export default function RecipeFormDialog({
         setDescription('');
         setImageUrl('');
         setVisibility('PRIVATE');
+        setServings(1);
         setRows([
           {
             tempId: Date.now(),
@@ -303,6 +307,7 @@ export default function RecipeFormDialog({
        description: description.trim() || undefined,
        imageUrl: imageUrl.trim() || undefined,
        visibility,
+         servings,
        ingredients,
      };
 
@@ -355,6 +360,15 @@ export default function RecipeFormDialog({
              renderInput={(params) => (
                <TextField {...params} label="Категория" />
              )}
+           />
+           <TextField
+             label="На сколько порций"
+             type="number"
+             fullWidth
+             value={servings}
+             onChange={(e) => setServings(Math.max(1, Number(e.target.value) || 1))}
+             onFocus={(e) => e.target.select()}
+             slotProps={{ htmlInput: { min: 1, step: 1 } }}
            />
 
             {/* Описание */}
