@@ -293,6 +293,7 @@ export default function DiaryPage() {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {entry.weightInGrams} г
+                    {entry.servings > 0 && ` · ${roundNutrient(entry.servings)} порц.`}
                   </Typography>
                   <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
                     <Typography variant="caption">

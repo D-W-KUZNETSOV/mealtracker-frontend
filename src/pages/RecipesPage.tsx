@@ -8,33 +8,71 @@ import {
   CardContent,
   Chip,
   CircularProgress,
+  Collapse,
+  MenuItem,
   Pagination,
   Paper,
   Stack,
   Tab,
   Tabs,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
 
 import { useMyRecipes, usePublicRecipes } from '../hooks/useRecipes';
 import type { ApiError, RecipeListItemDto } from '../types/api';
 import { roundNutrient } from '../types/api';
+import { useDebounce } from '../hooks/useDebounce';
 import RecipeFormDialog from '../components/RecipeFormDialog';
 
 type TabKey = 'my' | 'public';
+type SortKey = 'name,asc' | 'name,desc' | 'calories,asc' | 'calories,desc';
 
 const PAGE_SIZE = 10;
+
+const CATEGORIES = [
+  { value: '', label: 'Все' },
+  { value: 'BREAKFAST', label: 'Завтрак' },
+  { value: 'LUNCH', label: 'Обед' },
+  { value: 'DINNER', label: 'Ужин' },
+  { value: 'SNACK', label: 'Перекус' },
+  { value: 'DESSERT', label: 'Десерт' },
+  { value: 'DRINK', label: 'Напиток' },
+];
 
 export default function RecipesPage() {
   const [tab, setTab] = useState<TabKey>('my');
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
 
+  // Фильтры
+  const [queryStr, setQueryStr] = useState('');
+  const [category, setCategory] = useState<string>('');
+  const [minCalories, setMinCalories] = useState<string>('');
+  const [maxCalories, setMaxCalories] = useState<string>('');
+  const [minProtein, setMinProtein] = useState<string>('');
+  const [sort, setSort] = useState<SortKey>('name,asc');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const debouncedQuery = useDebounce(queryStr, 300);
   const navigate = useNavigate();
 
-  const myQuery = useMyRecipes(page - 1, PAGE_SIZE);
+  const filters = {
+    query: debouncedQuery || undefined,
+    category: category || undefined,
+    minCalories: minCalories ? Number(minCalories) : undefined,
+    maxCalories: maxCalories ? Number(maxCalories) : undefined,
+    minProtein: minProtein ? Number(minProtein) : undefined,
+    sort,
+  };
+
+  const myQuery = useMyRecipes(page - 1, PAGE_SIZE, filters);
   const publicQuery = usePublicRecipes();
 
   const isMyTab = tab === 'my';
@@ -51,15 +89,33 @@ export default function RecipesPage() {
     setPage(1);
   };
 
+  const handleResetFilters = () => {
+    setQueryStr('');
+    setCategory('');
+    setMinCalories('');
+    setMaxCalories('');
+    setMinProtein('');
+    setSort('name,asc');
+    setPage(1);
+  };
+
+  const hasActiveFilters =
+    queryStr ||
+    category ||
+    minCalories ||
+    maxCalories ||
+    minProtein ||
+    sort !== 'name,asc';
+
   return (
     <Box>
-     <Stack
-       sx={{
-         flexDirection: 'row',
-         justifyContent: 'space-between',
-         alignItems: 'center',
-       }}
-     >
+      <Stack
+        sx={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Typography variant="h4">Рецепты</Typography>
         {isMyTab && (
           <Button
@@ -79,6 +135,113 @@ export default function RecipesPage() {
         </Tabs>
       </Paper>
 
+      {/* Поиск */}
+      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Поиск по названию..."
+          value={queryStr}
+          onChange={(e) => {
+            setQueryStr(e.target.value);
+            setPage(1);
+          }}
+          slotProps={{ htmlInput: { inputMode: 'search' } }}
+        />
+        <Button
+          variant={showFilters ? 'contained' : 'outlined'}
+          startIcon={<FilterListIcon />}
+          onClick={() => setShowFilters((v) => !v)}
+          sx={{ flexShrink: 0 }}
+        >
+          Фильтры
+        </Button>
+        {hasActiveFilters && (
+          <Button
+            variant="text"
+            color="error"
+            startIcon={<ClearIcon />}
+            onClick={handleResetFilters}
+            sx={{ flexShrink: 0 }}
+          >
+            Сбросить
+          </Button>
+        )}
+      </Stack>
+
+      {/* Чипы категорий */}
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}
+      >
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          value={category}
+          onChange={(_, v) => {
+            if (v !== null) {
+              setCategory(v);
+              setPage(1);
+            }
+          }}
+        >
+          {CATEGORIES.map((c) => (
+            <ToggleButton key={c.value} value={c.value}>
+              {c.label}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Stack>
+
+      {/* Панель фильтров */}
+      <Collapse in={showFilters}>
+        <Paper sx={{ p: 2, mb: 2 }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Калории от"
+              type="number"
+              size="small"
+              value={minCalories}
+              onChange={(e) => setMinCalories(e.target.value)}
+              onFocus={(e) => e.target.select()}
+              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+            />
+            <TextField
+              label="Калории до"
+              type="number"
+              size="small"
+              value={maxCalories}
+              onChange={(e) => setMaxCalories(e.target.value)}
+              onFocus={(e) => e.target.select()}
+              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+            />
+            <TextField
+              label="Белок от, г"
+              type="number"
+              size="small"
+              value={minProtein}
+              onChange={(e) => setMinProtein(e.target.value)}
+              onFocus={(e) => e.target.select()}
+              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+            />
+            <TextField
+              select
+              label="Сортировка"
+              size="small"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              sx={{ minWidth: 200 }}
+            >
+              <MenuItem value="name,asc">Название (А-Я)</MenuItem>
+              <MenuItem value="name,desc">Название (Я-А)</MenuItem>
+              <MenuItem value="calories,asc">Калории (↑)</MenuItem>
+              <MenuItem value="calories,desc">Калории (↓)</MenuItem>
+            </TextField>
+          </Stack>
+        </Paper>
+      </Collapse>
+
       {currentQuery.isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
@@ -96,7 +259,9 @@ export default function RecipesPage() {
         items.length === 0 && (
           <Alert severity="info">
             {isMyTab
-              ? 'У вас пока нет рецептов. Нажмите «Создать рецепт», чтобы добавить первый.'
+              ? hasActiveFilters
+                ? 'По фильтрам ничего не найдено.'
+                : 'У вас пока нет рецептов. Нажмите «Создать рецепт», чтобы добавить первый.'
               : 'Пока нет публичных рецептов.'}
           </Alert>
         )}
@@ -119,14 +284,14 @@ export default function RecipesPage() {
                 onClick={() => navigate(`/recipes/${recipe.id}`)}
               >
                 <CardContent>
-                <Stack
-                  direction="row"
-                  sx={{
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 1,
-                  }}
-                >
+                  <Stack
+                    direction="row"
+                    sx={{
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      mb: 1,
+                    }}
+                  >
                     <Typography variant="h6" component="div">
                       {recipe.name}
                     </Typography>

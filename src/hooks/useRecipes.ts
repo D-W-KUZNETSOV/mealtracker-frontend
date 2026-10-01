@@ -20,11 +20,23 @@ export const recipesKeys = {
 };
 
 // ---------- Мои рецепты (пагинация) ----------
-export function useMyRecipes(page = 0, size = 10) {
+export interface RecipeFilters {
+  query?: string;
+  minCalories?: number;
+  maxCalories?: number;
+  minProtein?: number;
+  sort?: string;
+}
+
+export function useMyRecipes(
+  page = 0,
+  size = 10,
+  filters: RecipeFilters = {},
+) {
   return useQuery({
-    queryKey: recipesKeys.mine(page, size),
-    queryFn: async () => (await recipesApi.listMine(page, size)).data,
-    placeholderData: keepPreviousData, // чтобы не мигало при переключении страниц
+    queryKey: [...recipesKeys.mine(page, size), filters],
+    queryFn: async () => (await recipesApi.listMine(page, size, filters)).data,
+    placeholderData: keepPreviousData,
   });
 }
 
