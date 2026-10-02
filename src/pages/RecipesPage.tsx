@@ -176,6 +176,7 @@ export default function RecipesPage() {
         sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}
       >
         <ToggleButtonGroup
+        sx={{ flexWrap: 'wrap', gap: 0.5 }}
           size="small"
           exclusive
           value={category}
