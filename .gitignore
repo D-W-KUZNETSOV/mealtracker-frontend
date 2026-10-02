@@ -26,3 +26,5 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+# Nested clone (accidental gitlink, removed 2026-10-02)
+mealtracker-frontend_OLD_*/
