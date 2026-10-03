@@ -25,6 +25,7 @@ import {
   useSaveGoals,
   useTargetProtein,
 } from '../hooks/useNutrition';
+import { useDailyCalories } from '../hooks/useProfile';
 import type { ApiError, GoalType } from '../types/api';
 import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 
@@ -54,9 +55,10 @@ const GOAL_LABELS: Record<GoalType, string> = {
 export default function GoalsPage() {
   const { enqueueSnackbar } = useSnackbar();
 
-  const goalsQuery = useGoals();
-  const targetProteinQuery = useTargetProtein();
-  const saveMutation = useSaveGoals();
+ const goalsQuery = useGoals();
+ const targetProteinQuery = useTargetProtein();
+ const dailyCaloriesQuery = useDailyCalories();
+ const saveMutation = useSaveGoals();
 
   const [autoCalories, setAutoCalories] = useState(true);
   const [autoProtein, setAutoProtein] = useState(true);
@@ -157,6 +159,18 @@ export default function GoalsPage() {
             </Typography>
           </CardContent>
         </Card>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Дневная норма
+              </Typography>
+              <Typography variant="h5">
+                {dailyCaloriesQuery.data != null
+                  ? `${dailyCaloriesQuery.data} ккал`
+                  : '—'}
+              </Typography>
+            </CardContent>
+          </Card>
 
         <Card sx={{ flex: 1 }}>
           <CardContent>
@@ -250,6 +264,12 @@ export default function GoalsPage() {
                     Калории рассчитываются по формуле Миффлина–Сан Жеора
                     с учётом вашего пола, возраста, роста, веса и уровня
                     активности <b>из профиля</b>.
+                    {dailyCaloriesQuery.data != null && (
+                      <>
+                        {' '}
+                        → <b>~{dailyCaloriesQuery.data} ккал/день</b>
+                      </>
+                    )}
                   </Alert>
                 ) : (
                   <TextField
