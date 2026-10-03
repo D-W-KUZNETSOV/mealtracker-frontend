@@ -144,13 +144,6 @@ export default function Layout() {
               <Typography variant="body2">{user?.username}</Typography>
             )}
           </Stack>
-
-          {/* Кнопка «Выйти» только на десктопе */}
-          {!isMobile && (
-            <Button color="inherit" onClick={handleLogout} sx={{ ml: 1 }}>
-              Выйти
-            </Button>
-          )}
         </Toolbar>
       </AppBar>
 

@@ -46,10 +46,179 @@ export default function GuidePage() {
               <Typography>
                 <b>4. Веди дневник</b> → раздел «Дневник».
                 Выбирай рецепт и вес порции — КБЖУ посчитается сам.
+                Можно добавлять порции прямо из плана меню (кнопка «Из плана»).
               </Typography>
               <Typography>
-                <b>5. Отслеживай прогресс</b> → раздел «Замеры».
+                <b>5. Планируй меню</b> → раздел «Меню».
+                Составь меню на день или неделю: завтрак, обед, ужин, перекус.
+                КБЖУ за день считается автоматически.
+              </Typography>
+              <Typography>
+                <b>6. Составляй список покупок</b> → раздел «Покупки».
+                Сгенерируй список из плана меню — ингредиенты агрегируются
+                автоматически. Или добавь продукты вручную.
+              </Typography>
+              <Typography>
+                <b>7. Отслеживай прогресс</b> → раздел «Замеры».
                 Записывай вес и обхваты — увидишь графики.
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* ============ Меню (планировщик) ============ */}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6">Меню — планировщик питания</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={2}>
+              <Typography variant="body2">
+                <b>Что это:</b> раздел для планирования приёмов пищи
+                на день или неделю вперёд.
+              </Typography>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Как пользоваться
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  • <b>Выбери период</b> — день или неделя (переключатель сверху)<br />
+                  • <b>Кликни на слот</b> — Завтрак / Обед / Ужин / Перекус<br />
+                  • <b>Выбери блюдо</b> — из своих рецептов, публичных рецептов
+                  или отдельных ингредиентов<br />
+                  • <b>Укажи порцию</b> — в граммах или в порциях (если у рецепта
+                  заданы servings)
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Что показывает
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  • <b>Итоги КБЖУ за день</b> — сумма по всем слотам<br />
+                  • <b>Прогресс-бары</b> — сколько съедено от цели (калории + белок)<br />
+                  • <b>Сетка недели</b> — краткая сводка по каждому дню
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Перенос в дневник
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  Два способа:<br />
+                  1. <b>Из меню:</b> на карточке блюда — кнопка «Съедено»<br />
+                  2. <b>Из дневника:</b> кнопка «Из плана» → выбрать блюда из меню
+                  на сегодня
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" color="text.secondary">
+                💡 Совет: планируй меню на неделю заранее — так проще
+                контролировать КБЖУ и закупаться продуктами.
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* ============ Покупки ============ */}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6">Покупки — списки продуктов</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={2}>
+              <Typography variant="body2">
+                <b>Что это:</b> списки продуктов, которые нужно купить.
+                Можно создавать автоматически из плана меню или добавлять вручную.
+              </Typography>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Как создать список
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  <b>1. Из плана меню</b> — кнопка «Сгенерировать из плана».<br />
+                  Выбери период (день / неделя / свой диапазон) — система
+                  соберёт все ингредиенты из рецептов и агрегирует
+                  одинаковые позиции с суммированием веса.<br /><br />
+                  <b>2. Вручную</b> — кнопка «Добавить вручную».<br />
+                  Пригодится для бытовых продуктов (мыло, бумага),
+                  не связанных с рецептами.
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Что можно делать со списком
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  • <b>Отмечать купленное</b> — чекбокс рядом с позицией<br />
+                  • <b>Архивировать</b> — завершённые списки уходят в архив<br />
+                  • <b>Повторять</b> — кнопка «Повторить» создаёт копию списка
+                  (для регулярных закупок)<br />
+                  • <b>Редактировать</b> — менять количество, удалять позиции
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Как считается количество
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  Если один и тот же ингредиент встречается в нескольких
+                  рецептах — веса суммируются. Например, в трёх рецептах
+                  нужна курица по 200 г → в списке будет «Курица — 600 г».
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" color="text.secondary">
+                💡 Совет: сохраняй шаблонные списки через «Повторить» —
+                для еженедельных закупок это экономит время.
+              </Typography>
+            </Stack>
+          </AccordionDetails>
+        </Accordion>
+
+        {/* ============ Дневник — новая кнопка «Из плана» ============ */}
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6">Дневник: добавление «Из плана»</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={2}>
+              <Typography variant="body2">
+                В дневнике есть <b>две кнопки</b> для добавления еды:
+              </Typography>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  «Добавить порцию» — вручную
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  Выбираешь рецепт из своих или публичных, указываешь вес
+                  порции — КБЖУ считается автоматически.
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  «Из плана» — массово из меню
+                </Typography>
+                <Typography variant="body2" sx={{ pl: 2 }}>
+                  Открывается список блюд, запланированных в меню на сегодня.
+                  Отмечаешь нужные галочками — и они разом добавляются в
+                  дневник с указанными порциями.<br /><br />
+                  Удобно, если ты заранее спланировал меню на день и хочешь
+                  быстро перенести всё съеденное в дневник.
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" color="text.secondary">
+                💡 Совет: планируй меню утром или вечером накануне —
+                тогда в течение дня просто отмечаешь съеденное через «Из плана».
               </Typography>
             </Stack>
           </AccordionDetails>
@@ -381,6 +550,21 @@ export default function GuidePage() {
                   Следи за дефицитом калорий (важен для похудения),
                   белком (сохраняет мышцы) и силовыми тренировками.
                   Веди дневник честно — иногда мы едим больше, чем думаем.
+                </Typography>
+              </Box>
+
+              {/* 🆕 Новый FAQ-пункт про меню */}
+              <Box>
+                <Typography variant="subtitle2">
+                  Зачем планировать меню, если есть дневник?
+                </Typography>
+                <Typography variant="body2">
+                  Дневник — это «что я уже съел». Меню — «что я планирую съесть».
+                  Планирование помогает:<br />
+                  • Заранее рассчитать КБЖУ на день<br />
+                  • Составить список покупок без лишнего<br />
+                  • Не думать «что бы поесть» в течение дня<br />
+                  • Видеть, укладываешься ли в цели ещё до еды
                 </Typography>
               </Box>
             </Stack>
