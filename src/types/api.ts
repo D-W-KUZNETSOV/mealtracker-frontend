@@ -432,3 +432,10 @@ export const INGREDIENT_CATEGORIES: Record<string, { label: string; emoji: strin
   SAUCES:     { label: 'Соусы',      emoji: '🥫' },
   OTHER:      { label: 'Прочее',     emoji: '📦' },
 };
+export interface CreateShoppingListItemRequest {
+  ingredientId?: number | null;
+  ingredientName: string;
+  category?: string | null;
+  quantityGrams?: number | null;
+  unitType?: UnitType | null;
+}

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { shoppingApi } from '../api/shopping';
-import type { GenerateShoppingListRequest } from '../types/api';
+import type { GenerateShoppingListRequest,CreateShoppingListItemRequest } from '../types/api';
 
 export const shoppingKeys = {
   all: ['shoppingLists'] as const,
@@ -60,6 +60,14 @@ export function useRepeatShoppingList() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => shoppingApi.repeat(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: shoppingKeys.all }),
+  });
+}
+export function useAddShoppingItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, data }: { listId: number; data: CreateShoppingListItemRequest }) =>
+      shoppingApi.addItem(listId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: shoppingKeys.all }),
   });
 }

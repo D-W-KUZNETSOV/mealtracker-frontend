@@ -3,6 +3,7 @@ import type {
   ShoppingListDto,
   ShoppingListItemDto,
   GenerateShoppingListRequest,
+  CreateShoppingListItemRequest,
 } from '../types/api';
 
 export const shoppingApi = {
@@ -31,4 +32,7 @@ export const shoppingApi = {
 
     repeat: (id: number) =>
       apiClient.post<ShoppingListDto>(`/api/shopping-lists/${id}/repeat`),
+
+      addItem: (listId: number, data: CreateShoppingListItemRequest) =>
+        apiClient.post<ShoppingListItemDto>(`/api/shopping-lists/${listId}/items`, data),
 };

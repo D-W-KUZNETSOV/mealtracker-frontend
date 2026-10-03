@@ -14,7 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useRepeatShoppingList } from '../hooks/useShoppingLists';
 import { useSnackbar } from 'notistack';
-
+import AddShoppingItemDialog from '../components/AddShoppingItemDialog';
 
 import {
   useShoppingLists,
@@ -42,6 +42,7 @@ export default function ShoppingPage() {
 
   // 3. useState
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
+  const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
 
   // 3. JSX
   return (
@@ -65,9 +66,14 @@ export default function ShoppingPage() {
           >
             Из плана
           </Button>
-          <Button variant="contained" startIcon={<AddIcon />} disabled>
-            Вручную
-          </Button>
+         <Button
+           variant="contained"
+           startIcon={<AddIcon />}
+           onClick={() => setAddItemDialogOpen(true)}
+           disabled={!activeList}
+         >
+           Вручную
+         </Button>
         </Stack>
       </Stack>
 
@@ -263,6 +269,13 @@ export default function ShoppingPage() {
         open={generateDialogOpen}
         onClose={() => setGenerateDialogOpen(false)}
       />
+      {activeList && (
+        <AddShoppingItemDialog
+          open={addItemDialogOpen}
+          onClose={() => setAddItemDialogOpen(false)}
+          listId={activeList.id}
+        />
+      )}
     </Box>
    );
  }
