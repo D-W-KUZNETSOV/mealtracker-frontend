@@ -20,7 +20,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import BalanceIcon from './BalanceIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuthStore } from '../store/authStore';
@@ -88,7 +88,7 @@ export default function Layout() {
           )}
 
 
-        <RestaurantMenuIcon sx={{ mr: 1 }} />
+        <BalanceIcon sx={{ mr: 1, fontSize: 28 }} />
         <Typography
           variant="h6"
           component={RouterLink}
@@ -101,7 +101,7 @@ export default function Layout() {
             flexGrow: isMobile ? 1 : 0,
           }}
         >
-          MealTracker
+          Баланс
         </Typography>
 
          {/* Меню только на десктопе */}
@@ -156,9 +156,9 @@ export default function Layout() {
         <Box sx={{ width: 260 }} role="presentation">
           {/* Лого */}
           <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <RestaurantMenuIcon color="primary" />
+            <BalanceIcon color="primary" sx={{ fontSize: 28 }} />
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              MealTracker
+              Баланс
             </Typography>
           </Box>
           <Divider />
@@ -272,7 +272,7 @@ export default function Layout() {
           borderColor: 'divider',
         }}
       >
-        <Typography variant="caption">MealTracker © 2026</Typography>
+        <Typography variant="caption">Баланс © 2026</Typography>
       </Box>
     </Box>
   );
