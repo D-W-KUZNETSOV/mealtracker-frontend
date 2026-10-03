@@ -14,6 +14,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Grid,
   Stack,
   TextField,
   Typography,
@@ -147,57 +148,66 @@ export default function GoalsPage() {
         Цели КБЖУ
       </Typography>
 
-      {/* ============ Верхние карточки ============ */}
-      <Stack direction="row" spacing={3} sx={{ mb: 3 }}>
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Текущий вес
-            </Typography>
-            <Typography variant="h5">
-              {goalsQuery.data?.currentWeightKg ?? '—'} кг
-            </Typography>
-          </CardContent>
-        </Card>
-          <Card sx={{ flex: 1 }}>
-            <CardContent>
-              <Typography variant="subtitle2" color="text.secondary">
-                Дневная норма
-              </Typography>
-              <Typography variant="h5">
-                {dailyCaloriesQuery.data != null
-                  ? `${dailyCaloriesQuery.data} ккал`
-                  : '—'}
-              </Typography>
-            </CardContent>
-          </Card>
+     {/* ============ Верхние карточки ============ */}
+     <Grid container spacing={3} sx={{ mb: 3 }}>
+       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+         <Card>
+           <CardContent>
+             <Typography variant="subtitle2" color="text.secondary">
+               Текущий вес
+             </Typography>
+             <Typography variant="h5">
+               {goalsQuery.data?.currentWeightKg ?? '—'} кг
+             </Typography>
+           </CardContent>
+         </Card>
+       </Grid>
 
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Целевой белок
-            </Typography>
-            <Typography variant="h5">
-              {targetProteinQuery.data
-                ? `${targetProteinQuery.data.targetProteinGramsPerDay.toFixed(1)} г/день`
-                : '—'}
-            </Typography>
-          </CardContent>
-        </Card>
+       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+         <Card>
+           <CardContent>
+             <Typography variant="subtitle2" color="text.secondary">
+               Дневная норма
+             </Typography>
+             <Typography variant="h5">
+               {dailyCaloriesQuery.data != null
+                 ? `${dailyCaloriesQuery.data} ккал`
+                 : '—'}
+             </Typography>
+           </CardContent>
+         </Card>
+       </Grid>
 
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="subtitle2" color="text.secondary">
-              Дата обновления
-            </Typography>
-            <Typography variant="body1">
-              {goalsQuery.data?.createdAt
-                ? new Date(goalsQuery.data.createdAt).toLocaleDateString('ru-RU')
-                : '—'}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Stack>
+       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+         <Card>
+           <CardContent>
+             <Typography variant="subtitle2" color="text.secondary">
+               Целевой белок
+             </Typography>
+             <Typography variant="h5">
+               {targetProteinQuery.data
+                 ? `${targetProteinQuery.data.targetProteinGramsPerDay.toFixed(1)} г/день`
+                 : '—'}
+             </Typography>
+           </CardContent>
+         </Card>
+       </Grid>
+
+       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+         <Card>
+           <CardContent>
+             <Typography variant="subtitle2" color="text.secondary">
+               Дата обновления
+             </Typography>
+             <Typography variant="body1">
+               {goalsQuery.data?.createdAt
+                 ? new Date(goalsQuery.data.createdAt).toLocaleDateString('ru-RU')
+                 : '—'}
+             </Typography>
+           </CardContent>
+         </Card>
+       </Grid>
+     </Grid>
 
       {/* ============ Форма ============ */}
       <Card>
