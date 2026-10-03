@@ -1,5 +1,5 @@
 import SvgIcon from '@mui/material/SvgIcon';
-import type { SvgIconProps } from '@mui/material/SvgIcon';q
+import type { SvgIconProps } from '@mui/material/SvgIcon';
 
 /**
  * Иконка «Баланс» — стилизованные весы.
