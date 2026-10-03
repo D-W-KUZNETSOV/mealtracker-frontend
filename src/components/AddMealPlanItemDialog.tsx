@@ -15,7 +15,7 @@ import {
 import { useSnackbar } from 'notistack';
 
 import { useMyRecipes } from '../hooks/useRecipes';
-import { useBaseIngredients } from '../hooks/useIngredients';
+import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
 import { useAddMealPlanItem } from '../hooks/useMealPlans';
 import type {
   ApiError,
@@ -54,8 +54,9 @@ export default function AddMealPlanItemDialog({
   const addMutation = useAddMealPlanItem();
 
   // ---------- React Query ----------
-  const recipesQuery = useMyRecipes(0, 100);
-  const ingredientsQuery = useBaseIngredients();
+ const recipesQuery = useMyRecipes(0, 100);
+ const myIngredientsQuery = useMyIngredients();
+ const baseIngredientsQuery = useBaseIngredients();
 
   // ---------- useState ----------
   const [mode, setMode] = useState<Mode>('recipe');
@@ -83,8 +84,14 @@ export default function AddMealPlanItemDialog({
   }, [selectedRecipe]);
 
   // ---------- Данные для отображения ----------
-  const recipes = recipesQuery.data?.content ?? [];
-  const ingredients = ingredientsQuery.data ?? [];
+ const recipes = recipesQuery.data?.content ?? [];
+ const ingredients = useMemo(
+   () => [
+     ...(myIngredientsQuery.data ?? []),
+     ...(baseIngredientsQuery.data ?? []),
+   ],
+   [myIngredientsQuery.data, baseIngredientsQuery.data],
+ );
 
   const canSubmit = useMemo(() => {
     if (mode === 'recipe') return !!selectedRecipe && servings > 0;
@@ -196,7 +203,7 @@ export default function AddMealPlanItemDialog({
                 value={selectedIngredient}
                 onChange={(_, v) => setSelectedIngredient(v)}
                 isOptionEqualToValue={(o, v) => o.id === v.id}
-                loading={ingredientsQuery.isLoading}
+               loading={myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading}
                 renderInput={(params) => (
                   <TextField
                     {...params}

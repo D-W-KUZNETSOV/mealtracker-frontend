@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Button,
@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 
-import { useBaseIngredients } from '../hooks/useIngredients';
+import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
 import { useAddShoppingItem } from '../hooks/useShoppingLists';
 import type { ApiError, IngredientDto } from '../types/api';
 
@@ -34,7 +34,16 @@ const UNIT_LABELS: Record<string, string> = {
 export default function AddShoppingItemDialog({ open, onClose, listId }: Props) {
   const { enqueueSnackbar } = useSnackbar();
   const addMutation = useAddShoppingItem();
-  const ingredientsQuery = useBaseIngredients();
+ const myIngredientsQuery = useMyIngredients();
+ const baseIngredientsQuery = useBaseIngredients();
+
+ const allIngredients = useMemo(
+   () => [
+     ...(myIngredientsQuery.data ?? []),
+     ...(baseIngredientsQuery.data ?? []),
+   ],
+   [myIngredientsQuery.data, baseIngredientsQuery.data],
+ );
 
   const [selected, setSelected] = useState<IngredientDto | null>(null);
   const [quantity, setQuantity] = useState<number>(100);
@@ -75,12 +84,12 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Autocomplete
-            options={ingredientsQuery.data ?? []}
+            options={allIngredients}
             getOptionLabel={(i) => i.name}
             value={selected}
             onChange={(_, v) => setSelected(v)}
             isOptionEqualToValue={(o, v) => o.id === v.id}
-            loading={ingredientsQuery.isLoading}
+             loading={myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading}
             renderInput={(params) => (
               <TextField {...params} label="Ингредиент" fullWidth autoFocus />
             )}
