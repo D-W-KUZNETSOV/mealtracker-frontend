@@ -92,14 +92,24 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
                 КБЖУ на 100 г: {selected.caloriesPer100g ?? '—'} ккал
               </Typography>
 
-              <TextField
-                label={`Количество, ${UNIT_LABELS[selected.unitType] ?? 'ед.'}`}
-                type="number"
-                fullWidth
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value) || 0)}
-                slotProps={{ htmlInput: { step: '1', min: 1 } }}
-              />
+           <TextField
+             label={`Количество, ${UNIT_LABELS[selected.unitType] ?? 'ед.'}`}
+             type="number"
+             fullWidth
+             value={quantity === 0 || quantity == null ? '' : quantity}
+             onChange={(e) => {
+               const raw = e.target.value;
+               if (raw === '') {
+                 setQuantity(0);
+                 return;
+               }
+               const val = Number(raw.replace(',', '.'));
+               if (!Number.isNaN(val)) setQuantity(val);
+             }}
+             onFocus={(e) => e.target.select()}
+             placeholder="0"
+             slotProps={{ htmlInput: { step: '1', min: 1, inputMode: 'decimal' } }}
+           />
             </>
           )}
         </Stack>
