@@ -231,6 +231,42 @@ export default function RecipeDetailPage() {
           </Box>
         </Box>
       </Paper>
+            {/* ============ Шаги приготовления ============ */}
+            {recipe.steps && recipe.steps.length > 0 && (
+              <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Шаги приготовления
+                </Typography>
+                <Stack spacing={1.5} sx={{ mt: 1 }}>
+                  {recipe.steps.map((step, idx) => (
+                    <Stack key={idx} direction="row" spacing={2}>
+                      <Box
+                        sx={{
+                          minWidth: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          bgcolor: 'primary.main',
+                          color: 'primary.contrastText',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          flexShrink: 0,
+                          mt: 0.25,
+                        }}
+                      >
+                        {idx + 1}
+                      </Box>
+                      <Typography sx={{ wordBreak: 'break-word', pt: 0.25 }}>
+                        {step}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              </Paper>
+            )}
+
 
       {/* ============ Ингредиенты ============ */}
       <Typography variant="h6" gutterBottom>

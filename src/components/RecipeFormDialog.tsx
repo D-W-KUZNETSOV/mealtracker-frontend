@@ -25,7 +25,8 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSnackbar } from 'notistack';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';import { useSnackbar } from 'notistack';
 import ImageUpload from './ImageUpload';
 import IngredientFormDialog from './IngredientFormDialog';
 
@@ -109,6 +110,7 @@ export default function RecipeFormDialog({
   const [imageUrl, setImageUrl] = useState('');
   const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE');
   const [rows, setRows] = useState<IngredientRow[]>([]);
+    const [steps, setSteps] = useState<string[]>([]);
 
   // ---------- Состояние для создания ингредиента «на лету» ----------
   const [ingredientDialogOpen, setIngredientDialogOpen] = useState(false);
@@ -118,48 +120,49 @@ export default function RecipeFormDialog({
     Record<number, string>
   >({});
 
-    // ---------- Сброс формы при открытии ----------
-    useEffect(() => {
-      if (!open) return;
+       // ---------- Сброс формы при открытии ----------
+       useEffect(() => {
+         if (!open) return;
 
-      if (isEdit && initialData) {
-        setName(initialData.name);
-        setCategory(
-            CATEGORIES.find((c) => c.label === initialData.category)?.value ?? null
-          );
-        setDescription(initialData.description ?? '');
-        setImageUrl(initialData.imageUrl ?? '');
-        setVisibility(initialData.visibility);
-         setServings(initialData.servings ?? 1);
-        setRows(
-          initialData.ingredients.map((ing, idx) => ({
-            tempId: Date.now() + idx,
-            ingredientId: ing.ingredientId,
-            weightInGrams: ing.quantityGrams,
-            quantity: ing.quantityGrams,
-            unit: 'GRAM',
-          })),
-        );
-      } else {
-        setName('');
-        setCategory(null);
-        setDescription('');
-        setImageUrl('');
-        setVisibility('PRIVATE');
-        setServings(1);
-        setRows([
-          {
-            tempId: Date.now(),
-            ingredientId: null,
-            weightInGrams: 100,
-            quantity: 100,
-            unit: 'GRAM',
-          },
-        ]);
-      }
-      setInputValueByRow({});
-    }, [open, isEdit, initialData]);
-
+         if (isEdit && initialData) {
+           setName(initialData.name);
+           setCategory(
+             CATEGORIES.find((c) => c.label === initialData.category)?.value ?? null
+           );
+           setDescription(initialData.description ?? '');
+           setImageUrl(initialData.imageUrl ?? '');
+           setVisibility(initialData.visibility);
+           setServings(initialData.servings ?? 1);
+           setRows(
+             initialData.ingredients.map((ing, idx) => ({
+               tempId: Date.now() + idx,
+               ingredientId: ing.ingredientId,
+               weightInGrams: ing.quantityGrams,
+               quantity: ing.quantityGrams,
+               unit: 'GRAM',
+             })),
+           );
+           setSteps(initialData.steps ?? []);
+         } else {
+           setName('');
+           setCategory(null);
+           setDescription('');
+           setImageUrl('');
+           setVisibility('PRIVATE');
+           setServings(1);
+           setRows([
+             {
+               tempId: Date.now(),
+               ingredientId: null,
+               weightInGrams: 100,
+               quantity: 100,
+               unit: 'GRAM',
+             },
+           ]);
+           setSteps([]);
+         }
+         setInputValueByRow({});
+       }, [open, isEdit, initialData]);
   // ---------- Работа со строками ингредиентов ----------
   const handleAddRow = () => {
     setRows((prev) => [
@@ -191,6 +194,35 @@ export default function RecipeFormDialog({
       prev.map((r) => (r.tempId === tempId ? { ...r, ...patch } : r)),
     );
   };
+    const MAX_STEPS = 30;
+    const MAX_STEP_LEN = 500;
+
+    const handleAddStep = () => {
+      if (steps.length >= MAX_STEPS) {
+        enqueueSnackbar(`Максимум ${MAX_STEPS} шагов`, { variant: 'warning' });
+        return;
+      }
+      setSteps((prev) => [...prev, '']);
+    };
+
+    const handleRemoveStep = (idx: number) => {
+      setSteps((prev) => prev.filter((_, i) => i !== idx));
+    };
+
+    const handleStepChange = (idx: number, value: string) => {
+      if (value.length > MAX_STEP_LEN) return;
+      setSteps((prev) => prev.map((s, i) => (i === idx ? value : s)));
+    };
+
+    const handleStepMove = (idx: number, dir: -1 | 1) => {
+      const target = idx + dir;
+      if (target < 0 || target >= steps.length) return;
+      setSteps((prev) => {
+        const copy = [...prev];
+        [copy[idx], copy[target]] = [copy[target], copy[idx]];
+        return copy;
+      });
+    };
 
   // ============================================================
   // Единицы измерения
@@ -301,15 +333,16 @@ export default function RecipeFormDialog({
        weightInGrams: r.weightInGrams,
      }));
 
-     const payload: RecipeRequest = {
-       name: name.trim(),
-       category: category ?? undefined,
-       description: description.trim() || undefined,
-       imageUrl: imageUrl.trim() || undefined,
-       visibility,
-         servings,
-       ingredients,
-     };
+         const payload: RecipeRequest = {
+           name: name.trim(),
+           category: category ?? undefined,
+           description: description.trim() || undefined,
+           imageUrl: imageUrl.trim() || undefined,
+           visibility,
+           servings,
+           steps: steps.map((s) => s.trim()).filter((s) => s.length > 0),   // 🆕
+           ingredients,
+         };
 
      try {
        if (isEdit) {
@@ -631,6 +664,88 @@ export default function RecipeFormDialog({
                 })}
               </Stack>
             )}
+                        <Divider />
+
+                        {/* Шаги приготовления */}
+                        <Stack
+                          direction="row"
+                          sx={{
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography variant="h6">Шаги приготовления</Typography>
+                          <Button
+                            startIcon={<AddIcon />}
+                            onClick={handleAddStep}
+                            size="small"
+                            disabled={steps.length >= MAX_STEPS}
+                          >
+                            Добавить шаг
+                          </Button>
+                        </Stack>
+
+                        {steps.length === 0 ? (
+                          <Typography color="text.secondary" variant="body2">
+                            Шаги не добавлены
+                          </Typography>
+                        ) : (
+                          <Stack spacing={1}>
+                            {steps.map((step, idx) => (
+                              <Stack
+                                key={idx}
+                                direction="row"
+                                spacing={1}
+                                sx={{ alignItems: 'flex-start' }}
+                              >
+                                <Typography
+                                  sx={{
+                                    minWidth: 24,
+                                    pt: 1,
+                                    fontWeight: 600,
+                                    color: 'text.secondary',
+                                  }}
+                                >
+                                  {idx + 1}.
+                                </Typography>
+                                <TextField
+                                  size="small"
+                                  fullWidth
+                                  multiline
+                                  maxRows={4}
+                                  placeholder={`Шаг ${idx + 1}`}
+                                  value={step}
+                                  onChange={(e) => handleStepChange(idx, e.target.value)}
+                                  helperText={`${step.length} / ${MAX_STEP_LEN}`}
+                                />
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleStepMove(idx, -1)}
+                                  disabled={idx === 0}
+                                  title="Вверх"
+                                >
+                                  <ArrowUpwardIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleStepMove(idx, 1)}
+                                  disabled={idx === steps.length - 1}
+                                  title="Вниз"
+                                >
+                                  <ArrowDownwardIcon fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  onClick={() => handleRemoveStep(idx)}
+                                  title="Удалить"
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Stack>
+                            ))}
+                          </Stack>
+                        )}
 
             {/* Итого КБЖУ */}
             <Paper variant="outlined" sx={{ p: 2 }}>

@@ -125,6 +125,7 @@ export interface RecipeDto {
    totalWeight: number;
    servings: number;              // 🆕
      servingSizeGrams: number;      // 🆕
+     steps: string[] | null;
   visibility: 'PUBLIC' | 'PRIVATE';
 }
 
@@ -137,6 +138,7 @@ export interface RecipeRequest {
   visibility: 'PUBLIC' | 'PRIVATE';
     servings?: number;             // 🆕
   ingredients: RecipeIngredientInput[];
+  steps?: string[];
 }
 
 export interface RecipeIngredientInput {
@@ -171,6 +173,7 @@ export interface RecipeSummaryDto {
   totalWeight: number;          // 🆕
     servings: number;              // 🆕
     servingSizeGrams: number;      // 🆕
+    steps: string[] | null;
 }
 
 /** Статистика (GET /api/recipes/{recipeId}/stats) */
