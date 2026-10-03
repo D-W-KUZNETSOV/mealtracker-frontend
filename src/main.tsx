@@ -32,6 +32,21 @@ if ('serviceWorker' in navigator) {
           registration.update();
         }, 60 * 1000);
 
+    // Проверка обновлений при возврате на вкладку (мобильный фикс)
+                      document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'visible') {
+                          console.log('[SW] Visibility change → check update');
+                          registration.update();
+                        }
+                      });
+
+                      // Проверка обновлений при фокусе окна
+                      window.addEventListener('focus', () => {
+                        console.log('[SW] Focus → check update');
+                        registration.update();
+                      });
+
+
         // Авто-перезагрузка, когда новый SW активируется
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
