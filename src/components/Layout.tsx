@@ -26,16 +26,22 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuthStore } from '../store/authStore';
 import UserAvatar from './UserAvatar';
 
-// Пункты меню навигации
+// Основное меню (везде)
 const navItems = [
-    { label: 'Главная', path: '/' },
+  { label: 'Главная', path: '/' },
   { label: 'Рецепты', path: '/recipes' },
   { label: 'Ингредиенты', path: '/ingredients' },
   { label: 'Дневник', path: '/diary' },
+  { label: 'План', path: '/meal-plan' },
+  { label: 'Покупки', path: '/shopping' },
   { label: 'Замеры', path: '/measurements' },
   { label: 'Цели', path: '/goals' },
   { label: 'Профиль', path: '/profile' },
-  { label: 'Справочник', path: '/guide' },   // ← новое
+];
+
+// Доп. меню (только в Drawer + в меню аватара)
+const extraNavItems = [
+  { label: 'Справочник', path: '/guide' },
 ];
 
 export default function Layout() {
@@ -90,7 +96,7 @@ export default function Layout() {
           sx={{
             color: 'inherit',
             textDecoration: 'none',
-            mr: 4,
+            mr: 2,
             fontWeight: 600,
             flexGrow: isMobile ? 1 : 0,
           }}
@@ -98,28 +104,32 @@ export default function Layout() {
           MealTracker
         </Typography>
 
-          {/* Меню только на десктопе */}
-          {!isMobile && (
-            <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
-              {navItems.map((item) => (
-                <Button
-                  key={item.path}
-                  component={RouterLink}
-                  to={item.path}
-                  color="inherit"
-                  sx={{
-                    textTransform: 'none',
-                    bgcolor:
-                      location.pathname === item.path
-                        ? 'rgba(255,255,255,0.15)'
-                        : 'transparent',
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Stack>
-          )}
+         {/* Меню только на десктопе */}
+         {!isMobile && (
+           <Stack direction="row" spacing={0.5} sx={{ flexGrow: 1 }}>
+             {navItems.map((item) => (
+               <Button
+                 key={item.path}
+                 component={RouterLink}
+                 to={item.path}
+                 color="inherit"
+                 size="small"
+                 sx={{
+                   textTransform: 'none',
+                   fontSize: { md: '0.8rem', lg: '0.875rem' },
+                   px: { md: 0.75, lg: 1.25 },
+                   minWidth: 0,
+                   bgcolor:
+                     location.pathname === item.path
+                       ? 'rgba(255,255,255,0.15)'
+                       : 'transparent',
+                 }}
+               >
+                 {item.label}
+               </Button>
+             ))}
+           </Stack>
+         )}
 
           {/* Аватар + имя: на десктопе показываем имя, на мобильном только аватар */}
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', ml: 'auto' }}>
@@ -151,6 +161,7 @@ export default function Layout() {
         onClose={() => setDrawerOpen(false)}
       >
         <Box sx={{ width: 260 }} role="presentation">
+          {/* Лого */}
           <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <RestaurantMenuIcon color="primary" />
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -158,6 +169,8 @@ export default function Layout() {
             </Typography>
           </Box>
           <Divider />
+
+          {/* Основное меню */}
           <List>
             {navItems.map((item) => (
               <ListItem key={item.path} disablePadding>
@@ -173,6 +186,25 @@ export default function Layout() {
             ))}
           </List>
           <Divider />
+
+          {/* Доп. меню */}
+          <List>
+            {extraNavItems.map((item) => (
+              <ListItem key={item.path} disablePadding>
+                <ListItemButton
+                  component={RouterLink}
+                  to={item.path}
+                  selected={location.pathname === item.path}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+
+          {/* Выйти */}
           <List>
             <ListItem disablePadding>
               <ListItemButton
@@ -189,36 +221,47 @@ export default function Layout() {
         </Box>
       </Drawer>
 
-      {/* ============ Меню пользователя (клик по аватару) ============ */}
-      <Menu
-        anchorEl={userMenuAnchor}
-        open={Boolean(userMenuAnchor)}
-        onClose={handleUserMenuClose}
-      >
-        <MenuItem disabled>
-          <Typography variant="body2" color="text.secondary">
-            {user?.username}
-          </Typography>
-        </MenuItem>
-        <Divider />
-        <MenuItem
-          onClick={() => {
-            handleUserMenuClose();
-            navigate('/profile');
-          }}
-        >
-          Профиль
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleUserMenuClose();
-            handleLogout();
-          }}
-        >
-          <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
-          Выйти
-        </MenuItem>
-      </Menu>
+     {/* ============ Меню пользователя (клик по аватару) ============ */}
+     <Menu
+       anchorEl={userMenuAnchor}
+       open={Boolean(userMenuAnchor)}
+       onClose={handleUserMenuClose}
+     >
+       <MenuItem disabled>
+         <Typography variant="body2" color="text.secondary">
+           {user?.username}
+         </Typography>
+       </MenuItem>
+       <Divider />
+       <MenuItem
+         onClick={() => {
+           handleUserMenuClose();
+           navigate('/profile');
+         }}
+       >
+         Профиль
+       </MenuItem>
+       {!isMobile && (
+         <MenuItem
+           onClick={() => {
+             handleUserMenuClose();
+             navigate('/guide');
+           }}
+         >
+           Справочник
+         </MenuItem>
+       )}
+       <Divider />
+       <MenuItem
+         onClick={() => {
+           handleUserMenuClose();
+           handleLogout();
+         }}
+       >
+         <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
+         Выйти
+       </MenuItem>
+     </Menu>
 
       {/* ============ Контент страницы ============ */}
       <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>

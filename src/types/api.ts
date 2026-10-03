@@ -313,7 +313,7 @@ export interface ProfileUpdateRequest {
 
 export type DailyCaloriesDto = number;
 
-// ---------- Images ----------
+
 
 // ---------- Images ----------
 
@@ -351,3 +351,84 @@ export interface CreateBodyMeasurementRequest {
   neckCm?: number | null;
   note?: string | null;
 }
+// ---------- Meal Plans (F2) ----------
+
+export interface MealPlanDto {
+  id: number;
+  name: string | null;
+  startDate: string;           // ISO: "2026-10-05"
+  endDate: string;
+  items: MealPlanItemDto[];
+}
+
+export interface MealPlanItemDto {
+  id: number;
+  planDate: string;
+  mealType: MealType;
+  recipeId: number | null;
+  recipeName: string | null;
+  ingredientId: number | null;
+  ingredientName: string | null;
+  servings: number | null;
+  weightInGrams: number | null;
+  customName: string | null;
+}
+
+export interface CreateMealPlanRequest {
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface CreateMealPlanItemRequest {
+  planDate: string;
+  mealType: MealType;
+  recipeId?: number | null;
+  ingredientId?: number | null;
+  servings?: number | null;
+  weightInGrams?: number | null;
+  customName?: string | null;
+}
+
+// ---------- Shopping Lists (F2) ----------
+
+export interface ShoppingListDto {
+  id: number;
+  name: string | null;
+  planId: number | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  status: 'ACTIVE' | 'ARCHIVED';
+  items: ShoppingListItemDto[];
+}
+
+export interface ShoppingListItemDto {
+  id: number;
+  ingredientId: number | null;
+  ingredientName: string;
+  category: string | null;
+  quantityGrams: number | null;
+  unitType: UnitType | null;
+  isChecked: boolean;
+}
+
+export interface GenerateShoppingListRequest {
+  periodStart?: string | null;
+  periodEnd?: string | null;
+}
+
+// ---------- Категории ингредиентов (для группировки) ----------
+
+export const INGREDIENT_CATEGORIES: Record<string, { label: string; emoji: string }> = {
+  MEAT:       { label: 'Мясо',       emoji: '🥩' },
+  FISH:       { label: 'Рыба',       emoji: '🐟' },
+  VEGETABLES: { label: 'Овощи',      emoji: '🥬' },
+  FRUITS:     { label: 'Фрукты',     emoji: '🍎' },
+  GRAINS:     { label: 'Крупы',      emoji: '🌾' },
+  DAIRY:      { label: 'Молочное',   emoji: '🥛' },
+  SWEETS:     { label: 'Сладкое',    emoji: '🍫' },
+  DRINKS:     { label: 'Напитки',    emoji: '🥤' },
+  SPICES:     { label: 'Специи',     emoji: '🧂' },
+  SAUCES:     { label: 'Соусы',      emoji: '🥫' },
+  OTHER:      { label: 'Прочее',     emoji: '📦' },
+};
