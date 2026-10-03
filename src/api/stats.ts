@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { AddPortionRequest, DailyStatsDto } from '../types/api';
+import type { AddPortionRequest, DailyStatsDto, AddFromPlanRequest, AddFromPlanResponse} from '../types/api';
 
 // ============================================================
 // Модуль API для дневника питания.
@@ -19,4 +19,7 @@ export const statsApi = {
   /** Удалить запись из дневника */
   deleteEntry: (entryId: number) =>
     apiClient.delete(`/api/stats/entries/${entryId}`),
+
+    addFromPlan: (data: AddFromPlanRequest) =>
+      apiClient.post<AddFromPlanResponse>('/api/stats/daily/add-from-plan', data),
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { statsApi } from '../api/stats';
-import type { AddPortionRequest } from '../types/api';
+import type { AddPortionRequest,AddFromPlanRequest } from '../types/api';
 
 // ============================================================
 // Ключи кеша
@@ -16,6 +16,15 @@ export function useTodayStats() {
   return useQuery({
     queryKey: statsKeys.today(),
     queryFn: async () => (await statsApi.getToday()).data,
+  });
+}
+export function useAddFromPlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: AddFromPlanRequest) => statsApi.addFromPlan(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: statsKeys.all });
+    },
   });
 }
 

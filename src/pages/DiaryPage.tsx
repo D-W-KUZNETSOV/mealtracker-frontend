@@ -23,6 +23,9 @@ import { roundNutrient } from '../types/api';
 import AddPortionDialog from '../components/AddPortionDialog';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDeleteDiaryEntry } from '../hooks/useStats';
+import AddFromPlanDialog from '../components/AddFromPlanDialog';
+import { useMealPlans } from '../hooks/useMealPlans';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -45,6 +48,9 @@ export default function DiaryPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
   const deleteEntry = useDeleteDiaryEntry();
+  const plansQuery = useMealPlans();
+  const activePlan = plansQuery.data?.[0] ?? null;
+  const [addFromPlanOpen, setAddFromPlanOpen] = useState(false);
 
   const isTodaySelected = isToday(selectedDate);
 
@@ -89,21 +95,34 @@ export default function DiaryPage() {
     <Box>
      <Stack
        direction="row"
-      sx={{
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        mb: 2,
-      }}
+       sx={{
+         justifyContent: 'space-between',
+         alignItems: 'center',
+         mb: 2,
+         flexWrap: 'wrap',
+         gap: 1,
+       }}
      >
-        <Typography variant="h4">Дневник питания</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
-        >
-          Добавить порцию
-        </Button>
-      </Stack>
+       <Typography variant="h4">Дневник питания</Typography>
+       <Stack direction="row" spacing={1}>
+         {activePlan && (
+           <Button
+             variant="outlined"
+             startIcon={<PlaylistAddIcon />}
+             onClick={() => setAddFromPlanOpen(true)}
+           >
+             Из плана
+           </Button>
+         )}
+         <Button
+           variant="contained"
+           startIcon={<AddIcon />}
+           onClick={() => setDialogOpen(true)}
+         >
+           Добавить порцию
+         </Button>
+       </Stack>
+     </Stack>
 
       {/* Переключатель даты */}
       <Paper sx={{ p: 2, mb: 3 }}>
@@ -339,6 +358,14 @@ export default function DiaryPage() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />
+      {activePlan && (
+        <AddFromPlanDialog
+          open={addFromPlanOpen}
+          onClose={() => setAddFromPlanOpen(false)}
+          plan={activePlan}
+          date={toApiDate(selectedDate)}
+        />
+      )}
     </Box>
   );
 }

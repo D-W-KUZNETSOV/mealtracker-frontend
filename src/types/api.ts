@@ -439,3 +439,13 @@ export interface CreateShoppingListItemRequest {
   quantityGrams?: number | null;
   unitType?: UnitType | null;
 }
+export interface AddFromPlanRequest {
+  planId: number;
+  date: string;
+  itemIds: number[];
+}
+
+export interface AddFromPlanResponse {
+  added: number;
+  message: string;
+}
