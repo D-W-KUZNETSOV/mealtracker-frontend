@@ -17,6 +17,7 @@ export default function GuidePage() {
     <Box>
       <Typography variant="h4" gutterBottom>
         Справочник
+        </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Справочник «Баланса» — всё, что нужно знать о питании, КБЖУ и работе приложения.
       </Typography>
