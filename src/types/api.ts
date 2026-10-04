@@ -31,6 +31,9 @@ export interface RegisterRequest {
   email: string;
   dateOfBirth: string;  // ← ISO format: "1990-01-15"
 }
+export interface DeleteAccountRequest {
+  password: string;   // 🆕 подтверждение паролем
+}
 
 // ---------- Единый формат ошибок ----------
 
@@ -295,6 +298,7 @@ export interface TargetProteinDto {
 
 export interface UserProfileDto {
     avatarUrl: string | null;
+    email: string | null;   // 🆕
   ageYears: number;
   heightCm: number;
   currentWeightKg: number;
@@ -306,6 +310,7 @@ export interface UserProfileDto {
 
 export interface ProfileUpdateRequest {
     avatarUrl?: string;
+     email?: string;   // 🆕
   dateOfBirth?: string;
   heightCm?: number;
   currentWeightKg?: number;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,6 +10,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -25,6 +29,7 @@ import UserAvatar from '../components/UserAvatar';
 import ImageUpload from '../components/ImageUpload';
 import {
   useDailyCalories,
+  useDeleteAccount,
   useProfile,
   useUpdateProfile,
 } from '../hooks/useProfile';
@@ -86,6 +91,11 @@ export default function ProfilePage() {
   const profileQuery = useProfile();
   const dailyCaloriesQuery = useDailyCalories();
   const updateMutation = useUpdateProfile();
+  const deleteMutation = useDeleteAccount();   // 🆕
+
+  // 🆕 Диалог удаления
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
 
   const {
     register,
@@ -144,6 +154,25 @@ export default function ProfilePage() {
       });
     }
   };
+    // 🆕 Удаление аккаунта
+    const handleDeleteAccount = async () => {
+      if (!deletePassword.trim()) {
+        enqueueSnackbar('Введите пароль для подтверждения', { variant: 'warning' });
+        return;
+      }
+      try {
+        await deleteMutation.mutateAsync(deletePassword);
+        enqueueSnackbar('Аккаунт удалён', { variant: 'success' });
+        // Выход + редирект на /login
+        useAuthStore.getState().logout();
+        window.location.href = '/login';
+      } catch (err) {
+        const apiError = err as ApiError;
+        enqueueSnackbar(apiError.message || 'Ошибка удаления', {
+          variant: 'error',
+        });
+      }
+    };
 
   if (profileQuery.isLoading) {
     return (
@@ -359,9 +388,72 @@ export default function ProfilePage() {
                   : 'Сохранить профиль'}
               </Button>
             </Stack>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
-  );
-}
+                 </form>
+               </CardContent>
+             </Card>
+
+             {/* 🆕 Опасная зона — удаление аккаунта */}
+             <Card sx={{ mt: 3, border: 1, borderColor: 'error.main' }}>
+               <CardContent>
+                 <Typography variant="h6" color="error" gutterBottom>
+                   Опасная зона
+                 </Typography>
+                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                   Удаление аккаунта необратимо. Все данные (рецепты, дневник, замеры,
+                   цели) будут скрыты. Через 30 дней — удалены окончательно.
+                 </Typography>
+                 <Button
+                   variant="outlined"
+                   color="error"
+                   onClick={() => setDeleteDialogOpen(true)}
+                 >
+                   Удалить аккаунт
+                 </Button>
+               </CardContent>
+             </Card>
+
+             {/* 🆕 Диалог подтверждения */}
+             <Dialog
+               open={deleteDialogOpen}
+               onClose={() => setDeleteDialogOpen(false)}
+               maxWidth="sm"
+               fullWidth
+             >
+               <DialogTitle>Удалить аккаунт?</DialogTitle>
+               <DialogContent>
+                 <Typography variant="body2" sx={{ mb: 2 }}>
+                   Введите пароль для подтверждения. Это действие нельзя отменить.
+                 </Typography>
+                 <TextField
+                   label="Пароль"
+                   type="password"
+                   fullWidth
+                   autoFocus
+                   value={deletePassword}
+                   onChange={(e) => setDeletePassword(e.target.value)}
+                   disabled={deleteMutation.isPending}
+                 />
+               </DialogContent>
+               <DialogActions>
+                 <Button
+                   onClick={() => {
+                     setDeleteDialogOpen(false);
+                     setDeletePassword('');
+                   }}
+                   disabled={deleteMutation.isPending}
+                 >
+                   Отмена
+                 </Button>
+                 <Button
+                   variant="contained"
+                   color="error"
+                   onClick={handleDeleteAccount}
+                   disabled={deleteMutation.isPending || !deletePassword.trim()}
+                 >
+                   {deleteMutation.isPending ? 'Удаление...' : 'Удалить навсегда'}
+                 </Button>
+               </DialogActions>
+             </Dialog>
+           </Box>
+         );
+       }

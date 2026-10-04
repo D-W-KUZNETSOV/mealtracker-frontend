@@ -40,3 +40,9 @@ export function useUpdateProfile() {
     },
   });
 }
+// ---------- Удаление аккаунта ----------
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: (password: string) => profileApi.deleteAccount(password),
+  });
+}

@@ -19,4 +19,8 @@ export const profileApi = {
   /** Дневная норма калорий (просто число) */
   getDailyCalories: () =>
     apiClient.get<DailyCaloriesDto>('/api/profile/calories/daily'),
+
+    // 🆕 Удаление аккаунта
+      deleteAccount: (password: string) =>
+        apiClient.delete('/api/account', { data: { password } }),
 };

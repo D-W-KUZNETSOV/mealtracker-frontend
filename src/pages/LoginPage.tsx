@@ -19,7 +19,7 @@ import { useAuthStore } from '../store/authStore';
 import type { ApiError } from '../types/api';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Введите имя пользователя'),
+  username: z.string().min(1, 'Введите email или имя пользователя'),
   password: z.string().min(1, 'Введите пароль'),
 });
 
@@ -82,13 +82,13 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
-              <TextField
-                label="Имя пользователя"
-                fullWidth
-                {...register('username')}
-                error={!!errors.username}
-                helperText={errors.username?.message}
-              />
+               <TextField
+                 label="Email или имя пользователя"
+                 fullWidth
+                 {...register('username')}
+                 error={!!errors.username}
+                 helperText={errors.username?.message || 'Можно ввести email'}
+                 />
               <TextField
                 label="Пароль"
                 type="password"
