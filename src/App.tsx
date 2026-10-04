@@ -5,10 +5,11 @@ import { Box, CircularProgress } from '@mui/material';
 // Публичные — сразу
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';   // 🆕
+import ResetPasswordPage from './pages/ResetPasswordPage';     // 🆕
 import DashboardPage from './pages/DashboardPage';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-
 // Ленивые
 const RecipesPage = lazy(() => import('./pages/RecipesPage'));
 const RecipeDetailPage = lazy(() => import('./pages/RecipeDetailPage'));
@@ -34,10 +35,11 @@ function App() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Публичные */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-
+             {/* Публичные */}
+             <Route path="/login" element={<LoginPage />} />
+             <Route path="/register" element={<RegisterPage />} />
+             <Route path="/forgot-password" element={<ForgotPasswordPage />} />   {/* 🆕 */}
+             <Route path="/reset-password" element={<ResetPasswordPage />} />     {/* 🆕 */}
         {/* Защищённые */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>

@@ -19,4 +19,11 @@ export const authApi = {
     apiClient.post<AuthResponse>('/api/auth/register', data),
 
   me: () => apiClient.get<UserResponse>('/api/auth/me'),
-};
+
+  // 🆕 Восстановление пароля
+    forgotPassword: (data: ForgotPasswordRequest) =>
+      apiClient.post<void>('/api/auth/forgot-password', data),
+
+    resetPassword: (data: ResetPasswordRequest) =>
+      apiClient.post<void>('/api/auth/reset-password', data),
+  };

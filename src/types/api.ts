@@ -34,6 +34,14 @@ export interface RegisterRequest {
 export interface DeleteAccountRequest {
   password: string;   // 🆕 подтверждение паролем
 }
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
 
 // ---------- Единый формат ошибок ----------
 

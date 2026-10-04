@@ -89,24 +89,32 @@ export default function LoginPage() {
                  error={!!errors.username}
                  helperText={errors.username?.message || 'Можно ввести email'}
                  />
-              <TextField
-                label="Пароль"
-                type="password"
-                fullWidth
-                {...register('password')}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                disabled={submitting}
-              >
-                {submitting ? 'Вход...' : 'Войти'}
-              </Button>
-            </Stack>
-          </form>
+                           <TextField
+                             label="Пароль"
+                             type="password"
+                             fullWidth
+                             {...register('password')}
+                             error={!!errors.password}
+                             helperText={errors.password?.message}
+                           />
+                           <Button
+                             type="submit"
+                             variant="contained"
+                             fullWidth
+                             disabled={submitting}
+                           >
+                             {submitting ? 'Вход...' : 'Войти'}
+                           </Button>
+                           <Typography
+                             variant="body2"
+                             sx={{ textAlign: 'right', mt: -1 }}
+                           >
+                             <Link component={RouterLink} to="/forgot-password">
+                               Забыли пароль?
+                             </Link>
+                           </Typography>
+                         </Stack>
+                       </form>
 
           <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
             Нет аккаунта?{' '}
