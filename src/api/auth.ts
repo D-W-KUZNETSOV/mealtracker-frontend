@@ -1,8 +1,10 @@
 import { apiClient } from './client';
 import type {
   AuthResponse,
+  ForgotPasswordRequest,      // ← 🆕
   LoginRequest,
   RegisterRequest,
+  ResetPasswordRequest,       // ← 🆕
   UserResponse,
 } from '../types/api';
 
