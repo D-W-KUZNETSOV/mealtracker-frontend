@@ -42,6 +42,12 @@ export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
 }
+// ---------- Feedback ----------
+
+export interface FeedbackRequest {
+  message: string;
+  contactEmail?: string;
+}
 
 // ---------- Единый формат ошибок ----------
 

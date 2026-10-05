@@ -23,8 +23,10 @@ import {
 import BalanceIcon from './BalanceIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
+import FeedbackIcon from '@mui/icons-material/Feedback';   // 🆕
 import { useAuthStore } from '../store/authStore';
 import UserAvatar from './UserAvatar';
+import FeedbackDialog from './FeedbackDialog';   // 🆕
 
 // Основное меню (везде)
 const navItems = [
@@ -56,6 +58,7 @@ export default function Layout() {
   // Состояния для меню
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);   // 🆕
 
   const handleLogout = () => {
     logout();
@@ -180,37 +183,53 @@ export default function Layout() {
           </List>
           <Divider />
 
-          {/* Доп. меню */}
-          <List>
-            {extraNavItems.map((item) => (
-              <ListItem key={item.path} disablePadding>
-                <ListItemButton
-                  component={RouterLink}
-                  to={item.path}
-                  selected={location.pathname === item.path}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <ListItemText primary={item.label} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
+                    {/* Доп. меню */}
+                    <List>
+                      {extraNavItems.map((item) => (
+                        <ListItem key={item.path} disablePadding>
+                          <ListItemButton
+                            component={RouterLink}
+                            to={item.path}
+                            selected={location.pathname === item.path}
+                            onClick={() => setDrawerOpen(false)}
+                          >
+                            <ListItemText primary={item.label} />
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                    <Divider />
 
-          {/* Выйти */}
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  setDrawerOpen(false);
-                  handleLogout();
-                }}
-              >
-                <LogoutIcon sx={{ mr: 1 }} />
-                <ListItemText primary="Выйти" />
-              </ListItemButton>
-            </ListItem>
-          </List>
+                    {/* Обратная связь */}
+                    <List>
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setDrawerOpen(false);
+                            setFeedbackOpen(true);
+                          }}
+                        >
+                          <FeedbackIcon sx={{ mr: 1 }} />
+                          <ListItemText primary="Обратная связь" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                    <Divider />
+
+                    {/* Выйти */}
+                    <List>
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          onClick={() => {
+                            setDrawerOpen(false);
+                            handleLogout();
+                          }}
+                        >
+                          <LogoutIcon sx={{ mr: 1 }} />
+                          <ListItemText primary="Выйти" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
         </Box>
       </Drawer>
 
@@ -234,6 +253,15 @@ export default function Layout() {
        >
          Профиль
        </MenuItem>
+             <MenuItem
+               onClick={() => {
+                 handleUserMenuClose();
+                 setFeedbackOpen(true);
+               }}
+             >
+               <FeedbackIcon fontSize="small" sx={{ mr: 1 }} />
+               Обратная связь
+             </MenuItem>
        {!isMobile && (
          <MenuItem
            onClick={() => {
@@ -274,6 +302,11 @@ export default function Layout() {
       >
         <Typography variant="caption">Баланс © 2026</Typography>
       </Box>
+       {/* 🆕 Диалог обратной связи */}
+            <FeedbackDialog
+              open={feedbackOpen}
+              onClose={() => setFeedbackOpen(false)}
+            />
     </Box>
   );
 }
