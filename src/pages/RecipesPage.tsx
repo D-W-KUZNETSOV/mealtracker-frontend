@@ -32,7 +32,13 @@ import { useDebounce } from '../hooks/useDebounce';
 import RecipeFormDialog from '../components/RecipeFormDialog';
 
 type TabKey = 'my' | 'public';
-type SortKey = 'name,asc' | 'name,desc' | 'calories,asc' | 'calories,desc';
+type SortKey =
+  | 'name,asc'
+  | 'name,desc'
+  | 'calories,asc'
+  | 'calories,desc'
+  | 'protein,asc'
+  | 'protein,desc';
 
 const PAGE_SIZE = 10;
 
@@ -234,10 +240,12 @@ export default function RecipesPage() {
               onChange={(e) => setSort(e.target.value as SortKey)}
               sx={{ minWidth: 200 }}
             >
-              <MenuItem value="name,asc">Название (А-Я)</MenuItem>
-              <MenuItem value="name,desc">Название (Я-А)</MenuItem>
-              <MenuItem value="calories,asc">Калории (↑)</MenuItem>
-              <MenuItem value="calories,desc">Калории (↓)</MenuItem>
+                           <MenuItem value="name,asc">Название (А-Я)</MenuItem>
+                           <MenuItem value="name,desc">Название (Я-А)</MenuItem>
+                           <MenuItem value="calories,asc">Калории (↑)</MenuItem>
+                           <MenuItem value="calories,desc">Калории (↓)</MenuItem>
+                           <MenuItem value="protein,asc">Белок (↑)</MenuItem>
+                           <MenuItem value="protein,desc">Белок (↓)</MenuItem>
             </TextField>
           </Stack>
         </Paper>
