@@ -63,7 +63,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
     try {
-    await register({
+    await registerUser({
       username: data.username,
       password: data.password,
       email: data.email,
