@@ -28,7 +28,6 @@ const registerSchema = z
       .min(3, 'Минимум 3 символа')
       .max(50, 'Максимум 50 символов'),
     email: z.string().email('Некорректный email'),
-    dateOfBirth: z.string().min(1, 'Укажите дату рождения'),
     password: z
       .string()
       .min(6, 'Минимум 6 символов')
@@ -54,24 +53,21 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: '',
-      email: '',
-      dateOfBirth: '',
-      password: '',
-      confirmPassword: '',
-    },
+   defaultValues: {
+     username: '',
+     password: '',
+     email: '',
+   },
   });
 
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
     try {
-      await registerUser({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        dateOfBirth: data.dateOfBirth,
-      });
+    await register({
+      username: data.username,
+      password: data.password,
+      email: data.email,
+    });
       enqueueSnackbar('Регистрация успешна!', { variant: 'success' });
       navigate('/', { replace: true });
     } catch (err) {
@@ -120,15 +116,7 @@ export default function RegisterPage() {
                 error={!!errors.email}
                 helperText={errors.email?.message}
               />
-              <TextField
-                label="Дата рождения"
-                type="date"
-                fullWidth
-                slotProps={{ inputLabel: { shrink: true } }}
-                {...register('dateOfBirth')}
-                error={!!errors.dateOfBirth}
-                helperText={errors.dateOfBirth?.message}
-              />
+
               <TextField
                 label="Пароль"
                 type="password"

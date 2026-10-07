@@ -29,7 +29,7 @@ export interface RegisterRequest {
   username: string;
   password: string;
   email: string;
-  dateOfBirth: string;  // ← ISO format: "1990-01-15"
+  dateOfBirth?: string;  // 🆕 опционально — заполняется позже в профиле
 }
 export interface DeleteAccountRequest {
   password: string;   // 🆕 подтверждение паролем
