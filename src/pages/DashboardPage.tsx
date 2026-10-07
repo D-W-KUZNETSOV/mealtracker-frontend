@@ -21,6 +21,8 @@ import {
   FitnessCenter as ProteinIcon,
   MonitorWeight as WeightIcon,
 } from '@mui/icons-material';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { useAuthStore } from '../store/authStore';
 import { useTodayStats } from '../hooks/useStats';
@@ -28,6 +30,7 @@ import { useGoals } from '../hooks/useNutrition';
 import { useProfile } from '../hooks/useProfile';
 import MiniProgressWidget from '../components/MiniProgressWidget';
 import InfoTooltip, { tooltips } from '../components/InfoTooltip';
+
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -41,6 +44,11 @@ export default function DashboardPage() {
     statsQuery.isLoading || goalsQuery.isLoading || profileQuery.isLoading;
 
   // 404 от goals/profile — нормально (данные не заполнены), не считаем ошибкой
+  console.log('GOALS_DEBUG', {
+    isError: goalsQuery.isError,
+    error: goalsQuery.error,
+    data: goalsQuery.data,
+  });
   const isGoalsNotFound =
     goalsQuery.isError &&
     (goalsQuery.error as { status?: number })?.status === 404;
@@ -118,7 +126,41 @@ export default function DashboardPage() {
       {/* ============ Мини-виджет прогресса ============ */}
             <MiniProgressWidget />
       {/* ============ Сетка карточек ============ */}
+           {/* ============ Онбординг: нет цели ============ */}
+            {isGoalsNotFound && (
+              <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'primary.main' }}>
+                <CardContent>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    spacing={2}
+                    sx={{
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Box>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
+                        <TrackChangesIcon color="primary" />
+                        <Typography variant="h6">Поставь цель</Typography>
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary">
+                        Рассчитаем норму калорий и белка под твои параметры
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      endIcon={<ArrowForwardIcon />}
+                      onClick={() => navigate('/goals')}
+                    >
+                      Поставить цель
+                    </Button>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
       <Grid container spacing={3}>
+      {!isGoalsNotFound && (
+                <>
         {/* Калории */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Card>
@@ -279,7 +321,9 @@ export default function DashboardPage() {
               </Stack>
             </CardContent>
           </Card>
-        </Grid>
+         </Grid>
+                    </>
+                  )}
 
         {/* Быстрые действия */}
         <Grid size={12}>
