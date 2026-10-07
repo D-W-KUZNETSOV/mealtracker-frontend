@@ -52,5 +52,8 @@ export const recipesApi = {
   toggleVisibility: (id: number) =>
     apiClient.patch<RecipeDto>(`/api/recipes/${id}/visibility`),
 
+    copyToMy: (id: number) =>                                       // ← НОВОЕ
+        apiClient.post<RecipeDto>(`/api/recipes/${id}/copy-to-my`),
+
   remove: (id: number) => apiClient.delete(`/api/recipes/${id}`),
 };

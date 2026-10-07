@@ -88,6 +88,16 @@ export function useToggleRecipeVisibility() {
     },
   });
 }
+// ---------- Скопировать чужой публичный рецепт себе ----------
+export function useCopyRecipeToMy() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => recipesApi.copyToMy(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recipesKeys.all });
+    },
+  });
+}
 
 // ---------- Удаление ----------
 export function useDeleteRecipe() {

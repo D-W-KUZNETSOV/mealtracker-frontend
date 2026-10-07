@@ -176,9 +176,9 @@ export interface RecipeSummaryIngredientDto {
 }
 
 export interface RecipeSummaryDto {
-  id: number;                   // 🆕
+  id: number;
   name: string;
-  category: string | null;      // 🆕
+  category: string | null;
   description: string | null;
   imageUrl: string | null;
   visibility: 'PUBLIC' | 'PRIVATE';
@@ -187,10 +187,14 @@ export interface RecipeSummaryDto {
   totalProteins: number;
   totalFats: number;
   totalCarbs: number;
-  totalWeight: number;          // 🆕
-    servings: number;              // 🆕
-    servingSizeGrams: number;      // 🆕
-    steps: string[] | null;
+  totalWeight: number;
+  servings: number;
+  servingSizeGrams: number;
+  steps: string[] | null;
+
+  // 🆕 F5
+  isMine: boolean;
+  authorUsername: string;
 }
 
 /** Статистика (GET /api/recipes/{recipeId}/stats) */

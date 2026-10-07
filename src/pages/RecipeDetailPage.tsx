@@ -22,15 +22,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';   // 🆕
 import { useSnackbar } from 'notistack';
 import { getImageFullUrl } from '../utils/imageUrl';
 
 import {
+  useCopyRecipeToMy,
   useDeleteRecipe,
   useRecipeSummary,
   useToggleRecipeVisibility,
-} from '../hooks/useRecipes';
-import type { ApiError } from '../types/api';
+} from '../hooks/useRecipes';import type { ApiError } from '../types/api';
 import { roundNutrient } from '../types/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 import RecipeFormDialog from '../components/RecipeFormDialog';
@@ -49,6 +50,7 @@ export default function RecipeDetailPage() {
   const summaryQuery = useRecipeSummary(recipeId);
   const toggleMutation = useToggleRecipeVisibility();
   const deleteMutation = useDeleteRecipe();
+   const copyMutation = useCopyRecipeToMy();   // 🆕
 
   const handleToggleVisibility = async () => {
     if (!recipeId) return;
@@ -74,6 +76,22 @@ export default function RecipeDetailPage() {
       });
     }
   };
+    // 🆕 F5 — «Сохранить себе»
+    const handleCopyToMy = async () => {
+      if (!recipeId) return;
+      try {
+        const result = await copyMutation.mutateAsync(recipeId);
+        enqueueSnackbar('Рецепт сохранён в мои', { variant: 'success' });
+        navigate(`/recipes/${result.data.id}`, { replace: true });
+      } catch (err) {
+        const apiError = err as ApiError;
+        enqueueSnackbar(apiError.message || 'Ошибка сохранения', {
+          variant: 'error',
+        });
+      }
+    };
+
+
 
   if (summaryQuery.isLoading) {
     return (
@@ -133,38 +151,64 @@ export default function RecipeDetailPage() {
             )}
           </Box>
 
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1}
-            sx={{ flexShrink: 0 }}
-          >
-            <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={() => setEditOpen(true)}
-              fullWidth={isMobile}
-            >
-              Редактировать
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<VisibilityIcon />}
-              onClick={handleToggleVisibility}
-              disabled={toggleMutation.isPending}
-              fullWidth={isMobile}
-            >
-              Сменить видимость
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={() => setConfirmDelete(true)}
-              fullWidth={isMobile}
-            >
-              Удалить
-            </Button>
-          </Stack>
+                    {recipe.isMine ? (
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={1}
+                        sx={{ flexShrink: 0 }}
+                      >
+                        <Button
+                          variant="outlined"
+                          startIcon={<EditIcon />}
+                          onClick={() => setEditOpen(true)}
+                          fullWidth={isMobile}
+                        >
+                          Редактировать
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<VisibilityIcon />}
+                          onClick={handleToggleVisibility}
+                          disabled={toggleMutation.isPending}
+                          fullWidth={isMobile}
+                        >
+                          Сменить видимость
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => setConfirmDelete(true)}
+                          fullWidth={isMobile}
+                        >
+                          Удалить
+                        </Button>
+                      </Stack>
+                    ) : (
+                      <Stack
+                        direction="column"
+                        spacing={1}
+                        sx={{
+                          flexShrink: 0,
+                          alignItems: { xs: 'stretch', sm: 'flex-end' },
+                        }}
+                      >
+                        {recipe.authorUsername && (
+                          <Typography variant="body2" color="text.secondary">
+                            Автор: <b>{recipe.authorUsername}</b>
+                          </Typography>
+                        )}
+                        <Button
+                          variant="contained"
+                          startIcon={<SaveIcon />}
+                          onClick={handleCopyToMy}
+                          disabled={copyMutation.isPending}
+                          fullWidth={isMobile}
+                        >
+                          {copyMutation.isPending ? 'Сохранение...' : 'Сохранить себе'}
+                        </Button>
+                      </Stack>
+                    )}
         </Stack>
 
         {recipe.imageUrl && (
