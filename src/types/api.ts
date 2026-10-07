@@ -192,10 +192,12 @@ export interface RecipeSummaryDto {
   servingSizeGrams: number;
   steps: string[] | null;
 
-  // 🆕 F5
-  isMine: boolean;
-  authorUsername: string;
-}
+    // 🆕 F5
+    isMine: boolean;
+    authorUsername: string;
+    alreadyCopied: boolean;       // 🆕
+    copiedRecipeId: number | null; // 🆕
+  }
 
 /** Статистика (GET /api/recipes/{recipeId}/stats) */
 export interface RecipeStatsIngredientDto {

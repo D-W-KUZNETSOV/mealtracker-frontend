@@ -198,15 +198,30 @@ export default function RecipeDetailPage() {
                             Автор: <b>{recipe.authorUsername}</b>
                           </Typography>
                         )}
-                        <Button
-                          variant="contained"
-                          startIcon={<SaveIcon />}
-                          onClick={handleCopyToMy}
-                          disabled={copyMutation.isPending}
-                          fullWidth={isMobile}
-                        >
-                          {copyMutation.isPending ? 'Сохранение...' : 'Сохранить себе'}
-                        </Button>
+                                                {recipe.alreadyCopied ? (
+                                                  <Button
+                                                    variant="outlined"
+                                                    startIcon={<SaveIcon />}
+                                                    onClick={() => {
+                                                      if (recipe.copiedRecipeId) {
+                                                        navigate(`/recipes/${recipe.copiedRecipeId}`);
+                                                      }
+                                                    }}
+                                                    fullWidth={isMobile}
+                                                  >
+                                                    Уже в моих рецептах
+                                                  </Button>
+                                                ) : (
+                                                  <Button
+                                                    variant="contained"
+                                                    startIcon={<SaveIcon />}
+                                                    onClick={handleCopyToMy}
+                                                    disabled={copyMutation.isPending}
+                                                    fullWidth={isMobile}
+                                                  >
+                                                    {copyMutation.isPending ? 'Сохранение...' : 'Сохранить себе'}
+                                                  </Button>
+                                                )}
                       </Stack>
                     )}
         </Stack>

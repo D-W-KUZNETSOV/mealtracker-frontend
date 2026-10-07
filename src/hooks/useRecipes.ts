@@ -93,8 +93,11 @@ export function useCopyRecipeToMy() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => recipesApi.copyToMy(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
+      // 🆕 Инвалидируем весь список рецептов (включая все summary)
       queryClient.invalidateQueries({ queryKey: recipesKeys.all });
+      // 🆕 Явно инвалидируем summary того рецепта, который копировали
+      queryClient.invalidateQueries({ queryKey: recipesKeys.summary(id) });
     },
   });
 }
