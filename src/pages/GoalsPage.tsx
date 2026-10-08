@@ -209,170 +209,183 @@ export default function GoalsPage() {
        </Grid>
      </Grid>
 
-      {/* ============ Форма ============ */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Настройки целей
-          </Typography>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              {/* Вес */}
-              <TextField
-                label="Текущий вес, кг"
-                type="number"
-                fullWidth
-                slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                {...register('currentWeightKg', { valueAsNumber: true })}
-                error={!!errors.currentWeightKg}
-                helperText={errors.currentWeightKg?.message}
-              />
+             {/* ============ Форма ============ */}
+             <Card>
+               <CardContent>
+                 <Typography variant="h6" gutterBottom>
+                   Настройки целей
+                 </Typography>
 
-              {/* Цель */}
-              <FormControl>
-                <FormLabel>Цель</FormLabel>
-                <Controller
-                  name="goalType"
-                  control={control}
-                  render={({ field }) => (
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ mt: 1, flexWrap: 'wrap' }}
-                    >
-                      {(Object.keys(GOAL_LABELS) as GoalType[]).map((g) => (
-                        <Chip
-                          key={g}
-                          label={GOAL_LABELS[g]}
-                          color={field.value === g ? 'primary' : 'default'}
-                          onClick={() => field.onChange(g)}
-                          variant={field.value === g ? 'filled' : 'outlined'}
-                        />
-                      ))}
-                    </Stack>
-                  )}
-                />
-              </FormControl>
+                 <form onSubmit={handleSubmit(onSubmit)}>
+                   <Stack spacing={3} sx={{ mt: 2 }}>
+                     {/* Вес */}
+                     <TextField
+                       label="Текущий вес, кг"
+                       type="number"
+                       fullWidth
+                       slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
+                       {...register('currentWeightKg', { valueAsNumber: true })}
+                       error={!!errors.currentWeightKg}
+                       helperText={errors.currentWeightKg?.message}
+                     />
 
-              {/* Калории */}
-              <Box>
-                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={autoCalories}
-                        onChange={(e) => setAutoCalories(e.target.checked)}
-                      />
-                    }
-                    label="Рассчитать калории автоматически"
-                  />
-                  <InfoTooltip title={tooltips.calories} />
-                </Stack>
-                {autoCalories ? (
-                  <Alert severity="info" sx={{ mt: 1 }}>
-                    Калории рассчитываются по формуле Миффлина–Сан Жеора
-                    с учётом вашего пола, возраста, роста, веса и уровня
-                    активности <b>из профиля</b>.
-                    {dailyCaloriesQuery.data != null && (
-                      <>
-                        {' '}
-                        → <b>~{dailyCaloriesQuery.data} ккал/день</b>
-                      </>
-                    )}
-                  </Alert>
-                ) : (
-                  <TextField
-                    label="Целевые калории, ккал/день"
-                    type="number"
-                    fullWidth
-                    sx={{ mt: 1 }}
-                    slotProps={{
-                      htmlInput: { step: '1', min: 500, max: 10000 },
-                    }}
-                    {...register('targetCaloriesOverride', {
-                      valueAsNumber: true,
-                    })}
-                    error={!!errors.targetCaloriesOverride}
-                    helperText={errors.targetCaloriesOverride?.message}
-                  />
-                )}
-              </Box>
+                     {/* Цель */}
+                     <FormControl>
+                       <FormLabel>Цель</FormLabel>
+                       <Controller
+                         name="goalType"
+                         control={control}
+                         render={({ field }) => (
+                           <Stack
+                             direction="row"
+                             spacing={1}
+                             sx={{ mt: 1, flexWrap: 'wrap' }}
+                           >
+                             {(Object.keys(GOAL_LABELS) as GoalType[]).map((g) => (
+                               <Chip
+                                 key={g}
+                                 label={GOAL_LABELS[g]}
+                                 color={field.value === g ? 'primary' : 'default'}
+                                 onClick={() => field.onChange(g)}
+                                 variant={field.value === g ? 'filled' : 'outlined'}
+                               />
+                             ))}
+                           </Stack>
+                         )}
+                       />
+                     </FormControl>
 
-              {/* Белок */}
-              <Box>
-                <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={autoProtein}
-                        onChange={(e) => setAutoProtein(e.target.checked)}
-                      />
-                    }
-                    label="Рассчитать белок автоматически"
-                  />
-                  <InfoTooltip title={tooltips.protein} />
-                </Stack>
-                {autoProtein ? (
-                  <Alert severity="info" sx={{ mt: 1 }}>
-                    Белок рассчитывается по цели:{' '}
-                    {goalType === 'LOSE_WEIGHT' && '2.0 г/кг (сохранить мышцы)'}
-                    {goalType === 'MAINTAIN' && '1.6 г/кг (поддержание)'}
-                    {goalType === 'GAIN_MUSCLE' && '1.8 г/кг (набор массы)'}
-                    {' '}→ ~
-                    {Math.round(
-                      (currentWeight || 0) *
-                        (goalType === 'LOSE_WEIGHT'
-                          ? 2.0
-                          : goalType === 'GAIN_MUSCLE'
-                            ? 1.8
-                            : 1.6),
-                    )}{' '}
-                    г/день
-                  </Alert>
-                ) : (
-                  <TextField
-                    label="Целевой белок, г/день"
-                    type="number"
-                    fullWidth
-                    sx={{ mt: 1 }}
-                    slotProps={{ htmlInput: { step: '1', min: 10, max: 500 } }}
-                    {...register('targetProteinOverride', {
-                      valueAsNumber: true,
-                    })}
-                    error={!!errors.targetProteinOverride}
-                    helperText={errors.targetProteinOverride?.message}
-                  />
-                )}
-              </Box>
+                     {/* Калории */}
+                     <Box>
+                       <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                         <FormControlLabel
+                           control={
+                             <Checkbox
+                               checked={autoCalories}
+                               onChange={(e) => setAutoCalories(e.target.checked)}
+                             />
+                           }
+                           label="Рассчитать калории автоматически"
+                         />
+                         <InfoTooltip title={tooltips.calories} />
+                       </Stack>
+                       {autoCalories ? (
+                         <Alert severity="info" sx={{ mt: 1 }}>
+                           Калории рассчитываются по формуле Миффлина–Сан Жеора
+                           с учётом вашего пола, возраста, роста, веса и уровня
+                           активности <b>из профиля</b>.
+                           {dailyCaloriesQuery.data != null && (
+                             <>
+                               {' '}
+                               → <b>~{dailyCaloriesQuery.data} ккал/день</b>
+                             </>
+                           )}
+                         </Alert>
+                       ) : (
+                         <TextField
+                           label="Целевые калории, ккал/день"
+                           type="number"
+                           fullWidth
+                           sx={{ mt: 1 }}
+                           slotProps={{
+                             htmlInput: { step: '1', min: 500, max: 10000 },
+                           }}
+                           {...register('targetCaloriesOverride', {
+                             valueAsNumber: true,
+                           })}
+                           error={!!errors.targetCaloriesOverride}
+                           helperText={errors.targetCaloriesOverride?.message}
+                         />
+                       )}
+                     </Box>
 
-              {/* Скрытые поля для совместимости с API */}
-              <input
-                type="hidden"
-                {...register('proteinPerKg', { valueAsNumber: true })}
-              />
-              <input
-                type="hidden"
-                {...register('targetCalories', { valueAsNumber: true })}
-              />
+                     {/* Белок */}
+                     <Box>
+                       <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                         <FormControlLabel
+                           control={
+                             <Checkbox
+                               checked={autoProtein}
+                               onChange={(e) => setAutoProtein(e.target.checked)}
+                             />
+                           }
+                           label="Рассчитать белок автоматически"
+                         />
+                         <InfoTooltip title={tooltips.protein} />
+                       </Stack>
+                       {autoProtein ? (
+                         <Alert severity="info" sx={{ mt: 1 }}>
+                           Белок рассчитывается по цели:{' '}
+                           {goalType === 'LOSE_WEIGHT' && '2.0 г/кг (сохранить мышцы)'}
+                           {goalType === 'MAINTAIN' && '1.6 г/кг (поддержание)'}
+                           {goalType === 'GAIN_MUSCLE' && '1.8 г/кг (набор массы)'}
+                           {' '}→ ~
+                           {Math.round(
+                             (currentWeight || 0) *
+                               (goalType === 'LOSE_WEIGHT'
+                                 ? 2.0
+                                 : goalType === 'GAIN_MUSCLE'
+                                   ? 1.8
+                                   : 1.6),
+                           )}{' '}
+                           г/день
+                         </Alert>
+                       ) : (
+                         <TextField
+                           label="Целевой белок, г/день"
+                           type="number"
+                           fullWidth
+                           sx={{ mt: 1 }}
+                           slotProps={{ htmlInput: { step: '1', min: 10, max: 500 } }}
+                           {...register('targetProteinOverride', {
+                             valueAsNumber: true,
+                           })}
+                           error={!!errors.targetProteinOverride}
+                           helperText={errors.targetProteinOverride?.message}
+                         />
+                       )}
+                     </Box>
 
-              <Alert severity="info">
-                Уровень активности настраивается в разделе{' '}
-                <b>«Профиль»</b> и используется при расчёте калорий.
-              </Alert>
+                     {/* Скрытые поля для совместимости с API */}
+                     <input
+                       type="hidden"
+                       {...register('proteinPerKg', { valueAsNumber: true })}
+                     />
+                     <input
+                       type="hidden"
+                       {...register('targetCalories', { valueAsNumber: true })}
+                     />
 
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={saveMutation.isPending}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                {saveMutation.isPending ? 'Сохранение...' : 'Сохранить цели'}
-              </Button>
-            </Stack>
-          </form>
-        </CardContent>
-      </Card>
-    </Box>
-  );
+                     <Alert severity="info">
+                       Уровень активности настраивается в разделе{' '}
+                       <b>«Профиль»</b> и используется при расчёте калорий.
+                     </Alert>
+                   </Stack>
+                 </form>
+
+                          {/* Fixed-кнопка внизу справа */}
+                          <Box
+                            sx={{
+                              position: 'fixed',
+                              bottom: 16,
+                              right: 16,
+                              zIndex: 1200,
+                            }}
+                          >
+                            <Button
+                              type="submit"
+                              variant="contained"
+                              size="large"
+                              disabled={saveMutation.isPending}
+                              onClick={handleSubmit(onSubmit)}
+                              sx={{ boxShadow: 3 }}
+                            >
+                              {saveMutation.isPending ? 'Сохранение...' : 'Сохранить цели'}
+                            </Button>
+                          </Box>
+               </CardContent>
+             </Card>
+           </Box>
+         );
 }
