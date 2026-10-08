@@ -308,7 +308,7 @@ export default function DiaryPage() {
               >
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                    {entry.recipeName}
+                   {entry.itemName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {entry.weightInGrams} г
@@ -333,7 +333,7 @@ export default function DiaryPage() {
                   size="small"
                   color="error"
                   onClick={() => {
-                    if (window.confirm(`Удалить "${entry.recipeName}"?`)) {
+                    if (window.confirm(`Удалить "${entry.itemName}"?`)) {
                       deleteEntry.mutate(entry.id);
                     }
                   }}

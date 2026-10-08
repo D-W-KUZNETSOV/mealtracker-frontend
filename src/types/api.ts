@@ -236,6 +236,8 @@ export interface Page<T> {
 /** Сводка за день (GET /api/stats/daily, POST /api/stats/daily/add) */
 export interface FoodEntryDto {
   id: number;
+  itemName: string;         // универсальное — рецепт или ингредиент
+    ingredientId: number | null;  // 🆕
   recipeName: string;
   weightInGrams: number;
   calories: number;
@@ -259,7 +261,8 @@ export interface DailyStatsDto {
 
 /** Тело запроса на добавление порции */
 export interface AddPortionRequest {
-  recipeId: number;
+  recipeId?: number | null;       // либо рецепт
+  ingredientId?: number | null;   // либо ингредиент (ровно одно)
   weightInGrams: number;
 }
 

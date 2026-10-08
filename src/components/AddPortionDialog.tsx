@@ -18,8 +18,9 @@ import { useSnackbar } from 'notistack';
 
 import { useAddPortion } from '../hooks/useStats';
 import { useMyRecipes } from '../hooks/useRecipes';
-import type { ApiError, RecipeListItemDto } from '../types/api';
 import { roundNutrient } from '../types/api';
+import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
+import type { ApiError, IngredientDto, RecipeListItemDto } from '../types/api';
 
 interface AddPortionDialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ interface AddPortionDialogProps {
 }
 
 type UnitMode = 'GRAM' | 'PORTION';
+type SourceType = 'recipe' | 'ingredient';
 
 export default function AddPortionDialog({
   open,
@@ -37,55 +39,103 @@ export default function AddPortionDialog({
 
   const myRecipesQuery = useMyRecipes(0, 100);
   const recipes: RecipeListItemDto[] = myRecipesQuery.data?.content ?? [];
+  const myIngredientsQuery = useMyIngredients();
+  const baseIngredientsQuery = useBaseIngredients();
+
+  const ingredients: IngredientDto[] = useMemo(
+    () => [
+      ...(myIngredientsQuery.data ?? []),
+      ...(baseIngredientsQuery.data ?? []),
+    ],
+    [myIngredientsQuery.data, baseIngredientsQuery.data],
+  );
 
   const [selected, setSelected] = useState<RecipeListItemDto | null>(null);
+  const [selectedIngredient, setSelectedIngredient] = useState<IngredientDto | null>(null);
   const [mode, setMode] = useState<UnitMode>('GRAM');
   const [inputStr, setInputStr] = useState<string>('100');
+  const [sourceType, setSourceType] = useState<SourceType>('recipe');
 
   // Сброс при открытии
-  useEffect(() => {
-    if (open) {
-      setSelected(null);
-      setMode('GRAM');
-      setInputStr('100');
-    }
-  }, [open]);
+useEffect(() => {
+  if (open) {
+    setSourceType('recipe');
+    setSelected(null);
+    setSelectedIngredient(null);
+    setMode('GRAM');
+    setInputStr('100');
+  }
+}, [open]);
 
   const inputNum = Number(inputStr.replace(',', '.')) || 0;
 
   // Вес в граммах (в зависимости от режима)
-  const weight = useMemo(() => {
-    if (!selected) return 0;
-    if (mode === 'GRAM') return inputNum;
-    // PORTION
-    const size = selected.servingSizeGrams ?? 0;
-    return size > 0 ? inputNum * size : 0;
-  }, [selected, mode, inputNum]);
+const weight = useMemo(() => {
+  if (sourceType === 'ingredient') {
+    // Ингредиент — всегда граммы
+    return inputNum;
+  }
+  // Рецепт
+  if (!selected) return 0;
+  if (mode === 'GRAM') return inputNum;
+  const size = selected.servingSizeGrams ?? 0;
+  return size > 0 ? inputNum * size : 0;
+}, [sourceType, selected, mode, inputNum]);
 
   // Живой предпросмотр КБЖУ
-  const preview = useMemo(() => {
-    if (!selected || selected.totalCalories == null) return null;
-    if (!selected.totalWeight || selected.totalWeight <= 0) return null;
-    if (weight <= 0) return null;
-    const k = weight / selected.totalWeight;
-    return {
-      calories: (selected.totalCalories ?? 0) * k,
-      proteins: (selected.totalProteins ?? 0) * k,
-      fats: (selected.totalFats ?? 0) * k,
-      carbs: (selected.totalCarbs ?? 0) * k,
-    };
-  }, [selected, weight]);
+ const preview = useMemo(() => {
+   if (weight <= 0) return null;
 
-  const canSubmit =
-    selected !== null && weight > 0 && !addMutation.isPending;
+   // Рецепт: КБЖУ пропорционально totalWeight
+   if (sourceType === 'recipe') {
+     if (!selected || selected.totalCalories == null) return null;
+     if (!selected.totalWeight || selected.totalWeight <= 0) return null;
+     const k = weight / selected.totalWeight;
+     return {
+       calories: (selected.totalCalories ?? 0) * k,
+       proteins: (selected.totalProteins ?? 0) * k,
+       fats: (selected.totalFats ?? 0) * k,
+       carbs: (selected.totalCarbs ?? 0) * k,
+     };
+   }
+
+   // Ингредиент: КБЖУ на 100 г × вес / 100
+   if (sourceType === 'ingredient') {
+     if (!selectedIngredient) return null;
+     const k = weight / 100;
+     return {
+       calories: (selectedIngredient.caloriesPer100g ?? 0) * k,
+       proteins: (selectedIngredient.proteinsPer100g ?? 0) * k,
+       fats: (selectedIngredient.fatsPer100g ?? 0) * k,
+       carbs: (selectedIngredient.carbsPer100g ?? 0) * k,
+     };
+   }
+
+   return null;
+ }, [sourceType, selected, selectedIngredient, weight]);
+
+  const canSubmit = useMemo(() => {
+    if (weight <= 0 || addMutation.isPending) return false;
+    if (sourceType === 'recipe') return selected !== null;
+    if (sourceType === 'ingredient') return selectedIngredient !== null;
+    return false;
+  }, [sourceType, selected, selectedIngredient, weight, addMutation.isPending]);
 
   const handleSubmit = async () => {
-    if (!selected) return;
     try {
-      await addMutation.mutateAsync({
-        recipeId: selected.id,
-        weightInGrams: weight,
-      });
+      if (sourceType === 'recipe') {
+        if (!selected) return;
+        await addMutation.mutateAsync({
+          recipeId: selected.id,
+          weightInGrams: weight,
+        });
+      } else if (sourceType === 'ingredient') {
+        if (!selectedIngredient) return;
+        await addMutation.mutateAsync({
+          ingredientId: selectedIngredient.id,
+          weightInGrams: weight,
+        });
+      }
       enqueueSnackbar('Порция добавлена', { variant: 'success' });
       onClose();
     } catch (err) {
@@ -96,7 +146,6 @@ export default function AddPortionDialog({
       );
     }
   };
-
   const handleModeChange = (_: unknown, v: UnitMode | null) => {
     if (!v) return;
     setMode(v);
@@ -108,17 +157,53 @@ export default function AddPortionDialog({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Добавить порцию</DialogTitle>
       <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <Autocomplete
-            options={recipes}
-            getOptionLabel={(o) => o.name}
-            value={selected}
-            onChange={(_, v) => setSelected(v)}
-            isOptionEqualToValue={(o, v) => o.id === v.id}
-            renderInput={(params) => (
-              <TextField {...params} label="Рецепт" fullWidth autoFocus />
-            )}
-          />
+      <Stack spacing={2} sx={{ mt: 1 }}>
+        {/* Переключатель: рецепт / ингредиент */}
+        <ToggleButtonGroup
+          value={sourceType}
+          exclusive
+         onChange={(_, v) => {
+           if (!v) return;
+           setSourceType(v);
+           // Сброс mode при переключении типа
+           setMode('GRAM');
+           setInputStr('100');
+           // Сброс выбора
+           setSelected(null);
+           setSelectedIngredient(null);
+         }}
+          size="small"
+          fullWidth
+        >
+          <ToggleButton value="recipe">Рецепт</ToggleButton>
+          <ToggleButton value="ingredient">Ингредиент</ToggleButton>
+         </ToggleButtonGroup>
+
+              {sourceType === 'recipe' ? (
+                <Autocomplete
+                  options={recipes}
+                  getOptionLabel={(o) => o.name}
+                  value={selected}
+                  onChange={(_, v) => setSelected(v)}
+                  isOptionEqualToValue={(o, v) => o.id === v.id}
+                  loading={myRecipesQuery.isLoading}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Рецепт" fullWidth autoFocus />
+                  )}
+                />
+              ) : (
+                <Autocomplete
+                  options={ingredients}
+                  getOptionLabel={(o) => o.name}
+                  value={selectedIngredient}
+                  onChange={(_, v) => setSelectedIngredient(v)}
+                  isOptionEqualToValue={(o, v) => o.id === v.id}
+                  loading={myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Ингредиент" fullWidth autoFocus />
+                  )}
+                />
+              )}
 
           {/* Подсказка по порции */}
           {selected && selected.servingSizeGrams > 0 && (
@@ -128,20 +213,28 @@ export default function AddPortionDialog({
             </Typography>
           )}
 
-          {/* Переключатель: граммы / порции */}
+          {/* Переключатель: граммы / порции — только для рецептов */}
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <ToggleButtonGroup
-              size="small"
-              exclusive
-              value={mode}
-              onChange={handleModeChange}
-            >
-              <ToggleButton value="GRAM">Граммы</ToggleButton>
-              <ToggleButton value="PORTION">Порции</ToggleButton>
-            </ToggleButtonGroup>
+            {sourceType === 'recipe' && (
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                value={mode}
+                onChange={handleModeChange}
+              >
+                <ToggleButton value="GRAM">Граммы</ToggleButton>
+                <ToggleButton value="PORTION">Порции</ToggleButton>
+              </ToggleButtonGroup>
+            )}
 
             <TextField
-              label={mode === 'GRAM' ? 'Вес порции, г' : 'Количество порций'}
+              label={
+                sourceType === 'ingredient'
+                  ? 'Вес, г'
+                  : mode === 'GRAM'
+                    ? 'Вес порции, г'
+                    : 'Количество порций'
+              }
               type="text"
               fullWidth
               value={inputStr}
