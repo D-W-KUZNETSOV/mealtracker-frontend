@@ -81,7 +81,7 @@ export default function MiniProgressWidget() {
           >
            <Box>
              <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-               <Typography variant="h6">Прогресс веса</Typography>
+               <Typography variant="h6">Твой прогресс</Typography>
                <InfoTooltip title={tooltips.weightProgress} />
              </Stack>
              <Typography variant="caption" color="text.secondary">
@@ -139,7 +139,7 @@ export default function MiniProgressWidget() {
         >
           <Box>
             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-              <Typography variant="h6">Прогресс веса</Typography>
+              <Typography variant="h6">Твой прогресс</Typography>
               <InfoTooltip title={tooltips.weightProgress} />
             </Stack>
             {/* caption убираем — при 0 замерах он не нужен */}

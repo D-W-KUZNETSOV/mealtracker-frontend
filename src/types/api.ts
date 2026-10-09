@@ -238,7 +238,6 @@ export interface FoodEntryDto {
   id: number;
   itemName: string;         // универсальное — рецепт или ингредиент
     ingredientId: number | null;  // 🆕
-  recipeName: string;
   weightInGrams: number;
   calories: number;
   proteins: number;
@@ -264,6 +263,14 @@ export interface AddPortionRequest {
   recipeId?: number | null;       // либо рецепт
   ingredientId?: number | null;   // либо ингредиент (ровно одно)
   weightInGrams: number;
+}
+/** Календарь активности (GET /api/stats/calendar) */
+export interface CalendarResponse {
+  month: string;           // "2026-10"
+  days: string[];          // ["2026-10-09", ...]
+  totalDays: number;
+  currentStreak: number;
+  bestStreak: number;
 }
 
 // ---------- Общие enum'ы ----------

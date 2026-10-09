@@ -30,6 +30,9 @@ import { useGoals } from '../hooks/useNutrition';
 import { useProfile } from '../hooks/useProfile';
 import MiniProgressWidget from '../components/MiniProgressWidget';
 import InfoTooltip, { tooltips } from '../components/InfoTooltip';
+import { getCaloriesText, getProteinText } from '../utils/tone';
+import ActivityCalendar from '../components/ActivityCalendar';
+
 
 
 export default function DashboardPage() {
@@ -89,10 +92,10 @@ export default function DashboardPage() {
   });
 
   const getBmiLabel = (bmi: number) => {
-    if (bmi < 18.5) return { label: 'Недостаток', color: 'info' as const };
-    if (bmi < 25) return { label: 'Норма', color: 'success' as const };
-    if (bmi < 30) return { label: 'Избыток', color: 'warning' as const };
-    return { label: 'Ожирение', color: 'error' as const };
+    if (bmi < 18.5) return { label: 'Ниже нормы', color: 'info' as const };
+    if (bmi < 25) return { label: 'В норме', color: 'success' as const };
+    if (bmi < 30) return { label: 'Выше нормы', color: 'warning' as const };
+    return { label: 'Сильно выше нормы', color: 'warning' as const };
   };
 
   if (loading) {
@@ -122,9 +125,19 @@ export default function DashboardPage() {
           Сегодня {today}
         </Typography>
       </Box>
+      {/* ============ Календарь активности ============ */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Твоя неделя
+          </Typography>
+          <ActivityCalendar />
+        </CardContent>
+      </Card>
 
       {/* ============ Мини-виджет прогресса ============ */}
             <MiniProgressWidget />
+
       {/* ============ Сетка карточек ============ */}
            {/* ============ Онбординг: нет цели ============ */}
             {isGoalsNotFound && (
@@ -166,7 +179,7 @@ export default function DashboardPage() {
           <Card>
             <CardContent>
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-               <FireIcon color="error" />
+              <FireIcon color="action" />
                <Typography variant="h6">Калории сегодня</Typography>
                <InfoTooltip title={tooltips.calories} />
               </Stack>
@@ -180,21 +193,24 @@ export default function DashboardPage() {
                 </Typography>
               </Stack>
 
-             <LinearProgress
-               variant="determinate"
-               value={Math.min(100, caloriesPercent)}
-               sx={{ height: 12, borderRadius: 6, mb: 1 }}
-               color={caloriesPercent > 100 ? 'error' : 'primary'}
-             />
+            <LinearProgress
+              variant="determinate"
+              value={Math.min(100, caloriesPercent)}
+              sx={{ height: 12, borderRadius: 6, mb: 1 }}
+              color={caloriesPercent > 100 ? 'warning' : 'primary'}
+            />
 
-              <Typography
-                variant="body2"
-                color={caloriesPercent > 100 ? 'error' : 'text.secondary'}
-              >
-                {caloriesPercent > 100
-                  ? `⚠️ Превышение на ${Math.round(calories - targetCalories)} ккал`
-                  : `Осталось ${Math.round(remaining)} ккал`}
-              </Typography>
+             <Typography
+               variant="body2"
+               color={caloriesPercent > 100 ? 'warning.main' : 'text.secondary'}
+             >
+               {getCaloriesText({
+                 caloriesPercent,
+                 remaining,
+                 goalType: goalsQuery.data?.goalType,
+                 gender: profileQuery.data?.gender,
+               })}
+             </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -222,17 +238,19 @@ export default function DashboardPage() {
                variant="determinate"
                value={Math.min(100, proteinPercent)}
                sx={{ height: 12, borderRadius: 6, mb: 1 }}
-               color={proteinPercent > 100 ? 'error' : 'success'}
+               color={proteinPercent > 100 ? 'success' : 'success'}
              />
 
-              <Typography
-                variant="body2"
-                color={proteinPercent > 100 ? 'error' : 'text.secondary'}
-              >
-                {proteinPercent > 100
-                  ? `⚠️ Превышение на ${Math.round(proteins - targetProtein)} г`
-                  : `${Math.round(proteinPercent)}% от цели`}
-              </Typography>
+             <Typography
+               variant="body2"
+               color="text.secondary"
+             >
+               {getProteinText({
+                 proteinPercent,
+                 proteins,
+                 targetProtein,
+               })}
+             </Typography>
             </CardContent>
           </Card>
         </Grid>

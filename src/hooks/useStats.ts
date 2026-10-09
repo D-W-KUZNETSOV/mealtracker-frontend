@@ -60,3 +60,10 @@ export function useDeleteDiaryEntry() {
     },
   });
 }
+export function useCalendar(month: string) {
+  return useQuery({
+    queryKey: ['stats', 'calendar', month],
+    queryFn: async () => (await statsApi.getCalendar(month)).data,
+    enabled: !!month,
+  });
+}

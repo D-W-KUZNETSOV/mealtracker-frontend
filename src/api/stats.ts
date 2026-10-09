@@ -1,5 +1,11 @@
 import { apiClient } from './client';
-import type { AddPortionRequest, DailyStatsDto, AddFromPlanRequest, AddFromPlanResponse} from '../types/api';
+import type {
+  AddPortionRequest,
+  DailyStatsDto,
+  AddFromPlanRequest,
+  AddFromPlanResponse,
+  CalendarResponse,
+} from '../types/api';
 
 // ============================================================
 // Модуль API для дневника питания.
@@ -22,4 +28,9 @@ export const statsApi = {
 
     addFromPlan: (data: AddFromPlanRequest) =>
       apiClient.post<AddFromPlanResponse>('/api/stats/daily/add-from-plan', data),
-};
+
+    getCalendar: (month: string) =>
+      apiClient.get<CalendarResponse>('/api/stats/calendar', {
+        params: { month },
+      }),
+  };

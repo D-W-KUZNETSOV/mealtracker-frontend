@@ -26,6 +26,9 @@ import { useDeleteDiaryEntry } from '../hooks/useStats';
 import AddFromPlanDialog from '../components/AddFromPlanDialog';
 import { useMealPlans } from '../hooks/useMealPlans';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import { getCaloriesOverAlert, getProteinText } from '../utils/tone';
+import { useGoals } from '../hooks/useNutrition';
+import { useProfile } from '../hooks/useProfile';
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -53,6 +56,9 @@ export default function DiaryPage() {
   const [addFromPlanOpen, setAddFromPlanOpen] = useState(false);
 
   const isTodaySelected = isToday(selectedDate);
+
+  const goalsQuery = useGoals();
+  const profileQuery = useProfile();
 
   // Сегодня — отдельный хук, чтобы кеш не путался
   const todayQuery = useTodayStats();
@@ -182,7 +188,7 @@ export default function DiaryPage() {
               color="text.secondary"
               gutterBottom
             >
-              Съедено за день
+              {profileQuery.data?.gender === 'FEMALE' ? 'Ты съела за день' : 'Ты съел за день'}
             </Typography>
 
             <Stack direction="row" spacing={4} sx={{ mb: 3 }}>
@@ -231,21 +237,23 @@ export default function DiaryPage() {
                   </Typography>
                   <Typography
                     variant="body2"
-                    color={stats.caloriesProgressPercent > 100 ? 'error' : 'text.secondary'}
+                   color="text.secondary"
                   >
                     {roundNutrient(stats.caloriesProgressPercent)}%
                   </Typography>
                 </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={Math.min(stats.caloriesProgressPercent, 100)}
-                  color={stats.caloriesProgressPercent > 100 ? 'error' : 'primary'}
-                  sx={{ height: 12, borderRadius: 6 }}
-                />
+                 <LinearProgress
+                   variant="determinate"
+                   value={Math.min(stats.caloriesProgressPercent ?? 0, 100)}
+                   color={stats.caloriesProgressPercent > 100 ? 'warning' : 'primary'}
+                   sx={{ height: 12, borderRadius: 6 }}
+                 />
                 {stats.caloriesProgressPercent > 100 && (
                   <Alert severity="warning" sx={{ mt: 1 }}>
-                    ⚠️ Превышение калорий на{' '}
-                    {roundNutrient(stats.calories - stats.targetCalories)} ккал
+                    {getCaloriesOverAlert({
+                      goalType: goalsQuery.data?.goalType,
+                      gender: profileQuery.data?.gender,
+                    })}
                   </Alert>
                 )}
               </Box>
@@ -263,25 +271,27 @@ export default function DiaryPage() {
                     Белок: {roundNutrient(stats.proteins)} /{' '}
                     {roundNutrient(stats.targetProtein)} г
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color={stats.proteinProgressPercent > 100 ? 'error' : 'text.secondary'}
-                  >
+                  <Typography variant="body2" color="text.secondary">
                     {roundNutrient(stats.proteinProgressPercent)}%
                   </Typography>
                 </Stack>
-                <LinearProgress
-                  variant="determinate"
-                  value={Math.min(stats.proteinProgressPercent, 100)}
-                  color={stats.proteinProgressPercent > 100 ? 'error' : 'primary'}
-                  sx={{ height: 12, borderRadius: 6 }}
-                />
-                {stats.proteinProgressPercent > 100 && (
-                  <Alert severity="warning" sx={{ mt: 1 }}>
-                    ⚠️ Превышение белка на{' '}
-                    {roundNutrient(stats.proteins - stats.targetProtein)} г
-                  </Alert>
-                )}
+               <LinearProgress
+                 variant="determinate"
+                 value={Math.min(stats.proteinProgressPercent ?? 0, 100)}
+                 color="success"
+                 sx={{ height: 12, borderRadius: 6 }}
+               />
+               <Alert
+                 severity={stats.proteinProgressPercent > 100 ? 'success' : 'info'}
+                 sx={{ mt: 1 }}
+               >
+                 {getProteinText({
+                   proteinPercent: stats.proteinProgressPercent,
+                   proteins: stats.proteins,
+                   targetProtein: stats.targetProtein,
+                 })}
+               </Alert>
+
               </Box>
                       ) : (
                         <Alert severity="info" sx={{ mt: 1 }}>
