@@ -21,8 +21,6 @@ import {
   FitnessCenter as ProteinIcon,
   MonitorWeight as WeightIcon,
 } from '@mui/icons-material';
-import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { useAuthStore } from '../store/authStore';
 import { useTodayStats } from '../hooks/useStats';
@@ -32,8 +30,8 @@ import MiniProgressWidget from '../components/MiniProgressWidget';
 import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 import { getCaloriesText, getProteinText } from '../utils/tone';
 import ActivityCalendar from '../components/ActivityCalendar';
-
-
+import MorningGreetingCard from '../components/MorningGreetingCard';
+import type { ApiError } from '../types/api';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -46,19 +44,13 @@ export default function DashboardPage() {
   const loading =
     statsQuery.isLoading || goalsQuery.isLoading || profileQuery.isLoading;
 
-  // 404 от goals/profile — нормально (данные не заполнены), не считаем ошибкой
-  console.log('GOALS_DEBUG', {
-    isError: goalsQuery.isError,
-    error: goalsQuery.error,
-    data: goalsQuery.data,
-  });
   const isGoalsNotFound =
     goalsQuery.isError &&
-    (goalsQuery.error as { status?: number })?.status === 404;
+    (goalsQuery.error as unknown as ApiError)?.status === 404;
 
   const isProfileNotFound =
     profileQuery.isError &&
-    (profileQuery.error as { status?: number })?.status === 404;
+    (profileQuery.error as unknown as ApiError)?.status === 404;
 
   const error =
     statsQuery.isError ||
@@ -69,18 +61,15 @@ export default function DashboardPage() {
   const goals = goalsQuery.data;
   const profile = profileQuery.data;
 
-  // Калории
   const calories = stats?.calories ?? 0;
   const targetCalories = goals?.targetCalories ?? 2000;
   const remaining = Math.max(0, targetCalories - calories);
   const caloriesPercent = Math.round((calories / targetCalories) * 100);
 
-  // Белки
   const proteins = stats?.proteins ?? 0;
   const targetProtein = stats?.targetProtein ?? 0;
   const proteinPercent = stats?.proteinProgressPercent ?? 0;
 
-  // Вес
   const currentWeight = goals?.currentWeightKg ?? profile?.currentWeightKg ?? 0;
   const targetWeight = profile?.targetWeightKg ?? 0;
   const bmi = profile?.bmi ?? 0;
@@ -116,7 +105,7 @@ export default function DashboardPage() {
 
   return (
     <Box>
-      {/* ============ Приветствие ============ */}
+      {/* Приветствие */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" gutterBottom>
           Привет, {user?.username ?? 'друг'}! 👋
@@ -125,7 +114,8 @@ export default function DashboardPage() {
           Сегодня {today}
         </Typography>
       </Box>
-      {/* ============ Календарь активности ============ */}
+
+      {/* Календарь активности */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -135,213 +125,140 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* ============ Мини-виджет прогресса ============ */}
-            <MiniProgressWidget />
+     {/* Утреннее приветствие */}
+     <MorningGreetingCard isGoalsNotFound={isGoalsNotFound} />
 
-      {/* ============ Сетка карточек ============ */}
-           {/* ============ Онбординг: нет цели ============ */}
-            {isGoalsNotFound && (
-              <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'primary.main' }}>
+      {/* Мини-виджет прогресса */}
+      <MiniProgressWidget />
+
+
+
+      <Grid container spacing={3}>
+        {!isGoalsNotFound && (
+          <>
+            {/* Калории */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card>
                 <CardContent>
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={2}
-                    sx={{
-                      alignItems: { xs: 'flex-start', sm: 'center' },
-                      justifyContent: 'space-between',
-                    }}
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                    <FireIcon color="action" />
+                    <Typography variant="h6">Калории сегодня</Typography>
+                    <InfoTooltip title={tooltips.calories} />
+                  </Stack>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
+                    <Typography variant="h4" color="primary.main">
+                      {Math.round(calories)}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      / {targetCalories} ккал
+                    </Typography>
+                  </Stack>
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.min(100, caloriesPercent)}
+                    sx={{ height: 12, borderRadius: 6, mb: 1 }}
+                    color={caloriesPercent > 100 ? 'warning' : 'primary'}
+                  />
+                  <Typography
+                    variant="body2"
+                    color={caloriesPercent > 100 ? 'warning.main' : 'text.secondary'}
                   >
-                    <Box>
-                      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.5 }}>
-                        <TrackChangesIcon color="primary" />
-                        <Typography variant="h6">Поставь цель</Typography>
-                      </Stack>
-                      <Typography variant="body2" color="text.secondary">
-                        Рассчитаем норму калорий и белка под твои параметры
-                      </Typography>
-                    </Box>
-                    <Button
-                      variant="contained"
-                      endIcon={<ArrowForwardIcon />}
-                      onClick={() => navigate('/goals')}
-                    >
-                      Поставить цель
-                    </Button>
+                    {getCaloriesText({
+                      caloriesPercent,
+                      remaining,
+                      goalType: goalsQuery.data?.goalType,
+                      gender: profileQuery.data?.gender,
+                    })}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* Белки */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                    <ProteinIcon color="success" />
+                    <Typography variant="h6">Белки</Typography>
+                    <InfoTooltip title={tooltips.protein} />
+                  </Stack>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
+                    <Typography variant="h4" color="success.main">
+                      {Math.round(proteins)}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      / {targetProtein} г
+                    </Typography>
+                  </Stack>
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.min(100, proteinPercent)}
+                    sx={{ height: 12, borderRadius: 6, mb: 1 }}
+                    color="success"
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {getProteinText({ proteinPercent, proteins, targetProtein })}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* БЖУ сегодня */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    БЖУ сегодня
+                  </Typography>
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Белки</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(proteins)} г</Typography>
+                    </Stack>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Жиры</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(stats?.fats ?? 0)} г</Typography>
+                    </Stack>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Углеводы</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(stats?.carbs ?? 0)} г</Typography>
+                    </Stack>
                   </Stack>
                 </CardContent>
               </Card>
-            )}
-      <Grid container spacing={3}>
-      {!isGoalsNotFound && (
-                <>
-        {/* Калории */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-              <FireIcon color="action" />
-               <Typography variant="h6">Калории сегодня</Typography>
-               <InfoTooltip title={tooltips.calories} />
-              </Stack>
+            </Grid>
 
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
-                <Typography variant="h4" color="primary.main">
-                  {Math.round(calories)}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  / {targetCalories} ккал
-                </Typography>
-              </Stack>
-
-            <LinearProgress
-              variant="determinate"
-              value={Math.min(100, caloriesPercent)}
-              sx={{ height: 12, borderRadius: 6, mb: 1 }}
-              color={caloriesPercent > 100 ? 'warning' : 'primary'}
-            />
-
-             <Typography
-               variant="body2"
-               color={caloriesPercent > 100 ? 'warning.main' : 'text.secondary'}
-             >
-               {getCaloriesText({
-                 caloriesPercent,
-                 remaining,
-                 goalType: goalsQuery.data?.goalType,
-                 gender: profileQuery.data?.gender,
-               })}
-             </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Белки */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-                <ProteinIcon color="success" />
-                <Typography variant="h6">Белки</Typography>
-                <InfoTooltip title={tooltips.protein} />
-              </Stack>
-
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
-                <Typography variant="h4" color="success.main">
-                  {Math.round(proteins)}
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  / {targetProtein} г
-                </Typography>
-              </Stack>
-
-             <LinearProgress
-               variant="determinate"
-               value={Math.min(100, proteinPercent)}
-               sx={{ height: 12, borderRadius: 6, mb: 1 }}
-               color={proteinPercent > 100 ? 'success' : 'success'}
-             />
-
-             <Typography
-               variant="body2"
-               color="text.secondary"
-             >
-               {getProteinText({
-                 proteinPercent,
-                 proteins,
-                 targetProtein,
-               })}
-             </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* БЖУ сегодня */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                БЖУ сегодня
-              </Typography>
-              <Stack spacing={1.5}>
-                <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Белки
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {Math.round(proteins)} г
-                  </Typography>
-                </Stack>
-                <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Жиры
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {Math.round(stats?.fats ?? 0)} г
-                  </Typography>
-                </Stack>
-                <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Углеводы
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {Math.round(stats?.carbs ?? 0)} г
-                  </Typography>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Вес и цель */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-                <WeightIcon color="info" />
-                <Typography variant="h6">Вес и цель</Typography>
-              </Stack>
-
-              <Stack spacing={1.5}>
-                <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Текущий вес
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {currentWeight} кг
-                  </Typography>
-                </Stack>
-                <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Целевой вес
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {targetWeight} кг
-                  </Typography>
-                </Stack>
-                <Stack
-                  direction="row"
-                  sx={{ justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    ИМТ
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {bmi.toFixed(1)}
-                    </Typography>
-                    <Chip
-                      size="small"
-                      label={getBmiLabel(bmi).label}
-                      color={getBmiLabel(bmi).color}
-                    />
+            {/* Вес и цель */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Card>
+                <CardContent>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                    <WeightIcon color="info" />
+                    <Typography variant="h6">Вес и цель</Typography>
                   </Stack>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-         </Grid>
-                    </>
-                  )}
+                  <Stack spacing={1.5}>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Текущий вес</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{currentWeight} кг</Typography>
+                    </Stack>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">Целевой вес</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{targetWeight} кг</Typography>
+                    </Stack>
+                    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary">ИМТ</Typography>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{bmi.toFixed(1)}</Typography>
+                        <Chip size="small" label={getBmiLabel(bmi).label} color={getBmiLabel(bmi).color} />
+                      </Stack>
+                    </Stack>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
+          </>
+        )}
 
         {/* Быстрые действия */}
         <Grid size={12}>
@@ -352,42 +269,22 @@ export default function DashboardPage() {
               </Typography>
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<RestaurantIcon />}
-                    onClick={() => navigate('/recipes')}
-                  >
+                  <Button fullWidth variant="outlined" startIcon={<RestaurantIcon />} onClick={() => navigate('/recipes')}>
                     Рецепты
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<DiaryIcon />}
-                    onClick={() => navigate('/diary')}
-                  >
+                  <Button fullWidth variant="outlined" startIcon={<DiaryIcon />} onClick={() => navigate('/diary')}>
                     Дневник
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<GoalsIcon />}
-                    onClick={() => navigate('/goals')}
-                  >
+                  <Button fullWidth variant="outlined" startIcon={<GoalsIcon />} onClick={() => navigate('/goals')}>
                     Цели
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    startIcon={<ProfileIcon />}
-                    onClick={() => navigate('/profile')}
-                  >
+                  <Button fullWidth variant="outlined" startIcon={<ProfileIcon />} onClick={() => navigate('/profile')}>
                     Профиль
                   </Button>
                 </Grid>

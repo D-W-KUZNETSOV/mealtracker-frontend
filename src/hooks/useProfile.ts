@@ -16,6 +16,7 @@ export function useProfile() {
   return useQuery({
     queryKey: profileKeys.me(),
     queryFn: async () => (await profileApi.getProfile()).data,
+    retry: false,
   });
 }
 

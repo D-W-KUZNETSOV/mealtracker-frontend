@@ -11,14 +11,15 @@ export const nutritionKeys = {
   targetProtein: () => [...nutritionKeys.all, 'targetProtein'] as const,
 };
 
-// ---------- Текущие цели ----------
 export function useGoals() {
   return useQuery({
     queryKey: nutritionKeys.goals(),
     queryFn: async () => (await nutritionApi.getGoals()).data,
+    retry: false,
+    staleTime: Infinity,   // ← 🆕 кэш навсегда (404 тоже кэшируется)
+    gcTime: Infinity,      // ← 🆕 не удалять из кэша
   });
 }
-
 // ---------- Целевой белок ----------
 export function useTargetProtein() {
   return useQuery({
