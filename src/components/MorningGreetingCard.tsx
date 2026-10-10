@@ -34,8 +34,8 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
     const hour = now.getHours();
     const isMorning = hour >= 6 && hour < 12;
     if (!isMorning) return;
-   // const lastShown = localStorage.getItem('morning-greeting-shown');
-    //if (lastShown === today.iso) return;
+    const lastShown = localStorage.getItem('morning-greeting-shown');
+    if (lastShown === today.iso) return;
     setVisible(true);
     localStorage.setItem('morning-greeting-shown', today.iso);
   }, [today.iso]);
