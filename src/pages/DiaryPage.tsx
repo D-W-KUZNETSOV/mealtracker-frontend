@@ -191,40 +191,31 @@ export default function DiaryPage() {
               {profileQuery.data?.gender === 'FEMALE' ? 'Ты съела за день' : 'Ты съел за день'}
             </Typography>
 
-            <Stack direction="row" spacing={4} sx={{ mb: 3 }}>
-              <Box>
-                <Typography variant="h4">
-                  {roundNutrient(stats.calories)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  ккал
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h4">
-                  {roundNutrient(stats.proteins)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Белки, г
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h4">
-                  {roundNutrient(stats.fats)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Жиры, г
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="h4">
-                  {roundNutrient(stats.carbs)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Углеводы, г
-                </Typography>
-              </Box>
-            </Stack>
+           <Box
+             sx={{
+               display: 'grid',
+               gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+               gap: 2,
+               mb: 3,
+             }}
+           >
+             <Box>
+               <Typography variant="h4">{roundNutrient(stats.calories)}</Typography>
+               <Typography variant="caption" color="text.secondary">ккал</Typography>
+             </Box>
+             <Box>
+               <Typography variant="h4">{roundNutrient(stats.proteins)}</Typography>
+               <Typography variant="caption" color="text.secondary">Белки, г</Typography>
+             </Box>
+             <Box>
+               <Typography variant="h4">{roundNutrient(stats.fats)}</Typography>
+               <Typography variant="caption" color="text.secondary">Жиры, г</Typography>
+             </Box>
+             <Box>
+               <Typography variant="h4">{roundNutrient(stats.carbs)}</Typography>
+               <Typography variant="caption" color="text.secondary">Углеводы, г</Typography>
+             </Box>
+           </Box>
 
 
             {/* Прогресс по калориям */}
