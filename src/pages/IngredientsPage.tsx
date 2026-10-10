@@ -21,6 +21,8 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
+import { useTheme, useMediaQuery } from '@mui/material';
+import IngredientDetailDialog from '../components/IngredientDetailDialog';
 
 import {
   useBaseIngredients,
@@ -41,9 +43,11 @@ export default function IngredientsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<IngredientDto | null>(null);
   const [deleting, setDeleting] = useState<IngredientDto | null>(null);
+  const [selected, setSelected] = useState<IngredientDto | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
-
+const theme = useTheme();
+const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const myQuery = useMyIngredients();
   const baseQuery = useBaseIngredients();
 
@@ -154,56 +158,73 @@ export default function IngredientsPage() {
       {!currentQuery.isLoading && items.length > 0 && (
         <TableContainer component={Paper}>
           <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Название</TableCell>
-                <TableCell align="right">Ккал/100г</TableCell>
-                <TableCell align="right">Б/100г</TableCell>
-                <TableCell align="right">Ж/100г</TableCell>
-                <TableCell align="right">У/100г</TableCell>
-                {isMyTab && <TableCell align="right">Действия</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id} hover>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell align="right">
-                  {item.caloriesPer100g != null
-                    ? `${roundNutrient(item.caloriesPer100g)} ккал`
-                    : '—'}
-                  </TableCell>
-                  <TableCell align="right">
-                    {roundNutrient(item.proteinsPer100g)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {roundNutrient(item.fatsPer100g)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {roundNutrient(item.carbsPer100g)}
-                  </TableCell>
-                  {isMyTab && (
-                    <TableCell align="right">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenEdit(item)}
-                        title="Редактировать"
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => setDeleting(item)}
-                        title="Удалить"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
+           <TableHead>
+             <TableRow>
+               <TableCell>Название</TableCell>
+               <TableCell align="right">Ккал</TableCell>
+               {!isMobile && <TableCell align="right">Б</TableCell>}
+               {!isMobile && <TableCell align="right">Ж</TableCell>}
+               {!isMobile && <TableCell align="right">У</TableCell>}
+               {isMyTab && !isMobile && <TableCell align="right">Действия</TableCell>}
+             </TableRow>
+           </TableHead>
+           <TableBody>
+             {items.map((item) => (
+              <TableRow
+                key={item.id}
+                hover
+                onClick={() => setSelected(item)}
+                sx={{ cursor: 'pointer' }}
+              >
+                 <TableCell>{item.name}</TableCell>
+                 <TableCell align="right">
+                   {item.caloriesPer100g != null
+                     ? `${roundNutrient(item.caloriesPer100g)}`
+                     : '—'}
+                 </TableCell>
+                 {!isMobile && (
+                   <TableCell align="right">
+                     {roundNutrient(item.proteinsPer100g)}
+                   </TableCell>
+                 )}
+                 {!isMobile && (
+                   <TableCell align="right">
+                     {roundNutrient(item.fatsPer100g)}
+                   </TableCell>
+                 )}
+                 {!isMobile && (
+                   <TableCell align="right">
+                     {roundNutrient(item.carbsPer100g)}
+                   </TableCell>
+                 )}
+                 {isMyTab && !isMobile && (
+                   <TableCell align="right">
+                     <IconButton
+                       size="small"
+                       onClick={(e) => {
+                         e.stopPropagation();   // ⚠️ чтобы не открывалась модалка
+                         handleOpenEdit(item);
+                       }}
+                       title="Редактировать"
+                     >
+                       <EditIcon fontSize="small" />
+                     </IconButton>
+                     <IconButton
+                       size="small"
+                       color="error"
+                       onClick={(e) => {
+                         e.stopPropagation();   // ⚠️
+                         setDeleting(item);
+                       }}
+                       title="Удалить"
+                     >
+                       <DeleteIcon fontSize="small" />
+                     </IconButton>
+                   </TableCell>
+                 )}
+               </TableRow>
+             ))}
+           </TableBody>
           </Table>
         </TableContainer>
       )}
@@ -230,6 +251,21 @@ export default function IngredientsPage() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleting(null)}
       />
+      {selected && (
+       <IngredientDetailDialog
+         open={!!selected}
+         ingredient={selected}
+         onClose={() => setSelected(null)}
+         onEdit={isMyTab ? () => {
+           setSelected(null);
+           handleOpenEdit(selected);
+         } : undefined}
+         onDelete={isMyTab ? () => {
+           setSelected(null);
+           setDeleting(selected);
+         } : undefined}
+       />
+      )}
     </Box>
   );
 }

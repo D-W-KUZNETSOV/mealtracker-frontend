@@ -87,6 +87,7 @@ export interface IngredientDto {
   carbsPer100g: number;
   unitType: UnitType;
   unitWeightGrams: number | null;
+  category?: string;
 }
 
 export interface IngredientRequest {
@@ -464,10 +465,13 @@ export const INGREDIENT_CATEGORIES: Record<string, { label: string; emoji: strin
   FRUITS:     { label: 'Фрукты',     emoji: '🍎' },
   GRAINS:     { label: 'Крупы',      emoji: '🌾' },
   DAIRY:      { label: 'Молочное',   emoji: '🥛' },
+  EGGS:       { label: 'Яйца',       emoji: '🥚' },   // 🆕
+  NUTS:       { label: 'Орехи',      emoji: '🥜' },   // 🆕
+  OILS:       { label: 'Масла',      emoji: '🫒' },   // 🆕
+  DRESSINGS:  { label: 'Заправки',   emoji: '🫗' },   // 🆕 (заменяет SAUCES)
+  SPICES:     { label: 'Специи',     emoji: '🧂' },
   SWEETS:     { label: 'Сладкое',    emoji: '🍫' },
   DRINKS:     { label: 'Напитки',    emoji: '🥤' },
-  SPICES:     { label: 'Специи',     emoji: '🧂' },
-  SAUCES:     { label: 'Соусы',      emoji: '🥫' },
   OTHER:      { label: 'Прочее',     emoji: '📦' },
 };
 export interface CreateShoppingListItemRequest {
