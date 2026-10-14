@@ -18,6 +18,10 @@ export const mealPlansApi = {
   create: (data: CreateMealPlanRequest) =>
     apiClient.post<MealPlanDto>('/api/meal-plans', data),
 
+      /** Сгенерировать план */
+      generate: (data: CreateMealPlanRequest) =>
+        apiClient.post<MealPlanDto>('/api/meal-plans/generate', data),
+
   /** Обновить план */
   update: (id: number, data: CreateMealPlanRequest) =>
     apiClient.put<MealPlanDto>(`/api/meal-plans/${id}`, data),

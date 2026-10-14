@@ -33,6 +33,14 @@ export function useCreateMealPlan() {
   });
 }
 
+export function useGenerateMealPlan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateMealPlanRequest) => mealPlansApi.generate(data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: mealPlanKeys.all }),
+  });
+}
+
 export function useUpdateMealPlan() {
   const qc = useQueryClient();
   return useMutation({

@@ -10,8 +10,9 @@ import {
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
 
-import { useCreateMealPlan } from '../hooks/useMealPlans';
+
 import type { ApiError } from '../types/api';
+import { useCreateMealPlan, useGenerateMealPlan } from '../hooks/useMealPlans';
 
 
 
@@ -38,10 +39,12 @@ function getMonday(d: Date): Date {
 export default function CreateMealPlanDialog({ open, onClose }: Props) {
   const { enqueueSnackbar } = useSnackbar();
   const createMutation = useCreateMealPlan();
+  const generateMutation = useGenerateMealPlan();
 
   const [name, setName] = useState('План на неделю');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -72,6 +75,26 @@ export default function CreateMealPlanDialog({ open, onClose }: Props) {
       enqueueSnackbar(apiError.message || 'Ошибка создания', {
         variant: 'error',
       });
+    }
+  };
+  const handleGenerate = async () => {
+    if (!canSubmit) return;
+    setGenerating(true);
+    try {
+      await generateMutation.mutateAsync({
+        name: name.trim(),
+        startDate,
+        endDate,
+      });
+      enqueueSnackbar('План создан и заполнен', { variant: 'success' });
+      onClose();
+    } catch (err) {
+      const apiError = err as ApiError;
+      enqueueSnackbar(apiError.message || 'Ошибка генерации', {
+        variant: 'error',
+      });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -106,15 +129,22 @@ export default function CreateMealPlanDialog({ open, onClose }: Props) {
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={createMutation.isPending}>
+        <Button onClick={onClose} disabled={createMutation.isPending || generating}>
           Отмена
         </Button>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={handleSubmit}
-          disabled={!canSubmit || createMutation.isPending}
+          disabled={!canSubmit || createMutation.isPending || generating}
         >
           {createMutation.isPending ? 'Создание...' : 'Создать'}
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleGenerate}
+          disabled={!canSubmit || createMutation.isPending || generating}
+        >
+          {generating ? 'Генерация...' : 'Создать и заполнить'}
         </Button>
       </DialogActions>
     </Dialog>
