@@ -73,10 +73,10 @@ export default function LoginPage() {
     >
       <Card sx={{ maxWidth: 400, width: '100%' }}>
         <CardContent>
-          <Typography variant="h5" gutterBottom>
-            MealTracker
+          <Typography variant="h4" sx={{ fontWeight: 600 }} gutterBottom>
+            Баланс
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Войдите в свой аккаунт
           </Typography>
 
@@ -121,6 +121,20 @@ export default function LoginPage() {
             <Link component={RouterLink} to="/register">
               Зарегистрироваться
             </Link>
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 3,
+              textAlign: 'center',
+              fontStyle: 'italic',
+              fontWeight: 400,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              color: 'text.secondary',
+            }}
+          >
+            Баланс в твоих руках
           </Typography>
         </CardContent>
       </Card>
