@@ -25,6 +25,9 @@ import { useDeleteMealPlanItem } from '../hooks/useMealPlans';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 
+import { useDeleteMealPlan } from '../hooks/useMealPlans';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+
 import GenerateShoppingListDialog from '../components/GenerateShoppingListDialog';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
@@ -65,10 +68,16 @@ const DAY_LABELS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
 export default function MealPlanPage() {
   const plansQuery = useMealPlans();
-  const activePlan = plansQuery.data?.[0] ?? null;
+  const activePlan = useMemo(() => {
+    const plans = plansQuery.data ?? [];
+    if (plans.length === 0) return null;
+    return plans.reduce((max, p) => (p.id > max.id ? p : max));
+  }, [plansQuery.data]);
+  const deletePlan = useDeleteMealPlan();
 
   const { enqueueSnackbar } = useSnackbar();
   const deleteItem = useDeleteMealPlanItem();
+
 
  const theme = useTheme();
  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));   // < 600px
@@ -155,6 +164,23 @@ export default function MealPlanPage() {
                     onClick={() => setCreatePlanDialogOpen(true)}
                   >
                     Создать план
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteOutlineIcon />}
+                    onClick={() => {
+                      if (!activePlan) return;
+                      if (window.confirm(`Удалить план "${activePlan.name ?? 'без названия'}"?`)) {
+                        deletePlan.mutate(activePlan.id, {
+                          onSuccess: () => enqueueSnackbar('План удалён', { variant: 'success' }),
+                          onError: () => enqueueSnackbar('Ошибка удаления', { variant: 'error' }),
+                        });
+                      }
+                    }}
+                    disabled={!activePlan || deletePlan.isPending}
+                  >
+                    {deletePlan.isPending ? 'Удаление...' : 'Удалить план'}
                   </Button>
                  </Stack>
                </Stack>
