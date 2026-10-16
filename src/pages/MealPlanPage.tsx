@@ -148,7 +148,14 @@ export default function MealPlanPage() {
           mb: 3,
         }}
       >
-        <Typography variant="h4">План меню</Typography>
+        <Box>
+          <Typography variant="h4">План меню</Typography>
+          {activePlan && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {activePlan.name ?? 'Без названия'} · {new Date(activePlan.startDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })} — {new Date(activePlan.endDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+            </Typography>
+          )}
+        </Box>
         <Stack direction="row" spacing={1}>
           <Button
             variant="outlined"
@@ -171,7 +178,9 @@ export default function MealPlanPage() {
                     startIcon={<DeleteOutlineIcon />}
                     onClick={() => {
                       if (!activePlan) return;
-                      if (window.confirm(`Удалить план "${activePlan.name ?? 'без названия'}"?`)) {
+                      const startStr = new Date(activePlan.startDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                      const endStr = new Date(activePlan.endDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                      if (window.confirm(`Удалить план "${activePlan.name ?? 'без названия'}" (${startStr} — ${endStr})?`)) {
                         deletePlan.mutate(activePlan.id, {
                           onSuccess: () => enqueueSnackbar('План удалён', { variant: 'success' }),
                           onError: () => enqueueSnackbar('Ошибка удаления', { variant: 'error' }),
