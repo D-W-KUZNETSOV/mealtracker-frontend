@@ -67,3 +67,12 @@ export function useCalendar(month: string) {
     enabled: !!month,
   });
 }
+
+// ---------- F19-fill: подсказать добор ----------
+export function useSuggestFillers(date: string, enabled: boolean) {
+  return useQuery({
+    queryKey: [...statsKeys.all, 'suggestFillers', date],
+    queryFn: async () => (await statsApi.suggestFillers(date)).data,
+    enabled,
+  });
+}

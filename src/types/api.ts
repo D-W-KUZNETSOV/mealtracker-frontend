@@ -428,6 +428,22 @@ export interface CreateMealPlanItemRequest {
   weightInGrams?: number | null;
   customName?: string | null;
 }
+// ---------- F19-fill: добор до цели ----------
+
+export interface FillerSuggestionDto {
+  ingredientId: number;
+  ingredientName: string;
+  category: string | null;
+  weightInGrams: number;
+  calories: number;
+  proteins: number;
+}
+
+export interface FillSuggestionsResponse {
+  caloriesNeeded: number;
+  proteinsNeeded: number;
+  suggestions: FillerSuggestionDto[];
+}
 
 // ---------- Shopping Lists (F2) ----------
 

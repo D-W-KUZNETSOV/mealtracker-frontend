@@ -5,6 +5,7 @@ import type {
   AddFromPlanRequest,
   AddFromPlanResponse,
   CalendarResponse,
+  FillSuggestionsResponse,   // ← новое
 } from '../types/api';
 
 // ============================================================
@@ -33,4 +34,9 @@ export const statsApi = {
       apiClient.get<CalendarResponse>('/api/stats/calendar', {
         params: { month },
       }),
+   /** F19-fill: подсказать добор до цели на дату */
+      suggestFillers: (date: string) =>
+        apiClient.get<FillSuggestionsResponse>('/api/stats/suggest-fillers', {
+          params: { date },
+        }),
   };

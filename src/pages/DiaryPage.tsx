@@ -29,6 +29,8 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { getCaloriesOverAlert, getProteinText } from '../utils/tone';
 import { useGoals } from '../hooks/useNutrition';
 import { useProfile } from '../hooks/useProfile';
+import SuggestFillersDialog from '../components/SuggestFillersDialog';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -56,7 +58,7 @@ export default function DiaryPage() {
   const [addFromPlanOpen, setAddFromPlanOpen] = useState(false);
 
   const isTodaySelected = isToday(selectedDate);
-
+const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
   const goalsQuery = useGoals();
   const profileQuery = useProfile();
 
@@ -283,12 +285,29 @@ export default function DiaryPage() {
                  })}
                </Alert>
 
-              </Box>
-                      ) : (
-                        <Alert severity="info" sx={{ mt: 1 }}>
-                          Цель по белку не задана. Установите цели в разделе «Цели».
-                        </Alert>
-                      )}
+                            </Box>
+                                    ) : (
+                                      <Alert severity="info" sx={{ mt: 1 }}>
+                                        Цель по белку не задана. Установите цели в разделе «Цели».
+                                      </Alert>
+                                    )}
+
+                          {/* F19-fill: подсказать добор */}
+                          {isTodaySelected
+                            && stats.targetCalories != null
+                            && stats.calories < stats.targetCalories && (
+                            <Button
+                              variant="outlined"
+                              startIcon={<LightbulbIcon />}
+                              onClick={() => setSuggestFillersOpen(true)}
+                              sx={{ mt: 2 }}
+                              fullWidth
+                            >
+                              Подсказать добор
+                            </Button>
+                          )}
+
+
 
                     </CardContent>
                   </Card>
@@ -359,14 +378,21 @@ export default function DiaryPage() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />
-      {activePlan && (
-        <AddFromPlanDialog
-          open={addFromPlanOpen}
-          onClose={() => setAddFromPlanOpen(false)}
-          plan={activePlan}
-          date={toApiDate(selectedDate)}
-        />
-      )}
-    </Box>
-  );
-}
+            {activePlan && (
+              <AddFromPlanDialog
+                open={addFromPlanOpen}
+                onClose={() => setAddFromPlanOpen(false)}
+                plan={activePlan}
+                date={toApiDate(selectedDate)}
+              />
+            )}
+
+            <SuggestFillersDialog
+              open={suggestFillersOpen}
+              onClose={() => setSuggestFillersOpen(false)}
+              date={toApiDate(selectedDate)}
+            />
+
+          </Box>
+        );
+      }
