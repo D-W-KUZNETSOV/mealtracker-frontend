@@ -1,7 +1,7 @@
 // MealTracker Service Worker
 // Правильная стратегия обновления + офлайн-доступ к статике
 
-const CACHE_VERSION = 'v71';                    // ← bump 16.10.2026: F19-fill в дневнике
+const CACHE_VERSION = 'v72';                    // ← bump 16.10.2026: F19-fill в дневнике
 const CACHE_NAME = `mealtracker-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [

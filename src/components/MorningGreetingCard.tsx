@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -7,7 +6,9 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import WbTwilightIcon from '@mui/icons-material/WbTwilight';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import NightsStayIcon from '@mui/icons-material/NightsStay';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { useMealPlans } from '../hooks/useMealPlans';
@@ -17,9 +18,22 @@ interface Props {
   isGoalsNotFound: boolean;
 }
 
+function getGreetingData() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) {
+    return { text: 'Доброе утро', Icon: WbTwilightIcon, color: 'warning' as const };
+  }
+  if (h >= 12 && h < 18) {
+    return { text: 'Добрый день', Icon: WbSunnyIcon, color: 'warning' as const };
+  }
+  if (h >= 18 && h < 23) {
+    return { text: 'Добрый вечер', Icon: WbTwilightIcon, color: 'info' as const };
+  }
+  return { text: 'Доброй ночи', Icon: NightsStayIcon, color: 'info' as const };
+}
+
 export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
 
   const today = (() => {
     const now = new Date();
@@ -29,17 +43,6 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
     return { iso: `${y}-${m}-${d}`, month: `${y}-${m}` };
   })();
 
-  useEffect(() => {
-    const now = new Date();
-    const hour = now.getHours();
-    const isMorning = hour >= 6 && hour < 12;
-    if (!isMorning) return;
-    const lastShown = localStorage.getItem('morning-greeting-shown');
-    if (lastShown === today.iso) return;
-    setVisible(true);
-    localStorage.setItem('morning-greeting-shown', today.iso);
-  }, [today.iso]);
-
   const plansQuery = useMealPlans();
   const calendarQuery = useCalendar(today.month);
 
@@ -48,7 +51,7 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   );
   const streak = calendarQuery.data?.currentStreak ?? 0;
 
-  if (!visible) return null;
+  const { text: greetingText, Icon: GreetingIcon, color: iconColor } = getGreetingData();
 
   // Сценарий 1 — нет цели
   if (isGoalsNotFound) {
@@ -56,8 +59,8 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
       <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'primary.main' }}>
         <CardContent>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-            <WbSunnyIcon color="warning" />
-            <Typography variant="h6">Доброе утро</Typography>
+            <GreetingIcon color={iconColor} />
+            <Typography variant="h6">{greetingText}</Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Давай начнём с простого — поставим цель. Это поможет рассчитать
@@ -81,8 +84,8 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
       <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'success.main' }}>
         <CardContent>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-            <WbSunnyIcon color="warning" />
-            <Typography variant="h6">Доброе утро</Typography>
+            <GreetingIcon color={iconColor} />
+            <Typography variant="h6">{greetingText}</Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             План на сегодня готов.
@@ -99,13 +102,13 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
     );
   }
 
-  // Сценарий 3 — streak
+  // Сценарий 3 — streak / нет записей
   return (
     <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'warning.main' }}>
       <CardContent>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
-          <WbSunnyIcon color="warning" />
-          <Typography variant="h6">Доброе утро</Typography>
+          <GreetingIcon color={iconColor} />
+          <Typography variant="h6">{greetingText}</Typography>
         </Stack>
         {streak > 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
