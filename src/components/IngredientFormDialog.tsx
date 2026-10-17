@@ -12,10 +12,13 @@ import {
   Stack,
   TextField,
   Typography,
+  MenuItem,
 } from '@mui/material';
 
 import type { IngredientDto, IngredientRequest } from '../types/api';
-import { calcCaloriesFromMacros, roundNutrient } from '../types/api';
+import { calcCaloriesFromMacros, roundNutrient,INGREDIENT_CATEGORIES } from '../types/api';
+import { isValidNumberInput, normalizeNumberInput } from '../utils/numberInput';
+
 
 // ============================================================
 // Схема валидации формы ингредиента.
@@ -33,6 +36,7 @@ const numberString = (min: number, max: number, required = false) =>
 
 const ingredientSchema = z.object({
   name: z.string().min(1, 'Введите название').max(100, 'Максимум 100 символов'),
+  category: z.string().optional(),
   proteinsPer100g: numberString(0, 100, true),
   fatsPer100g: numberString(0, 100, true),
   carbsPer100g: numberString(0, 100, true),
@@ -76,6 +80,7 @@ export default function IngredientFormDialog({
     resolver: zodResolver(ingredientSchema),
   defaultValues: {
     name: '',
+    category: 'OTHER',
     proteinsPer100g: '',
     fatsPer100g: '',
     carbsPer100g: '',
@@ -89,6 +94,7 @@ export default function IngredientFormDialog({
       if (ingredient) {
         reset({
           name: ingredient.name,
+          category: ingredient.category ?? 'OTHER',
           proteinsPer100g: String(ingredient.proteinsPer100g ?? ''),
           fatsPer100g: String(ingredient.fatsPer100g ?? ''),
           carbsPer100g: String(ingredient.carbsPer100g ?? ''),
@@ -100,6 +106,7 @@ export default function IngredientFormDialog({
       } else {
         reset({
           name: initialName ?? '',
+          category: 'OTHER',
           proteinsPer100g: '',
           fatsPer100g: '',
           carbsPer100g: '',
@@ -140,6 +147,7 @@ export default function IngredientFormDialog({
 
    onSubmit({
      name: data.name.trim(),
+     category: data.category,
      proteinsPer100g: toNum(data.proteinsPer100g),
      fatsPer100g: toNum(data.fatsPer100g),
      carbsPer100g: toNum(data.carbsPer100g),
@@ -163,6 +171,25 @@ export default function IngredientFormDialog({
               error={!!errors.name}
               helperText={errors.name?.message}
             />
+            <Controller
+              name="category"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  select
+                  label="Категория"
+                  fullWidth
+                  value={field.value ?? 'OTHER'}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
+                  {Object.entries(INGREDIENT_CATEGORIES).map(([value, { label, emoji }]) => (
+                    <MenuItem key={value} value={value}>
+                      {emoji} {label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
 
 
                          <Stack direction="row" spacing={2}>
@@ -177,8 +204,8 @@ export default function IngredientFormDialog({
                  value={field.value ?? ''}
                  onChange={(e) => {
                    const raw = e.target.value;
-                   if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
-                     field.onChange(raw);
+                   if (isValidNumberInput(raw)) {
+                     field.onChange(normalizeNumberInput(raw));
                    }
                  }}
                  onFocus={(e) => e.target.select()}
@@ -201,8 +228,8 @@ export default function IngredientFormDialog({
                    value={field.value ?? ''}
                    onChange={(e) => {
                      const raw = e.target.value;
-                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
-                       field.onChange(raw);
+                     if (isValidNumberInput(raw)) {
+                       field.onChange(normalizeNumberInput(raw));
                      }
                    }}
                    onFocus={(e) => e.target.select()}
@@ -225,8 +252,8 @@ export default function IngredientFormDialog({
                    value={field.value ?? ''}
                    onChange={(e) => {
                      const raw = e.target.value;
-                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
-                       field.onChange(raw);
+                     if (isValidNumberInput(raw)) {
+                       field.onChange(normalizeNumberInput(raw));
                      }
                    }}
                    onFocus={(e) => e.target.select()}
@@ -249,8 +276,8 @@ export default function IngredientFormDialog({
                    value={field.value ?? ''}
                    onChange={(e) => {
                      const raw = e.target.value;
-                     if (raw === '' || /^\d*[.,]?\d*$/.test(raw)) {
-                       field.onChange(raw);
+                     if (isValidNumberInput(raw)) {
+                       field.onChange(normalizeNumberInput(raw));
                      }
                    }}
                    onFocus={(e) => e.target.select()}

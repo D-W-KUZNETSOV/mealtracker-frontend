@@ -96,6 +96,7 @@ export interface IngredientRequest {
   fatsPer100g: number;
   carbsPer100g: number;
   caloriesPer100g?: number | null;   // ← добавить
+  category?: string;
   unitType?: UnitType;
   unitWeightGrams?: number | null;
 }

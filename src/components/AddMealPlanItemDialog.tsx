@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
+import { isValidNumberInput, normalizeNumberInput } from '../utils/numberInput';
 
 import { useMyRecipes } from '../hooks/useRecipes';
 import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
@@ -62,24 +63,26 @@ export default function AddMealPlanItemDialog({
   const [mode, setMode] = useState<Mode>('recipe');
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeListItemDto | null>(null);
   const [selectedIngredient, setSelectedIngredient] = useState<IngredientDto | null>(null);
-  const [servings, setServings] = useState<number>(1);
-  const [weightInGrams, setWeightInGrams] = useState<number>(100);
+  const [servingsStr, setServingsStr] = useState('1');
+  const [weightStr, setWeightStr] = useState('100');
 
+const servings = parseFloat(servingsStr.replace(',', '.')) || 0;
+const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
   // ---------- Сброс при открытии ----------
-  useEffect(() => {
-    if (open) {
-      setMode('recipe');
-      setSelectedRecipe(null);
-      setSelectedIngredient(null);
-      setServings(1);
-      setWeightInGrams(100);
-    }
-  }, [open]);
+ useEffect(() => {
+   if (open) {
+     setMode('recipe');
+     setSelectedRecipe(null);
+     setSelectedIngredient(null);
+     setServingsStr('1');
+     setWeightStr('100');
+   }
+ }, [open]);
 
   // ---------- Автоподстановка servings/weight при выборе ----------
   useEffect(() => {
     if (selectedRecipe) {
-      setServings(selectedRecipe.servings ?? 1);
+      setServingsStr(String(selectedRecipe.servings ?? 1));
     }
   }, [selectedRecipe]);
 
@@ -184,11 +187,17 @@ export default function AddMealPlanItemDialog({
 
                   <TextField
                     label="Порций"
-                    type="number"
+                    type="text"
                     fullWidth
-                    value={servings}
-                    onChange={(e) => setServings(Number(e.target.value) || 0)}
-                    slotProps={{ htmlInput: { step: '0.5', min: 0.5 } }}
+                    value={servingsStr}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (isValidNumberInput(raw)) {
+                        setServingsStr(normalizeNumberInput(raw));
+                      }
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                   />
                 </>
               )}
@@ -222,11 +231,17 @@ export default function AddMealPlanItemDialog({
 
                   <TextField
                     label="Вес, г"
-                    type="number"
+                    type="text"
                     fullWidth
-                    value={weightInGrams}
-                    onChange={(e) => setWeightInGrams(Number(e.target.value) || 0)}
-                    slotProps={{ htmlInput: { step: '1', min: 1 } }}
+                    value={weightStr}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      if (isValidNumberInput(raw)) {
+                        setWeightStr(normalizeNumberInput(raw));
+                      }
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
                   />
                 </>
               )}
