@@ -25,6 +25,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
 import { mealTypeLabel } from '../utils/mealType';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 import { useMyRecipes, usePublicRecipes } from '../hooks/useRecipes';
 import type { ApiError, RecipeListItemDto } from '../types/api';
@@ -264,17 +265,51 @@ export default function RecipesPage() {
         </Alert>
       )}
 
-      {!currentQuery.isLoading &&
-        !currentQuery.isError &&
-        items.length === 0 && (
-          <Alert severity="info">
-            {isMyTab
-              ? hasActiveFilters
-                ? 'По фильтрам ничего не найдено.'
-                : 'У вас пока нет рецептов. Нажмите «Создать рецепт», чтобы добавить первый.'
-              : 'Пока нет публичных рецептов.'}
+      {!currentQuery.isLoading && !currentQuery.isError && items.length === 0 && (
+        isMyTab && hasActiveFilters ? (
+          <Alert
+            severity="info"
+            action={
+              <Button color="inherit" size="small" onClick={handleResetFilters}>
+                Сбросить
+              </Button>
+            }
+          >
+            По фильтрам ничего не найдено.
           </Alert>
-        )}
+        ) : isMyTab ? (
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <MenuBookIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h5" gutterBottom>
+              Пока нет рецептов
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              Добавьте первый — это займёт 1-2 минуты. Рецепты нужны для
+              планирования меню и дневника питания.
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setFormOpen(true)}
+              sx={{ mb: 3 }}
+            >
+              Создать рецепт
+            </Button>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              С чего начать:
+            </Typography>
+            <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Chip label="Овсянка с молоком" size="small" />
+              <Chip label="Курица с гречкой" size="small" />
+              <Chip label="Творог с мёдом" size="small" />
+            </Stack>
+          </Paper>
+        ) : (
+          <Alert severity="info">
+            Пока нет публичных рецептов.
+          </Alert>
+        )
+      )}
 
       {!currentQuery.isLoading && items.length > 0 && (
         <Box

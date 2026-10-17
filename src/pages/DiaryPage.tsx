@@ -185,12 +185,8 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
       {stats && (
         <Card>
           <CardContent>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              gutterBottom
-            >
-              {profileQuery.data?.gender === 'FEMALE' ? 'Ты съела за день' : 'Ты съел за день'}
+            <Typography variant="h6" gutterBottom>
+              Мой баланс сегодня
             </Typography>
 
            <Box
@@ -274,16 +270,34 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
                  color="success"
                  sx={{ height: 12, borderRadius: 6 }}
                />
-               <Alert
-                 severity={stats.proteinProgressPercent > 100 ? 'success' : 'info'}
-                 sx={{ mt: 1 }}
-               >
-                 {getProteinText({
-                   proteinPercent: stats.proteinProgressPercent,
-                   proteins: stats.proteins,
-                   targetProtein: stats.targetProtein,
-                 })}
-               </Alert>
+               {stats.entries.length === 0 ? (
+                 <Paper sx={{ p: 3, mt: 2, textAlign: 'center', bgcolor: 'action.hover' }}>
+                   <Typography variant="h6" gutterBottom>
+                     Начни с завтрака
+                   </Typography>
+                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                     Добавьте первый приём пищи — это займёт 1 минуту. Или добавьте из плана, если он у вас есть.
+                   </Typography>
+                   <Button
+                     variant="contained"
+                     startIcon={<AddIcon />}
+                     onClick={() => setDialogOpen(true)}
+                   >
+                     Добавить порцию
+                   </Button>
+                 </Paper>
+               ) : (
+                 <Alert
+                   severity={stats.proteinProgressPercent > 100 ? 'success' : 'info'}
+                   sx={{ mt: 1 }}
+                 >
+                   {getProteinText({
+                     proteinPercent: stats.proteinProgressPercent,
+                     proteins: stats.proteins,
+                     targetProtein: stats.targetProtein,
+                   })}
+                 </Alert>
+               )}
 
                             </Box>
                                     ) : (
