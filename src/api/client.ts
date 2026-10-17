@@ -36,6 +36,20 @@ apiClient.interceptors.response.use(
       'status' in backendData &&
       'code' in backendData;
 
+          // зачем: если мы офлайн, не пугаем красной ошибкой — OfflineIndicator уже предупредил
+          if (!navigator.onLine) {
+            return Promise.reject({
+              timestamp: new Date().toISOString(),
+              status: 0,
+              error: 'Offline',
+              code: 'OFFLINE',
+              message: 'Вы офлайн',
+              path: error.config?.url ?? '',
+            } as ApiError);
+          }
+
+
+
     const apiError: ApiError = isBackendApiError
       ? (backendData as ApiError)
       : {

@@ -7,6 +7,7 @@ import type {
   RegisterRequest,
   UserResponse,
 } from '../types/api';
+import type { ApiError } from '../types/api';
 
 // ============================================================
 // Форма стора
@@ -88,12 +89,17 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem(TOKEN_STORAGE_KEY);
         set({ token: null, user: null, isAuthenticated: false });
       },
-
       fetchMe: async () => {
         try {
           const response = await apiClient.get<UserResponse>('/api/auth/me');
           set({ user: response.data, isAuthenticated: true });
-        } catch {
+        } catch (error) {
+          // зачем: если мы офлайн, не выкидываем юзера — даём ему пользоваться кэшем
+          const apiError = error as ApiError;
+          if (apiError.code === 'OFFLINE') {
+            console.warn('Офлайн: пропускаем проверку токена');
+            return;
+          }
           get().logout();
         }
       },

@@ -27,6 +27,7 @@ import FeedbackIcon from '@mui/icons-material/Feedback';   // 🆕
 import { useAuthStore } from '../store/authStore';
 import UserAvatar from './UserAvatar';
 import FeedbackDialog from './FeedbackDialog';   // 🆕
+import OfflineIndicator from './OfflineIndicator';
 
 // Основное меню (везде)
 const navItems = [
@@ -286,6 +287,7 @@ export default function Layout() {
 
       {/* ============ Контент страницы ============ */}
       <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+              <OfflineIndicator />
         <Outlet />
       </Container>
 

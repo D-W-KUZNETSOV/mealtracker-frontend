@@ -45,22 +45,26 @@ export default function LoginPage() {
     defaultValues: { username: '', password: '' },
   });
 
-  const onSubmit = async (data: LoginForm) => {
-    setSubmitting(true);
-    try {
-      await login(data);
-      enqueueSnackbar('Вход выполнен', { variant: 'success' });
-      navigate(from, { replace: true });   // ← возвращаем туда, откуда пришли
-    } catch (err) {
-      const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка входа', {
-        variant: 'error',
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    const onSubmit = async (data: LoginForm) => {
+      setSubmitting(true);
+      try {
+        await login(data);
+        enqueueSnackbar('Вход выполнен', { variant: 'success' });
+        navigate(from, { replace: true });
+      } catch (err) {
+        const apiError = err as ApiError;
 
+        if (!navigator.onLine || apiError.code === 'NETWORK_ERROR' || apiError.code === 'OFFLINE') {
+          enqueueSnackbar('Нет интернета. Проверь соединение.', { variant: 'warning' });
+        } else {
+          enqueueSnackbar(apiError.message || 'Ошибка входа', {
+            variant: 'error',
+          });
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    };
   return (
     <Box
       sx={{
