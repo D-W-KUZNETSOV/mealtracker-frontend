@@ -16,6 +16,10 @@ export const profileApi = {
   updateProfile: (data: ProfileUpdateRequest) =>
     apiClient.put<UserProfileDto>('/api/profile', data),
 
+    /** Обновить только отображаемое имя (для модалки) */
+      updateDisplayName: (displayName: string) =>
+        apiClient.patch<void>('/api/profile/display-name', { displayName }),
+
   /** Дневная норма калорий (просто число) */
   getDailyCalories: () =>
     apiClient.get<DailyCaloriesDto>('/api/profile/calories/daily'),

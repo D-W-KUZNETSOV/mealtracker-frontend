@@ -31,7 +31,9 @@ import InfoTooltip, { tooltips } from '../components/InfoTooltip';
 import { getCaloriesText, getProteinText } from '../utils/tone';
 import ActivityCalendar from '../components/ActivityCalendar';
 import MorningGreetingCard from '../components/MorningGreetingCard';
+import DisplayNameDialog from '../components/DisplayNameDialog';
 import type { ApiError } from '../types/api';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -86,6 +88,14 @@ export default function DashboardPage() {
     if (bmi < 30) return { label: 'Выше нормы', color: 'warning' as const };
     return { label: 'Сильно выше нормы', color: 'warning' as const };
   };
+    const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
+
+    // зачем: если у юзера нет имени — открываем модалку один раз при загрузке
+      useEffect(() => {
+        if (user && !user.displayName) {
+          setIsNameDialogOpen(true);
+        }
+      }, [user]);
 
   if (loading) {
     return (
@@ -108,7 +118,7 @@ export default function DashboardPage() {
       {/* Приветствие */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" gutterBottom>
-          Привет, {user?.username ?? 'друг'}! 👋
+          Привет, {user?.displayName || user?.username || 'друг'}! 👋
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Сегодня {today}
@@ -293,6 +303,10 @@ export default function DashboardPage() {
           </Card>
         </Grid>
       </Grid>
+            <DisplayNameDialog
+              open={isNameDialogOpen}
+              onClose={() => setIsNameDialogOpen(false)}
+            />
     </Box>
   );
 }

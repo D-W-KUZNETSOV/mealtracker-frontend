@@ -40,6 +40,7 @@ import type {
   ProfileUpdateRequest,
 } from '../types/api';
 import InfoTooltip, { tooltips } from '../components/InfoTooltip';
+import DisplayNameDialog from '../components/DisplayNameDialog';
 
 // ============================================================
 // Схема валидации
@@ -96,6 +97,7 @@ export default function ProfilePage() {
   // 🆕 Диалог удаления
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
+    const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
 
   const {
     register,
@@ -209,9 +211,25 @@ export default function ProfilePage() {
               avatarUrl={profile.avatarUrl}
               size={64}
             />
-            <Box>
-              <Typography variant="h6">{user?.username}</Typography>
-            </Box>
+                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, justifyContent: 'space-between' }}>
+                                     <Typography
+                                       variant="h6"
+                                       sx={{
+                                         wordBreak: 'break-word', // зачем: если имя длинное, оно перенесётся на новую строку, а не сломает верстку
+                                         mr: 2 // отступ справа, чтобы не прилипало к кнопке
+                                       }}
+                                     >
+                                       {user?.displayName || user?.username}
+                                     </Typography>
+                                     <Button
+                                       size="small"
+                                       onClick={() => setIsNameDialogOpen(true)}
+                                       variant="text"
+                                       sx={{ flexShrink: 0 }} // зачем: запрещаем кнопке сжиматься, чтобы она всегда оставалась нормального размера
+                                     >
+                                       Изменить
+                                     </Button>
+                                   </Box>
           </Stack>
         </CardContent>
       </Card>
@@ -454,6 +472,10 @@ export default function ProfilePage() {
                  </Button>
                </DialogActions>
              </Dialog>
+                   <DisplayNameDialog
+                     open={isNameDialogOpen}
+                     onClose={() => setIsNameDialogOpen(false)}
+                   />
            </Box>
          );
        }

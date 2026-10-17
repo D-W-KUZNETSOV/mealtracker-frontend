@@ -23,10 +23,6 @@ import type { ApiError } from '../types/api';
 // ============================================================
 const registerSchema = z
   .object({
-    username: z
-      .string()
-      .min(3, 'Минимум 3 символа')
-      .max(50, 'Максимум 50 символов'),
     email: z.string().email('Некорректный email'),
     password: z
       .string()
@@ -53,21 +49,19 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-   defaultValues: {
-     username: '',
-     password: '',
-     email: '',
-   },
+      defaultValues: {
+        password: '',
+        email: '',
+      },
   });
 
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
     try {
     await registerUser({
-      username: data.username,
-      password: data.password,
-      email: data.email,
-    });
+          password: data.password,
+          email: data.email,
+        });
       enqueueSnackbar('Регистрация успешна!', { variant: 'success' });
       navigate('/', { replace: true });
     } catch (err) {
@@ -93,7 +87,7 @@ export default function RegisterPage() {
       <Card sx={{ maxWidth: 400, width: '100%' }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
-            MealTracker
+            Баланс
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Создайте аккаунт
@@ -101,13 +95,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
-              <TextField
-                label="Имя пользователя"
-                fullWidth
-                {...register('username')}
-                error={!!errors.username}
-                helperText={errors.username?.message}
-              />
+
               <TextField
                 label="Email"
                 type="email"

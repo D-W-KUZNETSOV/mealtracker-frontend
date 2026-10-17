@@ -14,6 +14,7 @@ export interface AuthResponse {
 
 export interface UserResponse {
   id: number;
+  displayName?: string | null; // зачем: бэк теперь отдаёт имя
   username: string;
   email: string;
   role: string;
@@ -26,7 +27,6 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
   password: string;
   email: string;
   dateOfBirth?: string;  // 🆕 опционально — заполняется позже в профиле
