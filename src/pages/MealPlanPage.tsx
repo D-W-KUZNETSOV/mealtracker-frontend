@@ -8,31 +8,29 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  IconButton,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import AddIcon from '@mui/icons-material/Add';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
-
-import { useMealPlans } from '../hooks/useMealPlans';
-import type { ApiError } from '../types/api';
-import { useMediaQuery, useTheme } from '@mui/material';
-
-import AddMealPlanItemDialog from '../components/AddMealPlanItemDialog';
-import type { MealType } from '../types/api';
-
-import { useDeleteMealPlanItem } from '../hooks/useMealPlans';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useSnackbar } from 'notistack';
 
-import { useDeleteMealPlan } from '../hooks/useMealPlans';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
-
-import GenerateShoppingListDialog from '../components/GenerateShoppingListDialog';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-
+import AddMealPlanItemDialog from '../components/AddMealPlanItemDialog';
 import CreateMealPlanDialog from '../components/CreateMealPlanDialog';
+import GenerateShoppingListDialog from '../components/GenerateShoppingListDialog';
+import ReplaceMealPlanItemDialog from '../components/ReplaceMealPlanItemDialog';
 
+import { useMealPlans, useDeleteMealPlanItem, useDeleteMealPlan } from '../hooks/useMealPlans';
+import type { ApiError, MealPlanItemDto, MealType } from '../types/api';
 type ViewMode = 'week' | 'day';
 
 // Утилиты дат
@@ -90,6 +88,9 @@ export default function MealPlanPage() {
  const [dialogMealType, setDialogMealType] = useState<MealType>('BREAKFAST');
  const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
  const [createPlanDialogOpen, setCreatePlanDialogOpen] = useState(false);
+
+ const [menuAnchor, setMenuAnchor] = useState<{ el: HTMLElement; item: MealPlanItemDto } | null>(null);
+ const [replaceItem, setReplaceItem] = useState<MealPlanItemDto | null>(null);
 
   // Начало периода (недели или дня)
   const periodStart = useMemo(() => {
@@ -358,15 +359,7 @@ export default function MealPlanPage() {
                               size="small"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (window.confirm('Удалить приём из плана?')) {
-                                  deleteItem.mutate(
-                                    { planId: activePlan.id, itemId: item.id },
-                                    {
-                                      onSuccess: () => enqueueSnackbar('Приём удалён', { variant: 'success' }),
-                                      onError: () => enqueueSnackbar('Ошибка удаления', { variant: 'error' }),
-                                    },
-                                  );
-                                }
+                                setMenuAnchor({ el: e.currentTarget, item });
                               }}
                               sx={{
                                 color: 'inherit',
@@ -374,7 +367,7 @@ export default function MealPlanPage() {
                                 '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
                               }}
                             >
-                              <CloseIcon sx={{ fontSize: '0.9rem' }} />
+                              <MoreVertIcon sx={{ fontSize: '1rem' }} />
                             </IconButton>
                           </Box>
                         ))}
@@ -405,6 +398,50 @@ export default function MealPlanPage() {
               open={createPlanDialogOpen}
               onClose={() => setCreatePlanDialogOpen(false)}
             />
+                  <Menu
+                    anchorEl={menuAnchor?.el}
+                    open={!!menuAnchor}
+                    onClose={() => setMenuAnchor(null)}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        if (menuAnchor) {
+                          setReplaceItem(menuAnchor.item);
+                          setMenuAnchor(null);
+                        }
+                      }}
+                    >
+                      <SwapHorizIcon fontSize="small" sx={{ mr: 1 }} />
+                      Заменить
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        if (menuAnchor && activePlan && window.confirm('Удалить приём из плана?')) {
+                          deleteItem.mutate(
+                            { planId: activePlan.id, itemId: menuAnchor.item.id },
+                            {
+                              onSuccess: () => enqueueSnackbar('Приём удалён', { variant: 'success' }),
+                              onError: () => enqueueSnackbar('Ошибка удаления', { variant: 'error' }),
+                            },
+                          );
+                        }
+                        setMenuAnchor(null);
+                      }}
+                      sx={{ color: 'error.main' }}
+                    >
+                      <CloseIcon fontSize="small" sx={{ mr: 1 }} />
+                      Удалить
+                    </MenuItem>
+                  </Menu>
+
+                  {replaceItem && activePlan && (
+                    <ReplaceMealPlanItemDialog
+                      open={!!replaceItem}
+                      onClose={() => setReplaceItem(null)}
+                      planId={activePlan.id}
+                      item={replaceItem}
+                    />
+                  )}
     </Box>
   );
 }

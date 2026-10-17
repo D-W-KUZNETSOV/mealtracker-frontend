@@ -1,7 +1,7 @@
 // MealTracker Service Worker
 // Правильная стратегия обновления + офлайн-доступ к статике
 
-const CACHE_VERSION = 'v68';                    // ← bump 03.10.2026: брендинг «Баланс»
+const CACHE_VERSION = 'v70';                    // ← bump 16.10.2026: F19-fill в дневнике
 const CACHE_NAME = `mealtracker-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [

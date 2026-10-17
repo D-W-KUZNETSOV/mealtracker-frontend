@@ -78,3 +78,21 @@ export function useDeleteMealPlanItem() {
     onSuccess: () => qc.invalidateQueries({ queryKey: mealPlanKeys.all }),
   });
 }
+export function useReplaceMealPlanItem() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      planId,
+      itemId,
+      newRecipeId,
+    }: {
+      planId: number;
+      itemId: number;
+      newRecipeId: number;
+    }) => mealPlansApi.replaceItem(planId, itemId, newRecipeId),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: mealPlanKeys.all });
+      qc.invalidateQueries({ queryKey: mealPlanKeys.detail(vars.planId) });
+    },
+  });
+}

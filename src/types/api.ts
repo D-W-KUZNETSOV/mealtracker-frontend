@@ -428,6 +428,9 @@ export interface CreateMealPlanItemRequest {
   weightInGrams?: number | null;
   customName?: string | null;
 }
+export interface ReplaceItemRequest {
+  newRecipeId: number;
+}
 // ---------- F19-fill: добор до цели ----------
 
 export interface FillerSuggestionDto {

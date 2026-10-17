@@ -126,8 +126,10 @@ export default function RecipeFormDialog({
 
          if (isEdit && initialData) {
            setName(initialData.name);
+           console.log('initialData.category:', initialData.category);
+           console.log('found:', CATEGORIES.find((c) => c.value === initialData.category));
            setCategory(
-             CATEGORIES.find((c) => c.label === initialData.category)?.value ?? null
+             CATEGORIES.find((c) => c.value === initialData.category)?.value ?? null
            );
            setDescription(initialData.description ?? '');
            setImageUrl(initialData.imageUrl ?? '');

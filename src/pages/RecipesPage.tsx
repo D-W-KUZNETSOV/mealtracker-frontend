@@ -24,6 +24,7 @@ import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useNavigate } from 'react-router-dom';
+import { mealTypeLabel } from '../utils/mealType';
 
 import { useMyRecipes, usePublicRecipes } from '../hooks/useRecipes';
 import type { ApiError, RecipeListItemDto } from '../types/api';
@@ -313,15 +314,15 @@ export default function RecipesPage() {
                     />
                   </Stack>
 
-                  {recipe.category && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
-                      {recipe.category}
-                    </Typography>
-                  )}
+                 {recipe.category && (
+                   <Typography
+                     variant="body2"
+                     color="text.secondary"
+                     sx={{ mb: 1 }}
+                   >
+                     {mealTypeLabel(recipe.category)}
+                   </Typography>
+                 )}
 
                   <Typography variant="body2" color="text.secondary">
                     {recipe.totalCalories != null

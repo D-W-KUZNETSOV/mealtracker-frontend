@@ -4,6 +4,7 @@ import type {
   MealPlanItemDto,
   CreateMealPlanRequest,
   CreateMealPlanItemRequest,
+  ReplaceItemRequest,
 } from '../types/api';
 
 export const mealPlansApi = {
@@ -37,4 +38,11 @@ export const mealPlansApi = {
   /** Удалить приём */
   deleteItem: (planId: number, itemId: number) =>
     apiClient.delete(`/api/meal-plans/${planId}/items/${itemId}`),
+
+      /** Заменить блюдо в приёме */
+      replaceItem: (planId: number, itemId: number, newRecipeId: number) =>
+        apiClient.patch<MealPlanItemDto>(
+          `/api/meal-plans/${planId}/items/${itemId}/replace`,
+          { newRecipeId } as ReplaceItemRequest,
+        ),
 };
