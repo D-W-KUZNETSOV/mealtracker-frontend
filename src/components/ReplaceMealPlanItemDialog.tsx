@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Autocomplete,
@@ -10,13 +10,17 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useMyRecipes } from '../hooks/useRecipes';
-import { useReplaceMealPlanItem } from '../hooks/useMealPlans';
-import { roundNutrient } from '../types/api';
-import type { ApiError, MealPlanItemDto, RecipeListItemDto } from '../types/api';
+import { useMyRecipes } from "../hooks/useRecipes";
+import { useReplaceMealPlanItem } from "../hooks/useMealPlans";
+import { roundNutrient } from "../types/api";
+import type {
+  ApiError,
+  MealPlanItemDto,
+  RecipeListItemDto,
+} from "../types/api";
 
 interface ReplaceMealPlanItemDialogProps {
   open: boolean;
@@ -43,19 +47,22 @@ export default function ReplaceMealPlanItemDialog({
   }, [open]);
 
   // Рецепты той же категории, кроме текущего
- const candidates = useMemo(() => {
-   const all = recipesQuery.data?.content ?? [];
-   console.log('=== ReplaceMealPlanItemDialog ===');
-   console.log('item.mealType:', item.mealType);
-   console.log('item.recipeId:', item.recipeId);
-   console.log('recipes count:', all.length);
-   console.log('categories:', all.map(r => ({ id: r.id, name: r.name, category: r.category })));
-   const filtered = all.filter(
-     (r) => r.category === item.mealType && r.id !== item.recipeId,
-   );
-   console.log('filtered count:', filtered.length);
-   return filtered;
- }, [recipesQuery.data, item.mealType, item.recipeId]);
+  const candidates = useMemo(() => {
+    const all = recipesQuery.data?.content ?? [];
+    console.log("=== ReplaceMealPlanItemDialog ===");
+    console.log("item.mealType:", item.mealType);
+    console.log("item.recipeId:", item.recipeId);
+    console.log("recipes count:", all.length);
+    console.log(
+      "categories:",
+      all.map((r) => ({ id: r.id, name: r.name, category: r.category })),
+    );
+    const filtered = all.filter(
+      (r) => r.category === item.mealType && r.id !== item.recipeId,
+    );
+    console.log("filtered count:", filtered.length);
+    return filtered;
+  }, [recipesQuery.data, item.mealType, item.recipeId]);
 
   const handleSubmit = async () => {
     if (!selected) return;
@@ -65,14 +72,13 @@ export default function ReplaceMealPlanItemDialog({
         itemId: item.id,
         newRecipeId: selected.id,
       });
-      enqueueSnackbar('Блюдо заменено', { variant: 'success' });
+      enqueueSnackbar("Блюдо заменено", { variant: "success" });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(
-        apiError.message || 'Ошибка замены',
-        { variant: 'error' },
-      );
+      enqueueSnackbar(apiError.message || "Ошибка замены", {
+        variant: "error",
+      });
     }
   };
 
@@ -82,7 +88,8 @@ export default function ReplaceMealPlanItemDialog({
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Alert severity="info">
-            Сейчас: {item.recipeName ?? item.ingredientName ?? item.customName ?? '—'}
+            Сейчас:{" "}
+            {item.recipeName ?? item.ingredientName ?? item.customName ?? "—"}
           </Alert>
 
           {candidates.length === 0 ? (
@@ -98,7 +105,12 @@ export default function ReplaceMealPlanItemDialog({
               isOptionEqualToValue={(o, v) => o.id === v.id}
               loading={recipesQuery.isLoading}
               renderInput={(params) => (
-                <TextField {...params} label="Новый рецепт" fullWidth autoFocus />
+                <TextField
+                  {...params}
+                  label="Новый рецепт"
+                  fullWidth
+                  autoFocus
+                />
               )}
               renderOption={(props, option) => (
                 <li {...props} key={option.id}>
@@ -107,7 +119,8 @@ export default function ReplaceMealPlanItemDialog({
                       {option.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {roundNutrient(option.totalCalories ?? 0)} ккал · Б: {roundNutrient(option.totalProteins ?? 0)} г
+                      {roundNutrient(option.totalCalories ?? 0)} ккал · Б:{" "}
+                      {roundNutrient(option.totalProteins ?? 0)} г
                     </Typography>
                   </Stack>
                 </li>
@@ -125,7 +138,7 @@ export default function ReplaceMealPlanItemDialog({
           onClick={handleSubmit}
           disabled={!selected || replaceMutation.isPending}
         >
-          {replaceMutation.isPending ? 'Замена...' : 'Заменить'}
+          {replaceMutation.isPending ? "Замена..." : "Заменить"}
         </Button>
       </DialogActions>
     </Dialog>

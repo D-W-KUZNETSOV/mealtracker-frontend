@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 import {
   Alert,
   Box,
@@ -10,33 +10,33 @@ import {
   Paper,
   Stack,
   Typography,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TodayIcon from '@mui/icons-material/Today';
-import IconButton from '@mui/material/IconButton';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import TodayIcon from "@mui/icons-material/Today";
+import IconButton from "@mui/material/IconButton";
 
-import { useStatsByDate, useTodayStats } from '../hooks/useStats';
-import type { ApiError } from '../types/api';
-import { roundNutrient } from '../types/api';
-import AddPortionDialog from '../components/AddPortionDialog';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useDeleteDiaryEntry } from '../hooks/useStats';
-import AddFromPlanDialog from '../components/AddFromPlanDialog';
-import { useMealPlans } from '../hooks/useMealPlans';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import { getCaloriesOverAlert, getProteinText } from '../utils/tone';
-import { useGoals } from '../hooks/useNutrition';
-import { useProfile } from '../hooks/useProfile';
-import SuggestFillersDialog from '../components/SuggestFillersDialog';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
+import { useStatsByDate, useTodayStats } from "../hooks/useStats";
+import type { ApiError } from "../types/api";
+import { roundNutrient } from "../types/api";
+import AddPortionDialog from "../components/AddPortionDialog";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useDeleteDiaryEntry } from "../hooks/useStats";
+import AddFromPlanDialog from "../components/AddFromPlanDialog";
+import { useMealPlans } from "../hooks/useMealPlans";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import { getCaloriesOverAlert, getProteinText } from "../utils/tone";
+import { useGoals } from "../hooks/useNutrition";
+import { useProfile } from "../hooks/useProfile";
+import SuggestFillersDialog from "../components/SuggestFillersDialog";
+import LightbulbIcon from "@mui/icons-material/Lightbulb";
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
 
@@ -58,7 +58,7 @@ export default function DiaryPage() {
   const [addFromPlanOpen, setAddFromPlanOpen] = useState(false);
 
   const isTodaySelected = isToday(selectedDate);
-const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
+  const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
   const goalsQuery = useGoals();
   const profileQuery = useProfile();
 
@@ -92,60 +92,60 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
   };
 
   const formattedDate = useMemo(() => {
-    return selectedDate.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+    return selectedDate.toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     });
   }, [selectedDate]);
 
   return (
     <Box>
-     <Stack
-       direction="row"
-       sx={{
-         justifyContent: 'space-between',
-         alignItems: 'center',
-         mb: 2,
-         flexWrap: 'wrap',
-         gap: 1,
-       }}
-     >
-       <Typography variant="h4">Дневник питания</Typography>
-       <Stack direction="row" spacing={1}>
-         {activePlan && (
-           <Button
-             variant="outlined"
-             startIcon={<PlaylistAddIcon />}
-             onClick={() => setAddFromPlanOpen(true)}
-           >
-             Из плана
-           </Button>
-         )}
-         <Button
-           variant="contained"
-           startIcon={<AddIcon />}
-           onClick={() => setDialogOpen(true)}
-         >
-           Добавить порцию
-         </Button>
-       </Stack>
-     </Stack>
-
-      {/* Переключатель даты */}
-      <Paper sx={{ p: 2, mb: 3 }}>
       <Stack
         direction="row"
         sx={{
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+          flexWrap: "wrap",
+          gap: 1,
         }}
       >
+        <Typography variant="h4">Дневник питания</Typography>
+        <Stack direction="row" spacing={1}>
+          {activePlan && (
+            <Button
+              variant="outlined"
+              startIcon={<PlaylistAddIcon />}
+              onClick={() => setAddFromPlanOpen(true)}
+            >
+              Из плана
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setDialogOpen(true)}
+          >
+            Добавить порцию
+          </Button>
+        </Stack>
+      </Stack>
+
+      {/* Переключатель даты */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <IconButton onClick={handlePrevDay} title="Предыдущий день">
             <ChevronLeftIcon />
           </IconButton>
 
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
             <Typography variant="h6">{formattedDate}</Typography>
             {!isTodaySelected && (
               <Button
@@ -170,14 +170,15 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
 
       {/* Загрузка / ошибки */}
       {currentQuery.isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       )}
 
       {currentQuery.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-         Ошибка загрузки: {(currentQuery.error as unknown as ApiError)?.message}
+          Ошибка загрузки:{" "}
+          {(currentQuery.error as unknown as ApiError)?.message}
         </Alert>
       )}
 
@@ -189,54 +190,75 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
               Мой баланс сегодня
             </Typography>
 
-           <Box
-             sx={{
-               display: 'grid',
-               gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-               gap: 2,
-               mb: 3,
-             }}
-           >
-             <Box>
-               <Typography variant="h4">{roundNutrient(stats.calories)}</Typography>
-               <Typography variant="caption" color="text.secondary">ккал</Typography>
-             </Box>
-             <Box>
-               <Typography variant="h4">{roundNutrient(stats.proteins)}</Typography>
-               <Typography variant="caption" color="text.secondary">Белки, г</Typography>
-             </Box>
-             <Box>
-               <Typography variant="h4">{roundNutrient(stats.fats)}</Typography>
-               <Typography variant="caption" color="text.secondary">Жиры, г</Typography>
-             </Box>
-             <Box>
-               <Typography variant="h4">{roundNutrient(stats.carbs)}</Typography>
-               <Typography variant="caption" color="text.secondary">Углеводы, г</Typography>
-             </Box>
-           </Box>
-
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(2, 1fr)",
+                  sm: "repeat(4, 1fr)",
+                },
+                gap: 2,
+                mb: 3,
+              }}
+            >
+              <Box>
+                <Typography variant="h4">
+                  {roundNutrient(stats.calories)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  ккал
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="h4">
+                  {roundNutrient(stats.proteins)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Белки, г
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="h4">
+                  {roundNutrient(stats.fats)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Жиры, г
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="h4">
+                  {roundNutrient(stats.carbs)}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Углеводы, г
+                </Typography>
+              </Box>
+            </Box>
 
             {/* Прогресс по калориям */}
-            {stats.targetCalories != null && stats.caloriesProgressPercent != null ? (
+            {stats.targetCalories != null &&
+            stats.caloriesProgressPercent != null ? (
               <Box sx={{ mb: 2 }}>
-                <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.5 }}>
+                <Stack
+                  direction="row"
+                  sx={{ justifyContent: "space-between", mb: 0.5 }}
+                >
                   <Typography variant="body2">
-                    Калории: {roundNutrient(stats.calories)} /{' '}
+                    Калории: {roundNutrient(stats.calories)} /{" "}
                     {roundNutrient(stats.targetCalories)} ккал
                   </Typography>
-                  <Typography
-                    variant="body2"
-                   color="text.secondary"
-                  >
+                  <Typography variant="body2" color="text.secondary">
                     {roundNutrient(stats.caloriesProgressPercent)}%
                   </Typography>
                 </Stack>
-                 <LinearProgress
-                   variant="determinate"
-                   value={Math.min(stats.caloriesProgressPercent ?? 0, 100)}
-                   color={stats.caloriesProgressPercent > 100 ? 'warning' : 'primary'}
-                   sx={{ height: 12, borderRadius: 6 }}
-                 />
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(stats.caloriesProgressPercent ?? 0, 100)}
+                  color={
+                    stats.caloriesProgressPercent > 100 ? "warning" : "primary"
+                  }
+                  sx={{ height: 12, borderRadius: 6 }}
+                />
                 {stats.caloriesProgressPercent > 100 && (
                   <Alert severity="warning" sx={{ mt: 1 }}>
                     {getCaloriesOverAlert({
@@ -253,81 +275,95 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
             )}
 
             {/* Прогресс по белку */}
-            {stats.targetProtein != null && stats.proteinProgressPercent != null ? (
+            {stats.targetProtein != null &&
+            stats.proteinProgressPercent != null ? (
               <Box>
-                <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 0.5 }}>
+                <Stack
+                  direction="row"
+                  sx={{ justifyContent: "space-between", mb: 0.5 }}
+                >
                   <Typography variant="body2">
-                    Белок: {roundNutrient(stats.proteins)} /{' '}
+                    Белок: {roundNutrient(stats.proteins)} /{" "}
                     {roundNutrient(stats.targetProtein)} г
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {roundNutrient(stats.proteinProgressPercent)}%
                   </Typography>
                 </Stack>
-               <LinearProgress
-                 variant="determinate"
-                 value={Math.min(stats.proteinProgressPercent ?? 0, 100)}
-                 color="success"
-                 sx={{ height: 12, borderRadius: 6 }}
-               />
-               {stats.entries.length === 0 ? (
-                 <Paper sx={{ p: 3, mt: 2, textAlign: 'center', bgcolor: 'action.hover' }}>
-                   <Typography variant="h6" gutterBottom>
-                     Начни с завтрака
-                   </Typography>
-                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                     Добавьте первый приём пищи — это займёт 1 минуту. Или добавьте из плана, если он у вас есть.
-                   </Typography>
-                   <Button
-                     variant="contained"
-                     startIcon={<AddIcon />}
-                     onClick={() => setDialogOpen(true)}
-                   >
-                     Добавить порцию
-                   </Button>
-                 </Paper>
-               ) : (
-                 <Alert
-                   severity={stats.proteinProgressPercent > 100 ? 'success' : 'info'}
-                   sx={{ mt: 1 }}
-                 >
-                   {getProteinText({
-                     proteinPercent: stats.proteinProgressPercent,
-                     proteins: stats.proteins,
-                     targetProtein: stats.targetProtein,
-                   })}
-                 </Alert>
-               )}
-
-                            </Box>
-                                    ) : (
-                                      <Alert severity="info" sx={{ mt: 1 }}>
-                                        Цель по белку не задана. Установите цели в разделе «Цели».
-                                      </Alert>
-                                    )}
-
-                          {/* F19-fill: подсказать добор */}
-                          {isTodaySelected
-                            && stats.targetCalories != null
-                            && stats.calories < stats.targetCalories && (
-                            <Button
-                              variant="outlined"
-                              startIcon={<LightbulbIcon />}
-                              onClick={() => setSuggestFillersOpen(true)}
-                              sx={{ mt: 2 }}
-                              fullWidth
-                            >
-                              Подсказать добор
-                            </Button>
-                          )}
-
-
-
-                    </CardContent>
-                  </Card>
+                <LinearProgress
+                  variant="determinate"
+                  value={Math.min(stats.proteinProgressPercent ?? 0, 100)}
+                  color="success"
+                  sx={{ height: 12, borderRadius: 6 }}
+                />
+                {stats.entries.length === 0 ? (
+                  <Paper
+                    sx={{
+                      p: 3,
+                      mt: 2,
+                      textAlign: "center",
+                      bgcolor: "action.hover",
+                    }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      Начни с завтрака
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
+                      Добавьте первый приём пищи — это займёт 1 минуту. Или
+                      добавьте из плана, если он у вас есть.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={() => setDialogOpen(true)}
+                    >
+                      Добавить порцию
+                    </Button>
+                  </Paper>
+                ) : (
+                  <Alert
+                    severity={
+                      stats.proteinProgressPercent > 100 ? "success" : "info"
+                    }
+                    sx={{ mt: 1 }}
+                  >
+                    {getProteinText({
+                      proteinPercent: stats.proteinProgressPercent,
+                      proteins: stats.proteins,
+                      targetProtein: stats.targetProtein,
+                    })}
+                  </Alert>
                 )}
+              </Box>
+            ) : (
+              <Alert severity="info" sx={{ mt: 1 }}>
+                Цель по белку не задана. Установите цели в разделе «Цели».
+              </Alert>
+            )}
 
-                {/* Список приёмов пищи */}
+            {/* F19-fill: подсказать добор */}
+            {isTodaySelected &&
+              stats.targetCalories != null &&
+              stats.calories < stats.targetCalories && (
+                <Button
+                  variant="outlined"
+                  startIcon={<LightbulbIcon />}
+                  onClick={() => setSuggestFillersOpen(true)}
+                  sx={{ mt: 2 }}
+                  fullWidth
+                >
+                  Подсказать добор
+                </Button>
+              )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Список приёмов пищи */}
       {stats && stats.entries && stats.entries.length > 0 && (
         <Stack spacing={1} sx={{ mt: 2 }}>
           <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
@@ -338,15 +374,16 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
               <Stack
                 direction="row"
                 spacing={2}
-                sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+                sx={{ alignItems: "center", justifyContent: "space-between" }}
               >
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                   {entry.itemName}
+                    {entry.itemName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {entry.weightInGrams} г
-                    {entry.servings > 0 && ` · ${roundNutrient(entry.servings)} порц.`}
+                    {entry.servings > 0 &&
+                      ` · ${roundNutrient(entry.servings)} порц.`}
                   </Typography>
                   <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
                     <Typography variant="caption">
@@ -392,21 +429,20 @@ const [suggestFillersOpen, setSuggestFillersOpen] = useState(false);
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
       />
-            {activePlan && (
-              <AddFromPlanDialog
-                open={addFromPlanOpen}
-                onClose={() => setAddFromPlanOpen(false)}
-                plan={activePlan}
-                date={toApiDate(selectedDate)}
-              />
-            )}
+      {activePlan && (
+        <AddFromPlanDialog
+          open={addFromPlanOpen}
+          onClose={() => setAddFromPlanOpen(false)}
+          plan={activePlan}
+          date={toApiDate(selectedDate)}
+        />
+      )}
 
-            <SuggestFillersDialog
-              open={suggestFillersOpen}
-              onClose={() => setSuggestFillersOpen(false)}
-              date={toApiDate(selectedDate)}
-            />
-
-          </Box>
-        );
-      }
+      <SuggestFillersDialog
+        open={suggestFillersOpen}
+        onClose={() => setSuggestFillersOpen(false)}
+        date={toApiDate(selectedDate)}
+      />
+    </Box>
+  );
+}

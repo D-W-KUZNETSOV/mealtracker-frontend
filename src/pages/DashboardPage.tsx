@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Card,
@@ -11,7 +11,7 @@ import {
   Typography,
   Button,
   Alert,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Restaurant as RestaurantIcon,
   LocalDining as DiaryIcon,
@@ -20,20 +20,20 @@ import {
   LocalFireDepartment as FireIcon,
   FitnessCenter as ProteinIcon,
   MonitorWeight as WeightIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
-import { useAuthStore } from '../store/authStore';
-import { useTodayStats } from '../hooks/useStats';
-import { useGoals } from '../hooks/useNutrition';
-import { useProfile } from '../hooks/useProfile';
-import MiniProgressWidget from '../components/MiniProgressWidget';
-import InfoTooltip, { tooltips } from '../components/InfoTooltip';
-import { getCaloriesText, getProteinText } from '../utils/tone';
-import ActivityCalendar from '../components/ActivityCalendar';
-import MorningGreetingCard from '../components/MorningGreetingCard';
-import DisplayNameDialog from '../components/DisplayNameDialog';
-import type { ApiError } from '../types/api';
-import { useState, useEffect } from 'react';
+import { useAuthStore } from "../store/authStore";
+import { useTodayStats } from "../hooks/useStats";
+import { useGoals } from "../hooks/useNutrition";
+import { useProfile } from "../hooks/useProfile";
+import MiniProgressWidget from "../components/MiniProgressWidget";
+import InfoTooltip, { tooltips } from "../components/InfoTooltip";
+import { getCaloriesText, getProteinText } from "../utils/tone";
+import ActivityCalendar from "../components/ActivityCalendar";
+import MorningGreetingCard from "../components/MorningGreetingCard";
+import DisplayNameDialog from "../components/DisplayNameDialog";
+import type { ApiError } from "../types/api";
+import { useState, useEffect } from "react";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -76,30 +76,30 @@ export default function DashboardPage() {
   const targetWeight = profile?.targetWeightKg ?? 0;
   const bmi = profile?.bmi ?? 0;
 
-  const today = new Date().toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  const today = new Date().toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 
   const getBmiLabel = (bmi: number) => {
-    if (bmi < 18.5) return { label: 'Ниже нормы', color: 'info' as const };
-    if (bmi < 25) return { label: 'В норме', color: 'success' as const };
-    if (bmi < 30) return { label: 'Выше нормы', color: 'warning' as const };
-    return { label: 'Сильно выше нормы', color: 'warning' as const };
+    if (bmi < 18.5) return { label: "Ниже нормы", color: "info" as const };
+    if (bmi < 25) return { label: "В норме", color: "success" as const };
+    if (bmi < 30) return { label: "Выше нормы", color: "warning" as const };
+    return { label: "Сильно выше нормы", color: "warning" as const };
   };
-    const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
+  const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
 
-    // зачем: если у юзера нет имени — открываем модалку один раз при загрузке
-      useEffect(() => {
-        if (user && !user.displayName) {
-          setIsNameDialogOpen(true);
-        }
-      }, [user]);
+  // зачем: если у юзера нет имени — открываем модалку один раз при загрузке
+  useEffect(() => {
+    if (user && !user.displayName) {
+      setIsNameDialogOpen(true);
+    }
+  }, [user]);
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
         <CircularProgress />
       </Box>
     );
@@ -118,7 +118,7 @@ export default function DashboardPage() {
       {/* Приветствие */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" gutterBottom>
-          Привет, {user?.displayName || user?.username || 'друг'}! 👋
+          Привет, {user?.displayName || user?.username || "друг"}! 👋
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Сегодня {today}
@@ -135,13 +135,11 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-     {/* Утреннее приветствие */}
-     <MorningGreetingCard isGoalsNotFound={isGoalsNotFound} />
+      {/* Утреннее приветствие */}
+      <MorningGreetingCard isGoalsNotFound={isGoalsNotFound} />
 
       {/* Мини-виджет прогресса */}
       <MiniProgressWidget />
-
-
 
       <Grid container spacing={3}>
         {!isGoalsNotFound && (
@@ -150,12 +148,20 @@ export default function DashboardPage() {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "center", mb: 2 }}
+                  >
                     <FireIcon color="action" />
                     <Typography variant="h6">Калории сегодня</Typography>
                     <InfoTooltip title={tooltips.calories} />
                   </Stack>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "baseline", mb: 1 }}
+                  >
                     <Typography variant="h4" color="primary.main">
                       {Math.round(calories)}
                     </Typography>
@@ -167,11 +173,13 @@ export default function DashboardPage() {
                     variant="determinate"
                     value={Math.min(100, caloriesPercent)}
                     sx={{ height: 12, borderRadius: 6, mb: 1 }}
-                    color={caloriesPercent > 100 ? 'warning' : 'primary'}
+                    color={caloriesPercent > 100 ? "warning" : "primary"}
                   />
                   <Typography
                     variant="body2"
-                    color={caloriesPercent > 100 ? 'warning.main' : 'text.secondary'}
+                    color={
+                      caloriesPercent > 100 ? "warning.main" : "text.secondary"
+                    }
                   >
                     {getCaloriesText({
                       caloriesPercent,
@@ -188,12 +196,20 @@ export default function DashboardPage() {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "center", mb: 2 }}
+                  >
                     <ProteinIcon color="success" />
                     <Typography variant="h6">Белки</Typography>
                     <InfoTooltip title={tooltips.protein} />
                   </Stack>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', mb: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "baseline", mb: 1 }}
+                  >
                     <Typography variant="h4" color="success.main">
                       {Math.round(proteins)}
                     </Typography>
@@ -208,7 +224,11 @@ export default function DashboardPage() {
                     color="success"
                   />
                   <Typography variant="body2" color="text.secondary">
-                    {getProteinText({ proteinPercent, proteins, targetProtein })}
+                    {getProteinText({
+                      proteinPercent,
+                      proteins,
+                      targetProtein,
+                    })}
                   </Typography>
                 </CardContent>
               </Card>
@@ -222,17 +242,38 @@ export default function DashboardPage() {
                     БЖУ сегодня
                   </Typography>
                   <Stack spacing={1.5}>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Белки</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(proteins)} г</Typography>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Белки
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {Math.round(proteins)} г
+                      </Typography>
                     </Stack>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Жиры</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(stats?.fats ?? 0)} г</Typography>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Жиры
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {Math.round(stats?.fats ?? 0)} г
+                      </Typography>
                     </Stack>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Углеводы</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{Math.round(stats?.carbs ?? 0)} г</Typography>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Углеводы
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {Math.round(stats?.carbs ?? 0)} г
+                      </Typography>
                     </Stack>
                   </Stack>
                 </CardContent>
@@ -243,24 +284,60 @@ export default function DashboardPage() {
             <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>
-                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "center", mb: 2 }}
+                  >
                     <WeightIcon color="info" />
                     <Typography variant="h6">Вес и цель</Typography>
                   </Stack>
                   <Stack spacing={1.5}>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Текущий вес</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{currentWeight} кг</Typography>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Текущий вес
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {currentWeight} кг
+                      </Typography>
                     </Stack>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">Целевой вес</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{targetWeight} кг</Typography>
+                    <Stack
+                      direction="row"
+                      sx={{ justifyContent: "space-between" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        Целевой вес
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {targetWeight} кг
+                      </Typography>
                     </Stack>
-                    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="body2" color="text.secondary">ИМТ</Typography>
-                      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{bmi.toFixed(1)}</Typography>
-                        <Chip size="small" label={getBmiLabel(bmi).label} color={getBmiLabel(bmi).color} />
+                    <Stack
+                      direction="row"
+                      sx={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        ИМТ
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ alignItems: "center" }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {bmi.toFixed(1)}
+                        </Typography>
+                        <Chip
+                          size="small"
+                          label={getBmiLabel(bmi).label}
+                          color={getBmiLabel(bmi).color}
+                        />
                       </Stack>
                     </Stack>
                   </Stack>
@@ -279,22 +356,42 @@ export default function DashboardPage() {
               </Typography>
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button fullWidth variant="outlined" startIcon={<RestaurantIcon />} onClick={() => navigate('/recipes')}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<RestaurantIcon />}
+                    onClick={() => navigate("/recipes")}
+                  >
                     Рецепты
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button fullWidth variant="outlined" startIcon={<DiaryIcon />} onClick={() => navigate('/diary')}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<DiaryIcon />}
+                    onClick={() => navigate("/diary")}
+                  >
                     Дневник
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button fullWidth variant="outlined" startIcon={<GoalsIcon />} onClick={() => navigate('/goals')}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<GoalsIcon />}
+                    onClick={() => navigate("/goals")}
+                  >
                     Цели
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
-                  <Button fullWidth variant="outlined" startIcon={<ProfileIcon />} onClick={() => navigate('/profile')}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<ProfileIcon />}
+                    onClick={() => navigate("/profile")}
+                  >
                     Профиль
                   </Button>
                 </Grid>
@@ -303,10 +400,10 @@ export default function DashboardPage() {
           </Card>
         </Grid>
       </Grid>
-            <DisplayNameDialog
-              open={isNameDialogOpen}
-              onClose={() => setIsNameDialogOpen(false)}
-            />
+      <DisplayNameDialog
+        open={isNameDialogOpen}
+        onClose={() => setIsNameDialogOpen(false)}
+      />
     </Box>
   );
 }

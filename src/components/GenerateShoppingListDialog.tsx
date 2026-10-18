@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Autocomplete,
   Button,
@@ -9,12 +9,12 @@ import {
   Stack,
   TextField,
   Alert,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useMealPlans } from '../hooks/useMealPlans';
-import { useGenerateShoppingList } from '../hooks/useShoppingLists';
-import type { ApiError, MealPlanDto } from '../types/api';
+import { useMealPlans } from "../hooks/useMealPlans";
+import { useGenerateShoppingList } from "../hooks/useShoppingLists";
+import type { ApiError, MealPlanDto } from "../types/api";
 
 interface Props {
   open: boolean;
@@ -27,14 +27,14 @@ export default function GenerateShoppingListDialog({ open, onClose }: Props) {
   const generateMutation = useGenerateShoppingList();
 
   const [selectedPlan, setSelectedPlan] = useState<MealPlanDto | null>(null);
-  const [periodStart, setPeriodStart] = useState<string>('');
-  const [periodEnd, setPeriodEnd] = useState<string>('');
+  const [periodStart, setPeriodStart] = useState<string>("");
+  const [periodEnd, setPeriodEnd] = useState<string>("");
 
   useEffect(() => {
     if (open) {
       setSelectedPlan(null);
-      setPeriodStart('');
-      setPeriodEnd('');
+      setPeriodStart("");
+      setPeriodEnd("");
     }
   }, [open]);
 
@@ -56,12 +56,12 @@ export default function GenerateShoppingListDialog({ open, onClose }: Props) {
           periodEnd: periodEnd || null,
         },
       });
-      enqueueSnackbar('Список покупок создан', { variant: 'success' });
+      enqueueSnackbar("Список покупок создан", { variant: "success" });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка создания', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка создания", {
+        variant: "error",
       });
     }
   };
@@ -116,7 +116,7 @@ export default function GenerateShoppingListDialog({ open, onClose }: Props) {
           onClick={handleSubmit}
           disabled={!selectedPlan || generateMutation.isPending}
         >
-          {generateMutation.isPending ? 'Создание...' : 'Создать'}
+          {generateMutation.isPending ? "Создание..." : "Создать"}
         </Button>
       </DialogActions>
     </Dialog>

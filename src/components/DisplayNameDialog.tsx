@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,29 +7,32 @@ import {
   Button,
   TextField,
   Typography,
-} from '@mui/material';
-import { profileApi } from '../api/profile'; // подгони путь под свой проект
-import { useAuthStore } from '../store/authStore'; // проверь путь
+} from "@mui/material";
+import { profileApi } from "../api/profile"; // подгони путь под свой проект
+import { useAuthStore } from "../store/authStore"; // проверь путь
 
 interface DisplayNameDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export default function DisplayNameDialog({ open, onClose }: DisplayNameDialogProps) {
-  const [name, setName] = useState('');
+export default function DisplayNameDialog({
+  open,
+  onClose,
+}: DisplayNameDialogProps) {
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-    const fetchMe = useAuthStore((s) => s.fetchMe);
+  const fetchMe = useAuthStore((s) => s.fetchMe);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setLoading(true);
     try {
-           await profileApi.updateDisplayName(name.trim());
-           await fetchMe(); // зачем: подтягиваем свежие данные, чтобы имя обновилось везде
-           onClose();
+      await profileApi.updateDisplayName(name.trim());
+      await fetchMe(); // зачем: подтягиваем свежие данные, чтобы имя обновилось везде
+      onClose();
     } catch (e) {
-      console.error('Ошибка сохранения имени', e);
+      console.error("Ошибка сохранения имени", e);
     } finally {
       setLoading(false);
     }
@@ -37,11 +40,11 @@ export default function DisplayNameDialog({ open, onClose }: DisplayNameDialogPr
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-           <DialogTitle>Привет, давай познакомимся 👋</DialogTitle>
-           <DialogContent>
-             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-               Как к тебе обращаться?
-             </Typography>
+      <DialogTitle>Привет, давай познакомимся 👋</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Как к тебе обращаться?
+        </Typography>
         <TextField
           autoFocus
           fullWidth
@@ -60,7 +63,7 @@ export default function DisplayNameDialog({ open, onClose }: DisplayNameDialogPr
           variant="contained"
           disabled={!name.trim() || loading}
         >
-          {loading ? 'Сохраняем...' : 'Сохранить'}
+          {loading ? "Сохраняем..." : "Сохранить"}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useAuthStore } from '../store/authStore';
+import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuthStore } from "../store/authStore";
 import {
   Alert,
   Box,
@@ -23,24 +23,24 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import UserAvatar from '../components/UserAvatar';
-import ImageUpload from '../components/ImageUpload';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import UserAvatar from "../components/UserAvatar";
+import ImageUpload from "../components/ImageUpload";
 import {
   useDailyCalories,
   useDeleteAccount,
   useProfile,
   useUpdateProfile,
-} from '../hooks/useProfile';
+} from "../hooks/useProfile";
 import type {
   ActivityLevel,
   ApiError,
   Gender,
   ProfileUpdateRequest,
-} from '../types/api';
-import InfoTooltip, { tooltips } from '../components/InfoTooltip';
-import DisplayNameDialog from '../components/DisplayNameDialog';
+} from "../types/api";
+import InfoTooltip, { tooltips } from "../components/InfoTooltip";
+import DisplayNameDialog from "../components/DisplayNameDialog";
 
 // ============================================================
 // Схема валидации
@@ -49,40 +49,40 @@ const profileSchema = z.object({
   avatarUrl: z.string().optional(),
   dateOfBirth: z.string().optional(),
   heightCm: z
-    .number({ message: 'Введите число' })
-    .min(50, 'Минимум 50 см')
-    .max(250, 'Максимум 250 см'),
+    .number({ message: "Введите число" })
+    .min(50, "Минимум 50 см")
+    .max(250, "Максимум 250 см"),
   currentWeightKg: z
-    .number({ message: 'Введите число' })
-    .min(20, 'Минимум 20 кг')
-    .max(300, 'Максимум 300 кг'),
+    .number({ message: "Введите число" })
+    .min(20, "Минимум 20 кг")
+    .max(300, "Максимум 300 кг"),
   targetWeightKg: z
-    .number({ message: 'Введите число' })
-    .min(20, 'Минимум 20 кг')
-    .max(300, 'Максимум 300 кг'),
-  gender: z.enum(['MALE', 'FEMALE']),
+    .number({ message: "Введите число" })
+    .min(20, "Минимум 20 кг")
+    .max(300, "Максимум 300 кг"),
+  gender: z.enum(["MALE", "FEMALE"]),
   activityLevel: z.enum([
-    'SEDENTARY',
-    'LIGHT',
-    'MODERATE',
-    'HIGH',
-    'VERY_HIGH',
+    "SEDENTARY",
+    "LIGHT",
+    "MODERATE",
+    "HIGH",
+    "VERY_HIGH",
   ]),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
 
 const ACTIVITY_LABELS: Record<ActivityLevel, string> = {
-  SEDENTARY: 'Сидячий образ жизни',
-  LIGHT: 'Лёгкая активность (1–2 раза в неделю)',
-  MODERATE: 'Умеренная активность (3–4 раза в неделю)',
-  HIGH: 'Высокая активность (5–6 раз в неделю)',
-  VERY_HIGH: 'Очень высокая (ежедневно / физическая работа)',
+  SEDENTARY: "Сидячий образ жизни",
+  LIGHT: "Лёгкая активность (1–2 раза в неделю)",
+  MODERATE: "Умеренная активность (3–4 раза в неделю)",
+  HIGH: "Высокая активность (5–6 раз в неделю)",
+  VERY_HIGH: "Очень высокая (ежедневно / физическая работа)",
 };
 
 const GENDER_LABELS: Record<Gender, string> = {
-  MALE: 'Мужской',
-  FEMALE: 'Женский',
+  MALE: "Мужской",
+  FEMALE: "Женский",
 };
 
 export default function ProfilePage() {
@@ -92,12 +92,12 @@ export default function ProfilePage() {
   const profileQuery = useProfile();
   const dailyCaloriesQuery = useDailyCalories();
   const updateMutation = useUpdateProfile();
-  const deleteMutation = useDeleteAccount();   // 🆕
+  const deleteMutation = useDeleteAccount(); // 🆕
 
   // 🆕 Диалог удаления
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
-    const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [isNameDialogOpen, setIsNameDialogOpen] = useState(false);
 
   const {
     register,
@@ -108,13 +108,13 @@ export default function ProfilePage() {
   } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      avatarUrl: '',
-      dateOfBirth: '',
+      avatarUrl: "",
+      dateOfBirth: "",
       heightCm: 170,
       currentWeightKg: 70,
       targetWeightKg: 70,
-      gender: 'MALE',
-      activityLevel: 'MODERATE',
+      gender: "MALE",
+      activityLevel: "MODERATE",
     },
   });
 
@@ -123,13 +123,13 @@ export default function ProfilePage() {
     if (profileQuery.data) {
       const p = profileQuery.data;
       reset({
-        avatarUrl: p.avatarUrl ?? '',
-        dateOfBirth: '',
+        avatarUrl: p.avatarUrl ?? "",
+        dateOfBirth: "",
         heightCm: p.heightCm ?? 170,
         currentWeightKg: p.currentWeightKg ?? 70,
         targetWeightKg: p.targetWeightKg ?? 70,
-        gender: p.gender ?? 'MALE',
-        activityLevel: p.activityLevel ?? 'MODERATE',
+        gender: p.gender ?? "MALE",
+        activityLevel: p.activityLevel ?? "MODERATE",
       });
     }
   }, [profileQuery.data, reset]);
@@ -148,37 +148,39 @@ export default function ProfilePage() {
       await updateMutation.mutateAsync(payload);
       // Обновляем user в authStore, чтобы шапка (Layout) увидела новый avatarUrl
       await useAuthStore.getState().fetchMe();
-      enqueueSnackbar('Профиль обновлён', { variant: 'success' });
+      enqueueSnackbar("Профиль обновлён", { variant: "success" });
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка сохранения', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка сохранения", {
+        variant: "error",
       });
     }
   };
-    // 🆕 Удаление аккаунта
-    const handleDeleteAccount = async () => {
-      if (!deletePassword.trim()) {
-        enqueueSnackbar('Введите пароль для подтверждения', { variant: 'warning' });
-        return;
-      }
-      try {
-        await deleteMutation.mutateAsync(deletePassword);
-        enqueueSnackbar('Аккаунт удалён', { variant: 'success' });
-        // Выход + редирект на /login
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
-      } catch (err) {
-        const apiError = err as ApiError;
-        enqueueSnackbar(apiError.message || 'Ошибка удаления', {
-          variant: 'error',
-        });
-      }
-    };
+  // 🆕 Удаление аккаунта
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      enqueueSnackbar("Введите пароль для подтверждения", {
+        variant: "warning",
+      });
+      return;
+    }
+    try {
+      await deleteMutation.mutateAsync(deletePassword);
+      enqueueSnackbar("Аккаунт удалён", { variant: "success" });
+      // Выход + редирект на /login
+      useAuthStore.getState().logout();
+      window.location.href = "/login";
+    } catch (err) {
+      const apiError = err as ApiError;
+      enqueueSnackbar(apiError.message || "Ошибка удаления", {
+        variant: "error",
+      });
+    }
+  };
 
   if (profileQuery.isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -187,9 +189,9 @@ export default function ProfilePage() {
   if (profileQuery.isError || !profileQuery.data) {
     return (
       <Alert severity="error">
-        Ошибка загрузки:{' '}
+        Ошибка загрузки:{" "}
         {(profileQuery.error as unknown as ApiError)?.message ??
-          'Профиль не заполнен'}
+          "Профиль не заполнен"}
       </Alert>
     );
   }
@@ -205,31 +207,39 @@ export default function ProfilePage() {
       {/* ============ Аватар + имя ============ */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
             <UserAvatar
-              username={user?.username ?? '?'}
+              username={user?.username ?? "?"}
               avatarUrl={profile.avatarUrl}
               size={64}
             />
-                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, justifyContent: 'space-between' }}>
-                                     <Typography
-                                       variant="h6"
-                                       sx={{
-                                         wordBreak: 'break-word', // зачем: если имя длинное, оно перенесётся на новую строку, а не сломает верстку
-                                         mr: 2 // отступ справа, чтобы не прилипало к кнопке
-                                       }}
-                                     >
-                                       {user?.displayName || user?.username}
-                                     </Typography>
-                                     <Button
-                                       size="small"
-                                       onClick={() => setIsNameDialogOpen(true)}
-                                       variant="text"
-                                       sx={{ flexShrink: 0 }} // зачем: запрещаем кнопке сжиматься, чтобы она всегда оставалась нормального размера
-                                     >
-                                       Изменить
-                                     </Button>
-                                   </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                flex: 1,
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  wordBreak: "break-word", // зачем: если имя длинное, оно перенесётся на новую строку, а не сломает верстку
+                  mr: 2, // отступ справа, чтобы не прилипало к кнопке
+                }}
+              >
+                {user?.displayName || user?.username}
+              </Typography>
+              <Button
+                size="small"
+                onClick={() => setIsNameDialogOpen(true)}
+                variant="text"
+                sx={{ flexShrink: 0 }} // зачем: запрещаем кнопке сжиматься, чтобы она всегда оставалась нормального размера
+              >
+                Изменить
+              </Button>
+            </Box>
           </Stack>
         </CardContent>
       </Card>
@@ -237,25 +247,25 @@ export default function ProfilePage() {
       {/* ============ Сводка ============ */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="subtitle2" color="text.secondary">
                 Возраст
               </Typography>
               <Typography variant="h5">
-                {profile.ageYears != null ? `${profile.ageYears} лет` : '—'}
+                {profile.ageYears != null ? `${profile.ageYears} лет` : "—"}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Stack
                 direction="row"
                 spacing={0.5}
-                sx={{ alignItems: 'center' }}
+                sx={{ alignItems: "center" }}
               >
                 <Typography variant="subtitle2" color="text.secondary">
                   ИМТ (BMI)
@@ -263,14 +273,14 @@ export default function ProfilePage() {
                 <InfoTooltip title={tooltips.bmi} />
               </Stack>
               <Typography variant="h5">
-                {profile.bmi != null ? profile.bmi.toFixed(1) : '—'}
+                {profile.bmi != null ? profile.bmi.toFixed(1) : "—"}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
         <Grid size={{ xs: 12, sm: 12, md: 4 }}>
-          <Card sx={{ height: '100%' }}>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="subtitle2" color="text.secondary">
                 Дневная норма
@@ -278,7 +288,7 @@ export default function ProfilePage() {
               <Typography variant="h5">
                 {dailyCaloriesQuery.data != null
                   ? `${dailyCaloriesQuery.data} ккал`
-                  : '—'}
+                  : "—"}
               </Typography>
             </CardContent>
           </Card>
@@ -300,7 +310,7 @@ export default function ProfilePage() {
                 render={({ field }) => (
                   <ImageUpload
                     value={field.value || null}
-                    onChange={(url) => field.onChange(url ?? '')}
+                    onChange={(url) => field.onChange(url ?? "")}
                     label="Аватар"
                   />
                 )}
@@ -311,7 +321,7 @@ export default function ProfilePage() {
                 type="date"
                 fullWidth
                 slotProps={{ inputLabel: { shrink: true } }}
-                {...register('dateOfBirth')}
+                {...register("dateOfBirth")}
                 helperText="Формат: ГГГГ-ММ-ДД"
               />
 
@@ -321,8 +331,8 @@ export default function ProfilePage() {
                     label="Рост, см"
                     type="number"
                     fullWidth
-                    slotProps={{ htmlInput: { step: '1', min: 50, max: 250 } }}
-                    {...register('heightCm', { valueAsNumber: true })}
+                    slotProps={{ htmlInput: { step: "1", min: 50, max: 250 } }}
+                    {...register("heightCm", { valueAsNumber: true })}
                     error={!!errors.heightCm}
                     helperText={errors.heightCm?.message}
                   />
@@ -332,8 +342,10 @@ export default function ProfilePage() {
                     label="Текущий вес, кг"
                     type="number"
                     fullWidth
-                    slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                    {...register('currentWeightKg', { valueAsNumber: true })}
+                    slotProps={{
+                      htmlInput: { step: "0.1", min: 20, max: 300 },
+                    }}
+                    {...register("currentWeightKg", { valueAsNumber: true })}
                     error={!!errors.currentWeightKg}
                     helperText={errors.currentWeightKg?.message}
                   />
@@ -343,8 +355,10 @@ export default function ProfilePage() {
                     label="Целевой вес, кг"
                     type="number"
                     fullWidth
-                    slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                    {...register('targetWeightKg', { valueAsNumber: true })}
+                    slotProps={{
+                      htmlInput: { step: "0.1", min: 20, max: 300 },
+                    }}
+                    {...register("targetWeightKg", { valueAsNumber: true })}
                     error={!!errors.targetWeightKg}
                     helperText={errors.targetWeightKg?.message}
                   />
@@ -399,83 +413,83 @@ export default function ProfilePage() {
                 type="submit"
                 variant="contained"
                 disabled={updateMutation.isPending}
-                sx={{ alignSelf: 'flex-start' }}
+                sx={{ alignSelf: "flex-start" }}
               >
                 {updateMutation.isPending
-                  ? 'Сохранение...'
-                  : 'Сохранить профиль'}
+                  ? "Сохранение..."
+                  : "Сохранить профиль"}
               </Button>
             </Stack>
-                 </form>
-               </CardContent>
-             </Card>
+          </form>
+        </CardContent>
+      </Card>
 
-             {/* 🆕 Опасная зона — удаление аккаунта */}
-             <Card sx={{ mt: 3, border: 1, borderColor: 'error.main' }}>
-               <CardContent>
-                 <Typography variant="h6" color="error" gutterBottom>
-                   Опасная зона
-                 </Typography>
-                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                   Удаление аккаунта необратимо. Все данные (рецепты, дневник, замеры,
-                   цели) будут скрыты. Через 30 дней — удалены окончательно.
-                 </Typography>
-                 <Button
-                   variant="outlined"
-                   color="error"
-                   onClick={() => setDeleteDialogOpen(true)}
-                 >
-                   Удалить аккаунт
-                 </Button>
-               </CardContent>
-             </Card>
+      {/* 🆕 Опасная зона — удаление аккаунта */}
+      <Card sx={{ mt: 3, border: 1, borderColor: "error.main" }}>
+        <CardContent>
+          <Typography variant="h6" color="error" gutterBottom>
+            Опасная зона
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Удаление аккаунта необратимо. Все данные (рецепты, дневник, замеры,
+            цели) будут скрыты. Через 30 дней — удалены окончательно.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            Удалить аккаунт
+          </Button>
+        </CardContent>
+      </Card>
 
-             {/* 🆕 Диалог подтверждения */}
-             <Dialog
-               open={deleteDialogOpen}
-               onClose={() => setDeleteDialogOpen(false)}
-               maxWidth="sm"
-               fullWidth
-             >
-               <DialogTitle>Удалить аккаунт?</DialogTitle>
-               <DialogContent>
-                 <Typography variant="body2" sx={{ mb: 2 }}>
-                   Введите пароль для подтверждения. Это действие нельзя отменить.
-                 </Typography>
-                 <TextField
-                   label="Пароль"
-                   type="password"
-                   fullWidth
-                   autoFocus
-                   value={deletePassword}
-                   onChange={(e) => setDeletePassword(e.target.value)}
-                   disabled={deleteMutation.isPending}
-                 />
-               </DialogContent>
-               <DialogActions>
-                 <Button
-                   onClick={() => {
-                     setDeleteDialogOpen(false);
-                     setDeletePassword('');
-                   }}
-                   disabled={deleteMutation.isPending}
-                 >
-                   Отмена
-                 </Button>
-                 <Button
-                   variant="contained"
-                   color="error"
-                   onClick={handleDeleteAccount}
-                   disabled={deleteMutation.isPending || !deletePassword.trim()}
-                 >
-                   {deleteMutation.isPending ? 'Удаление...' : 'Удалить навсегда'}
-                 </Button>
-               </DialogActions>
-             </Dialog>
-                   <DisplayNameDialog
-                     open={isNameDialogOpen}
-                     onClose={() => setIsNameDialogOpen(false)}
-                   />
-           </Box>
-         );
-       }
+      {/* 🆕 Диалог подтверждения */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Удалить аккаунт?</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Введите пароль для подтверждения. Это действие нельзя отменить.
+          </Typography>
+          <TextField
+            label="Пароль"
+            type="password"
+            fullWidth
+            autoFocus
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            disabled={deleteMutation.isPending}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setDeleteDialogOpen(false);
+              setDeletePassword("");
+            }}
+            disabled={deleteMutation.isPending}
+          >
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteAccount}
+            disabled={deleteMutation.isPending || !deletePassword.trim()}
+          >
+            {deleteMutation.isPending ? "Удаление..." : "Удалить навсегда"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <DisplayNameDialog
+        open={isNameDialogOpen}
+        onClose={() => setIsNameDialogOpen(false)}
+      />
+    </Box>
+  );
+}

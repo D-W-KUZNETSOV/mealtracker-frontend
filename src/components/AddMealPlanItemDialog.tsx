@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   Autocomplete,
   Button,
@@ -11,19 +11,19 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
-import { isValidNumberInput, normalizeNumberInput } from '../utils/numberInput';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import { isValidNumberInput, normalizeNumberInput } from "../utils/numberInput";
 
-import { useMyRecipes } from '../hooks/useRecipes';
-import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
-import { useAddMealPlanItem } from '../hooks/useMealPlans';
+import { useMyRecipes } from "../hooks/useRecipes";
+import { useBaseIngredients, useMyIngredients } from "../hooks/useIngredients";
+import { useAddMealPlanItem } from "../hooks/useMealPlans";
 import type {
   ApiError,
   IngredientDto,
   MealType,
   RecipeListItemDto,
-} from '../types/api';
+} from "../types/api";
 
 interface Props {
   open: boolean;
@@ -33,15 +33,15 @@ interface Props {
   mealType: MealType;
 }
 
-type Mode = 'recipe' | 'ingredient';
+type Mode = "recipe" | "ingredient";
 
 const MEAL_LABELS: Record<MealType, string> = {
-  BREAKFAST: 'Завтрак',
-  LUNCH: 'Обед',
-  DINNER: 'Ужин',
-  SNACK: 'Перекус',
-  DESSERT: 'Десерт',
-  DRINK: 'Напиток',
+  BREAKFAST: "Завтрак",
+  LUNCH: "Обед",
+  DINNER: "Ужин",
+  SNACK: "Перекус",
+  DESSERT: "Десерт",
+  DRINK: "Напиток",
 };
 
 export default function AddMealPlanItemDialog({
@@ -55,29 +55,31 @@ export default function AddMealPlanItemDialog({
   const addMutation = useAddMealPlanItem();
 
   // ---------- React Query ----------
- const recipesQuery = useMyRecipes(0, 100);
- const myIngredientsQuery = useMyIngredients();
- const baseIngredientsQuery = useBaseIngredients();
+  const recipesQuery = useMyRecipes(0, 100);
+  const myIngredientsQuery = useMyIngredients();
+  const baseIngredientsQuery = useBaseIngredients();
 
   // ---------- useState ----------
-  const [mode, setMode] = useState<Mode>('recipe');
-  const [selectedRecipe, setSelectedRecipe] = useState<RecipeListItemDto | null>(null);
-  const [selectedIngredient, setSelectedIngredient] = useState<IngredientDto | null>(null);
-  const [servingsStr, setServingsStr] = useState('1');
-  const [weightStr, setWeightStr] = useState('100');
+  const [mode, setMode] = useState<Mode>("recipe");
+  const [selectedRecipe, setSelectedRecipe] =
+    useState<RecipeListItemDto | null>(null);
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<IngredientDto | null>(null);
+  const [servingsStr, setServingsStr] = useState("1");
+  const [weightStr, setWeightStr] = useState("100");
 
-const servings = parseFloat(servingsStr.replace(',', '.')) || 0;
-const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
+  const servings = parseFloat(servingsStr.replace(",", ".")) || 0;
+  const weightInGrams = parseFloat(weightStr.replace(",", ".")) || 0;
   // ---------- Сброс при открытии ----------
- useEffect(() => {
-   if (open) {
-     setMode('recipe');
-     setSelectedRecipe(null);
-     setSelectedIngredient(null);
-     setServingsStr('1');
-     setWeightStr('100');
-   }
- }, [open]);
+  useEffect(() => {
+    if (open) {
+      setMode("recipe");
+      setSelectedRecipe(null);
+      setSelectedIngredient(null);
+      setServingsStr("1");
+      setWeightStr("100");
+    }
+  }, [open]);
 
   // ---------- Автоподстановка servings/weight при выборе ----------
   useEffect(() => {
@@ -87,17 +89,17 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
   }, [selectedRecipe]);
 
   // ---------- Данные для отображения ----------
- const recipes = recipesQuery.data?.content ?? [];
- const ingredients = useMemo(
-   () => [
-     ...(myIngredientsQuery.data ?? []),
-     ...(baseIngredientsQuery.data ?? []),
-   ],
-   [myIngredientsQuery.data, baseIngredientsQuery.data],
- );
+  const recipes = recipesQuery.data?.content ?? [];
+  const ingredients = useMemo(
+    () => [
+      ...(myIngredientsQuery.data ?? []),
+      ...(baseIngredientsQuery.data ?? []),
+    ],
+    [myIngredientsQuery.data, baseIngredientsQuery.data],
+  );
 
   const canSubmit = useMemo(() => {
-    if (mode === 'recipe') return !!selectedRecipe && servings > 0;
+    if (mode === "recipe") return !!selectedRecipe && servings > 0;
     return !!selectedIngredient && weightInGrams > 0;
   }, [mode, selectedRecipe, selectedIngredient, servings, weightInGrams]);
 
@@ -106,7 +108,7 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
     if (!canSubmit) return;
 
     try {
-      if (mode === 'recipe' && selectedRecipe) {
+      if (mode === "recipe" && selectedRecipe) {
         await addMutation.mutateAsync({
           planId,
           data: {
@@ -116,7 +118,7 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
             servings,
           },
         });
-      } else if (mode === 'ingredient' && selectedIngredient) {
+      } else if (mode === "ingredient" && selectedIngredient) {
         await addMutation.mutateAsync({
           planId,
           data: {
@@ -128,12 +130,12 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
         });
       }
 
-      enqueueSnackbar('Приём добавлен в план', { variant: 'success' });
+      enqueueSnackbar("Приём добавлен в план", { variant: "success" });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка добавления', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка добавления", {
+        variant: "error",
       });
     }
   };
@@ -158,7 +160,7 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
             <ToggleButton value="ingredient">Ингредиент</ToggleButton>
           </ToggleButtonGroup>
 
-          {mode === 'recipe' && (
+          {mode === "recipe" && (
             <>
               <Autocomplete
                 options={recipes}
@@ -168,21 +170,16 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
                 isOptionEqualToValue={(o, v) => o.id === v.id}
                 loading={recipesQuery.isLoading}
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Рецепт"
-                    fullWidth
-                    autoFocus
-                  />
+                  <TextField {...params} label="Рецепт" fullWidth autoFocus />
                 )}
               />
 
               {selectedRecipe && (
                 <>
                   <Typography variant="body2" color="text.secondary">
-                    КБЖУ рецепта: {selectedRecipe.totalCalories ?? '—'} ккал ·{' '}
-                    {selectedRecipe.servings} порц. по{' '}
-                    {selectedRecipe.servingSizeGrams?.toFixed(0) ?? '—'} г
+                    КБЖУ рецепта: {selectedRecipe.totalCalories ?? "—"} ккал ·{" "}
+                    {selectedRecipe.servings} порц. по{" "}
+                    {selectedRecipe.servingSizeGrams?.toFixed(0) ?? "—"} г
                   </Typography>
 
                   <TextField
@@ -197,14 +194,14 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
                       }
                     }}
                     onFocus={(e) => e.target.select()}
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                   />
                 </>
               )}
             </>
           )}
 
-          {mode === 'ingredient' && (
+          {mode === "ingredient" && (
             <>
               <Autocomplete
                 options={ingredients}
@@ -212,7 +209,9 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
                 value={selectedIngredient}
                 onChange={(_, v) => setSelectedIngredient(v)}
                 isOptionEqualToValue={(o, v) => o.id === v.id}
-               loading={myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading}
+                loading={
+                  myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -226,7 +225,8 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
               {selectedIngredient && (
                 <>
                   <Typography variant="body2" color="text.secondary">
-                    КБЖУ на 100 г: {selectedIngredient.caloriesPer100g ?? '—'} ккал
+                    КБЖУ на 100 г: {selectedIngredient.caloriesPer100g ?? "—"}{" "}
+                    ккал
                   </Typography>
 
                   <TextField
@@ -241,7 +241,7 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
                       }
                     }}
                     onFocus={(e) => e.target.select()}
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                   />
                 </>
               )}
@@ -258,7 +258,7 @@ const weightInGrams = parseFloat(weightStr.replace(',', '.')) || 0;
           onClick={handleSubmit}
           disabled={!canSubmit || addMutation.isPending}
         >
-          {addMutation.isPending ? 'Добавление...' : 'Добавить'}
+          {addMutation.isPending ? "Добавление..." : "Добавить"}
         </Button>
       </DialogActions>
     </Dialog>

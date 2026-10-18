@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useState } from "react";
+import {
+  Link as RouterLink,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Alert,
   Box,
@@ -13,23 +17,23 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { authApi } from '../api/auth';
-import type { ApiError } from '../types/api';
+import { authApi } from "../api/auth";
+import type { ApiError } from "../types/api";
 
 const resetSchema = z
   .object({
     newPassword: z
       .string()
-      .min(6, 'Минимум 6 символов')
-      .max(100, 'Максимум 100 символов'),
-    confirmPassword: z.string().min(1, 'Подтвердите пароль'),
+      .min(6, "Минимум 6 символов")
+      .max(100, "Максимум 100 символов"),
+    confirmPassword: z.string().min(1, "Подтвердите пароль"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: 'Пароли не совпадают',
-    path: ['confirmPassword'],
+    message: "Пароли не совпадают",
+    path: ["confirmPassword"],
   });
 
 type ResetForm = z.infer<typeof resetSchema>;
@@ -40,7 +44,7 @@ export default function ResetPasswordPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [submitting, setSubmitting] = useState(false);
 
-  const token = searchParams.get('token') ?? '';
+  const token = searchParams.get("token") ?? "";
 
   const {
     register,
@@ -48,7 +52,7 @@ export default function ResetPasswordPage() {
     formState: { errors },
   } = useForm<ResetForm>({
     resolver: zodResolver(resetSchema),
-    defaultValues: { newPassword: '', confirmPassword: '' },
+    defaultValues: { newPassword: "", confirmPassword: "" },
   });
 
   // Если токена нет — не показываем форму
@@ -56,14 +60,14 @@ export default function ResetPasswordPage() {
     return (
       <Box
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           p: 2,
         }}
       >
-        <Card sx={{ maxWidth: 400, width: '100%' }}>
+        <Card sx={{ maxWidth: 400, width: "100%" }}>
           <CardContent>
             <Alert severity="error" sx={{ mb: 2 }}>
               Ссылка недействительна: отсутствует токен. Запросите новую ссылку
@@ -90,15 +94,15 @@ export default function ResetPasswordPage() {
         token,
         newPassword: data.newPassword,
       });
-      enqueueSnackbar('Пароль изменён. Войдите с новым паролем.', {
-        variant: 'success',
+      enqueueSnackbar("Пароль изменён. Войдите с новым паролем.", {
+        variant: "success",
       });
-      navigate('/login', { replace: true });
+      navigate("/login", { replace: true });
     } catch (err) {
       const apiError = err as ApiError;
       enqueueSnackbar(
-        apiError.message || 'Ошибка сброса пароля. Возможно, ссылка истекла.',
-        { variant: 'error' },
+        apiError.message || "Ошибка сброса пароля. Возможно, ссылка истекла.",
+        { variant: "error" },
       );
     } finally {
       setSubmitting(false);
@@ -108,14 +112,14 @@ export default function ResetPasswordPage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
+      <Card sx={{ maxWidth: 400, width: "100%" }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
             Новый пароль
@@ -131,7 +135,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 fullWidth
                 autoFocus
-                {...register('newPassword')}
+                {...register("newPassword")}
                 error={!!errors.newPassword}
                 helperText={errors.newPassword?.message}
               />
@@ -139,7 +143,7 @@ export default function ResetPasswordPage() {
                 label="Подтвердите пароль"
                 type="password"
                 fullWidth
-                {...register('confirmPassword')}
+                {...register("confirmPassword")}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
               />
@@ -149,12 +153,12 @@ export default function ResetPasswordPage() {
                 fullWidth
                 disabled={submitting}
               >
-                {submitting ? 'Сохранение...' : 'Сохранить пароль'}
+                {submitting ? "Сохранение..." : "Сохранить пароль"}
               </Button>
             </Stack>
           </form>
 
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
             <Link component={RouterLink} to="/login">
               Вернуться ко входу
             </Link>

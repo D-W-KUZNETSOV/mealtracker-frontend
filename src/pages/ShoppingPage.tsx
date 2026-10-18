@@ -1,30 +1,40 @@
-import { useState } from 'react';
-import { Box, Button, Stack, Typography, Alert, CircularProgress, Card, CardContent, Paper } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import IconButton from '@mui/material/IconButton';
-import Checkbox from '@mui/material/Checkbox';
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Stack,
+  Typography,
+  Alert,
+  CircularProgress,
+  Card,
+  CardContent,
+  Paper,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import IconButton from "@mui/material/IconButton";
+import Checkbox from "@mui/material/Checkbox";
 
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ReplayIcon from '@mui/icons-material/Replay';
-import { useRepeatShoppingList } from '../hooks/useShoppingLists';
-import { useSnackbar } from 'notistack';
-import AddShoppingItemDialog from '../components/AddShoppingItemDialog';
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ReplayIcon from "@mui/icons-material/Replay";
+import { useRepeatShoppingList } from "../hooks/useShoppingLists";
+import { useSnackbar } from "notistack";
+import AddShoppingItemDialog from "../components/AddShoppingItemDialog";
 
 import {
   useShoppingLists,
   useToggleShoppingItem,
   useArchiveShoppingList,
   useDeleteShoppingList,
-} from '../hooks/useShoppingLists';
-import type { ApiError } from '../types/api';
-import { roundNutrient } from '../types/api';
-import GenerateShoppingListDialog from '../components/GenerateShoppingListDialog';
+} from "../hooks/useShoppingLists";
+import type { ApiError } from "../types/api";
+import { roundNutrient } from "../types/api";
+import GenerateShoppingListDialog from "../components/GenerateShoppingListDialog";
 
 export default function ShoppingPage() {
   // 1. Хуки — все наверху
@@ -37,8 +47,8 @@ export default function ShoppingPage() {
 
   // 2. Производные данные
   const allLists = listsQuery.data ?? [];
-  const activeList = allLists.find((l) => l.status === 'ACTIVE') ?? null;
-  const archivedLists = allLists.filter((l) => l.status === 'ARCHIVED');
+  const activeList = allLists.find((l) => l.status === "ACTIVE") ?? null;
+  const archivedLists = allLists.filter((l) => l.status === "ARCHIVED");
 
   // 3. useState
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false);
@@ -49,11 +59,11 @@ export default function ShoppingPage() {
     <Box>
       {/* Заголовок + кнопки */}
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
+        direction={{ xs: "column", sm: "row" }}
         spacing={2}
         sx={{
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
           mb: 3,
         }}
       >
@@ -66,20 +76,20 @@ export default function ShoppingPage() {
           >
             Из плана
           </Button>
-         <Button
-           variant="contained"
-           startIcon={<AddIcon />}
-           onClick={() => setAddItemDialogOpen(true)}
-           disabled={!activeList}
-         >
-           Вручную
-         </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setAddItemDialogOpen(true)}
+            disabled={!activeList}
+          >
+            Вручную
+          </Button>
         </Stack>
       </Stack>
 
       {/* Loading */}
       {listsQuery.isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       )}
@@ -104,11 +114,15 @@ export default function ShoppingPage() {
           <CardContent>
             <Stack
               direction="row"
-              sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
             >
               <Box>
                 <Typography variant="h6">
-                  {activeList.name ?? 'Список покупок'}
+                  {activeList.name ?? "Список покупок"}
                 </Typography>
                 {activeList.periodStart && activeList.periodEnd && (
                   <Typography variant="caption" color="text.secondary">
@@ -121,7 +135,7 @@ export default function ShoppingPage() {
                   size="small"
                   title="В архив"
                   onClick={() => {
-                    if (window.confirm('Отправить список в архив?')) {
+                    if (window.confirm("Отправить список в архив?")) {
                       archiveList.mutate(activeList.id);
                     }
                   }}
@@ -134,7 +148,7 @@ export default function ShoppingPage() {
                   color="error"
                   title="Удалить"
                   onClick={() => {
-                    if (window.confirm('Удалить список покупок?')) {
+                    if (window.confirm("Удалить список покупок?")) {
                       deleteList.mutate(activeList.id);
                     }
                   }}
@@ -157,14 +171,21 @@ export default function ShoppingPage() {
                     sx={{
                       p: 1.5,
                       opacity: item.isChecked ? 0.5 : 1,
-                      transition: 'opacity 0.2s',
+                      transition: "opacity 0.2s",
                     }}
                   >
-                    <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+                    <Stack
+                      direction="row"
+                      spacing={1.5}
+                      sx={{ alignItems: "center" }}
+                    >
                       <Checkbox
                         checked={item.isChecked}
                         onChange={() =>
-                          toggleItem.mutate({ listId: activeList.id, itemId: item.id })
+                          toggleItem.mutate({
+                            listId: activeList.id,
+                            itemId: item.id,
+                          })
                         }
                         disabled={toggleItem.isPending}
                       />
@@ -172,7 +193,9 @@ export default function ShoppingPage() {
                         <Typography
                           variant="body1"
                           sx={{
-                            textDecoration: item.isChecked ? 'line-through' : 'none',
+                            textDecoration: item.isChecked
+                              ? "line-through"
+                              : "none",
                           }}
                         >
                           {item.ingredientName}
@@ -180,7 +203,7 @@ export default function ShoppingPage() {
                         <Typography variant="caption" color="text.secondary">
                           {item.quantityGrams != null
                             ? `${roundNutrient(item.quantityGrams)} г`
-                            : '—'}
+                            : "—"}
                         </Typography>
                       </Box>
                     </Stack>
@@ -207,18 +230,22 @@ export default function ShoppingPage() {
                   <Stack
                     direction="row"
                     sx={{
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
                       gap: 1,
                     }}
                   >
                     <Box>
                       <Typography variant="subtitle1">
-                        {list.name ?? 'Список покупок'}
+                        {list.name ?? "Список покупок"}
                       </Typography>
                       {list.periodStart && list.periodEnd && (
-                        <Typography variant="caption" color="text.secondary" component="div">
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          component="div"
+                        >
                           {list.periodStart} → {list.periodEnd}
                         </Typography>
                       )}
@@ -231,10 +258,18 @@ export default function ShoppingPage() {
                         size="small"
                         title="Повторить"
                         onClick={() => {
-                          if (window.confirm('Повторить этот список? Активный будет заархивирован.')) {
+                          if (
+                            window.confirm(
+                              "Повторить этот список? Активный будет заархивирован.",
+                            )
+                          ) {
                             repeatList.mutate(list.id, {
-                              onSuccess: () => enqueueSnackbar('Список повторён', { variant: 'success' }),
-                              onError: () => enqueueSnackbar('Ошибка', { variant: 'error' }),
+                              onSuccess: () =>
+                                enqueueSnackbar("Список повторён", {
+                                  variant: "success",
+                                }),
+                              onError: () =>
+                                enqueueSnackbar("Ошибка", { variant: "error" }),
                             });
                           }
                         }}
@@ -247,7 +282,7 @@ export default function ShoppingPage() {
                         color="error"
                         title="Удалить"
                         onClick={() => {
-                          if (window.confirm('Удалить архивный список?')) {
+                          if (window.confirm("Удалить архивный список?")) {
                             deleteList.mutate(list.id);
                           }
                         }}
@@ -277,5 +312,5 @@ export default function ShoppingPage() {
         />
       )}
     </Box>
-   );
- }
+  );
+}

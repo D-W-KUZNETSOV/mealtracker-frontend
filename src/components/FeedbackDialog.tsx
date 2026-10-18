@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,11 +8,11 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { feedbackApi } from '../api/feedback';
-import type { ApiError } from '../types/api';
+import { feedbackApi } from "../api/feedback";
+import type { ApiError } from "../types/api";
 
 interface FeedbackDialogProps {
   open: boolean;
@@ -21,13 +21,13 @@ interface FeedbackDialogProps {
 
 export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
-  const [message, setMessage] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
+  const [message, setMessage] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [sending, setSending] = useState(false);
 
   const reset = () => {
-    setMessage('');
-    setContactEmail('');
+    setMessage("");
+    setContactEmail("");
   };
 
   const handleClose = () => {
@@ -38,7 +38,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
 
   const handleSubmit = async () => {
     if (message.trim().length < 5) {
-      enqueueSnackbar('Сообщение от 5 символов', { variant: 'warning' });
+      enqueueSnackbar("Сообщение от 5 символов", { variant: "warning" });
       return;
     }
 
@@ -48,13 +48,13 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
         message: message.trim(),
         contactEmail: contactEmail.trim() || undefined,
       });
-      enqueueSnackbar('Спасибо! Фидбек отправлен', { variant: 'success' });
+      enqueueSnackbar("Спасибо! Фидбек отправлен", { variant: "success" });
       reset();
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка отправки', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка отправки", {
+        variant: "error",
       });
     } finally {
       setSending(false);
@@ -105,7 +105,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
           onClick={handleSubmit}
           disabled={sending || message.trim().length < 5}
         >
-          {sending ? 'Отправка...' : 'Отправить'}
+          {sending ? "Отправка..." : "Отправить"}
         </Button>
       </DialogActions>
     </Dialog>

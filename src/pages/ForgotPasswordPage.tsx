@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Alert,
   Box,
@@ -13,14 +13,14 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { authApi } from '../api/auth';
-import type { ApiError } from '../types/api';
+import { authApi } from "../api/auth";
+import type { ApiError } from "../types/api";
 
 const forgotSchema = z.object({
-  email: z.string().min(1, 'Введите email').email('Некорректный email'),
+  email: z.string().min(1, "Введите email").email("Некорректный email"),
 });
 
 type ForgotForm = z.infer<typeof forgotSchema>;
@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
     formState: { errors },
   } = useForm<ForgotForm>({
     resolver: zodResolver(forgotSchema),
-    defaultValues: { email: '' },
+    defaultValues: { email: "" },
   });
 
   const onSubmit = async (data: ForgotForm) => {
@@ -44,11 +44,11 @@ export default function ForgotPasswordPage() {
     try {
       await authApi.forgotPassword({ email: data.email });
       setSent(true);
-      enqueueSnackbar('Письмо отправлено', { variant: 'success' });
+      enqueueSnackbar("Письмо отправлено", { variant: "success" });
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка отправки', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка отправки", {
+        variant: "error",
       });
     } finally {
       setSubmitting(false);
@@ -58,14 +58,14 @@ export default function ForgotPasswordPage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
+      <Card sx={{ maxWidth: 400, width: "100%" }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
             Забыли пароль?
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   fullWidth
                   autoFocus
-                  {...register('email')}
+                  {...register("email")}
                   error={!!errors.email}
                   helperText={errors.email?.message}
                 />
@@ -107,14 +107,14 @@ export default function ForgotPasswordPage() {
                   fullWidth
                   disabled={submitting}
                 >
-                  {submitting ? 'Отправка...' : 'Отправить ссылку'}
+                  {submitting ? "Отправка..." : "Отправить ссылку"}
                 </Button>
               </Stack>
             </form>
           )}
 
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-            Вспомнили пароль?{' '}
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            Вспомнили пароль?{" "}
             <Link component={RouterLink} to="/login">
               Войти
             </Link>

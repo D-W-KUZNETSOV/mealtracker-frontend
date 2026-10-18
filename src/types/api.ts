@@ -416,6 +416,10 @@ export interface MealPlanItemDto {
   servings: number | null;
   weightInGrams: number | null;
   customName: string | null;
+  calories?: number | null;
+    proteins?: number | null;
+    fats?: number | null;
+    carbs?: number | null;
 }
 
 export interface CreateMealPlanRequest {

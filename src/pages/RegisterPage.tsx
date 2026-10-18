@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Box,
   Button,
@@ -12,27 +12,27 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useAuthStore } from '../store/authStore';
-import type { ApiError } from '../types/api';
+import { useAuthStore } from "../store/authStore";
+import type { ApiError } from "../types/api";
 
 // ============================================================
 // Схема валидации формы регистрации
 // ============================================================
 const registerSchema = z
   .object({
-    email: z.string().email('Некорректный email'),
+    email: z.string().email("Некорректный email"),
     password: z
       .string()
-      .min(6, 'Минимум 6 символов')
-      .max(100, 'Максимум 100 символов'),
+      .min(6, "Минимум 6 символов")
+      .max(100, "Максимум 100 символов"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Пароли не совпадают',
-    path: ['confirmPassword'],
+    message: "Пароли не совпадают",
+    path: ["confirmPassword"],
   });
 
 type RegisterForm = z.infer<typeof registerSchema>;
@@ -49,25 +49,25 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-      defaultValues: {
-        password: '',
-        email: '',
-      },
+    defaultValues: {
+      password: "",
+      email: "",
+    },
   });
 
   const onSubmit = async (data: RegisterForm) => {
     setSubmitting(true);
     try {
-    await registerUser({
-          password: data.password,
-          email: data.email,
-        });
-      enqueueSnackbar('Регистрация успешна!', { variant: 'success' });
-      navigate('/', { replace: true });
+      await registerUser({
+        password: data.password,
+        email: data.email,
+      });
+      enqueueSnackbar("Регистрация успешна!", { variant: "success" });
+      navigate("/", { replace: true });
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка регистрации', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка регистрации", {
+        variant: "error",
       });
     } finally {
       setSubmitting(false);
@@ -77,14 +77,14 @@ export default function RegisterPage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
+      <Card sx={{ maxWidth: 400, width: "100%" }}>
         <CardContent>
           <Typography variant="h5" gutterBottom>
             Баланс
@@ -95,12 +95,11 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
-
               <TextField
                 label="Email"
                 type="email"
                 fullWidth
-                {...register('email')}
+                {...register("email")}
                 error={!!errors.email}
                 helperText={errors.email?.message}
               />
@@ -109,7 +108,7 @@ export default function RegisterPage() {
                 label="Пароль"
                 type="password"
                 fullWidth
-                {...register('password')}
+                {...register("password")}
                 error={!!errors.password}
                 helperText={errors.password?.message}
               />
@@ -117,7 +116,7 @@ export default function RegisterPage() {
                 label="Повторите пароль"
                 type="password"
                 fullWidth
-                {...register('confirmPassword')}
+                {...register("confirmPassword")}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
               />
@@ -127,13 +126,13 @@ export default function RegisterPage() {
                 fullWidth
                 disabled={submitting}
               >
-                {submitting ? 'Регистрация...' : 'Зарегистрироваться'}
+                {submitting ? "Регистрация..." : "Зарегистрироваться"}
               </Button>
             </Stack>
           </form>
 
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-            Уже есть аккаунт?{' '}
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            Уже есть аккаунт?{" "}
             <Link component={RouterLink} to="/login">
               Войти
             </Link>

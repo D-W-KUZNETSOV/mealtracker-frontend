@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
@@ -11,11 +11,11 @@ import {
   FormControlLabel,
   Stack,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useAddFromPlan } from '../hooks/useStats';
-import type { ApiError, MealPlanDto } from '../types/api';
+import { useAddFromPlan } from "../hooks/useStats";
+import type { ApiError, MealPlanDto } from "../types/api";
 
 interface Props {
   open: boolean;
@@ -24,7 +24,12 @@ interface Props {
   date: string;
 }
 
-export default function AddFromPlanDialog({ open, onClose, plan, date }: Props) {
+export default function AddFromPlanDialog({
+  open,
+  onClose,
+  plan,
+  date,
+}: Props) {
   const { enqueueSnackbar } = useSnackbar();
   const addMutation = useAddFromPlan();
 
@@ -56,11 +61,13 @@ export default function AddFromPlanDialog({ open, onClose, plan, date }: Props) 
         date,
         itemIds: Array.from(selectedIds),
       });
-      enqueueSnackbar(result.data.message || 'Добавлено', { variant: 'success' });
+      enqueueSnackbar(result.data.message || "Добавлено", {
+        variant: "success",
+      });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка', { variant: 'error' });
+      enqueueSnackbar(apiError.message || "Ошибка", { variant: "error" });
     }
   };
 
@@ -70,17 +77,15 @@ export default function AddFromPlanDialog({ open, onClose, plan, date }: Props) 
       <DialogContent>
         <Stack spacing={1} sx={{ mt: 1 }}>
           {itemsForDate.length === 0 ? (
-            <Alert severity="info">
-              На эту дату в плане нет приёмов
-            </Alert>
+            <Alert severity="info">На эту дату в плане нет приёмов</Alert>
           ) : (
             itemsForDate.map((item) => (
               <Box
                 key={item.id}
                 sx={{
                   p: 1,
-                  border: '1px solid',
-                  borderColor: 'divider',
+                  border: "1px solid",
+                  borderColor: "divider",
                   borderRadius: 1,
                 }}
               >
@@ -94,15 +99,18 @@ export default function AddFromPlanDialog({ open, onClose, plan, date }: Props) 
                   label={
                     <Box>
                       <Typography variant="body1">
-                        {item.recipeName || item.ingredientName || item.customName || '—'}
+                        {item.recipeName ||
+                          item.ingredientName ||
+                          item.customName ||
+                          "—"}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {item.mealType} ·{' '}
+                        {item.mealType} ·{" "}
                         {item.servings != null
                           ? `${item.servings} порц.`
                           : item.weightInGrams != null
-                          ? `${item.weightInGrams} г`
-                          : ''}
+                            ? `${item.weightInGrams} г`
+                            : ""}
                       </Typography>
                     </Box>
                   }
@@ -121,7 +129,9 @@ export default function AddFromPlanDialog({ open, onClose, plan, date }: Props) 
           onClick={handleSubmit}
           disabled={selectedIds.size === 0 || addMutation.isPending}
         >
-          {addMutation.isPending ? 'Добавление...' : `Добавить (${selectedIds.size})`}
+          {addMutation.isPending
+            ? "Добавление..."
+            : `Добавить (${selectedIds.size})`}
         </Button>
       </DialogActions>
     </Dialog>

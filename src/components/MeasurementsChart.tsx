@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   Box,
   Card,
@@ -7,7 +7,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
+} from "@mui/material";
 import {
   CartesianGrid,
   Legend,
@@ -17,9 +17,9 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts';
+} from "recharts";
 
-import type { BodyMeasurementDto } from '../types/api';
+import type { BodyMeasurementDto } from "../types/api";
 
 interface MeasurementsChartProps {
   measurements: BodyMeasurementDto[];
@@ -32,15 +32,14 @@ export default function MeasurementsChart({
   measurements,
 }: MeasurementsChartProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Сортируем по дате (от старых к новым) — для графика
   const sorted = useMemo(
     () =>
       [...measurements].sort(
         (a, b) =>
-          new Date(a.measuredAt).getTime() -
-          new Date(b.measuredAt).getTime(),
+          new Date(a.measuredAt).getTime() - new Date(b.measuredAt).getTime(),
       ),
     [measurements],
   );
@@ -51,14 +50,14 @@ export default function MeasurementsChart({
       sorted
         .filter((m) => m.weightKg != null)
         .map((m) => ({
-          date: new Date(m.measuredAt).toLocaleDateString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
+          date: new Date(m.measuredAt).toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
           }),
-          fullDate: new Date(m.measuredAt).toLocaleDateString('ru-RU', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
+          fullDate: new Date(m.measuredAt).toLocaleDateString("ru-RU", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
           }),
           weight: m.weightKg,
         })),
@@ -77,14 +76,14 @@ export default function MeasurementsChart({
             m.hipsCm != null,
         )
         .map((m) => ({
-          date: new Date(m.measuredAt).toLocaleDateString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
+          date: new Date(m.measuredAt).toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
           }),
-          fullDate: new Date(m.measuredAt).toLocaleDateString('ru-RU', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
+          fullDate: new Date(m.measuredAt).toLocaleDateString("ru-RU", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
           }),
           waist: m.waistCm,
           belly: m.bellyCm,
@@ -119,10 +118,10 @@ export default function MeasurementsChart({
             <Stack
               direction="row"
               sx={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                justifyContent: "space-between",
+                alignItems: "center",
                 mb: 2,
-                flexWrap: 'wrap',
+                flexWrap: "wrap",
                 gap: 1,
               }}
             >
@@ -133,27 +132,27 @@ export default function MeasurementsChart({
                   sx={{
                     color:
                       weightProgress.diff < 0
-                        ? 'success.main'
+                        ? "success.main"
                         : weightProgress.diff > 0
-                          ? 'error.main'
-                          : 'text.secondary',
+                          ? "error.main"
+                          : "text.secondary",
                     fontWeight: 600,
                   }}
                 >
-                  {weightProgress.diff > 0 ? '+' : ''}
+                  {weightProgress.diff > 0 ? "+" : ""}
                   {weightProgress.diff.toFixed(1)} кг с начала
                 </Typography>
               )}
             </Stack>
 
-            <Box sx={{ width: '100%', height: isMobile ? 180 : 260 }}>
+            <Box sx={{ width: "100%", height: isMobile ? 180 : 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={weightData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                   <XAxis dataKey="date" fontSize={12} />
                   <YAxis
                     fontSize={12}
-                    domain={['dataMin - 2', 'dataMax + 2']}
+                    domain={["dataMin - 2", "dataMax + 2"]}
                     unit=" кг"
                   />
                   <Tooltip
@@ -163,7 +162,7 @@ export default function MeasurementsChart({
                       }
                       return label;
                     }}
-                    formatter={(value) => [`${value} кг`, 'Вес']}
+                    formatter={(value) => [`${value} кг`, "Вес"]}
                   />
                   <Line
                     type="monotone"
@@ -188,7 +187,7 @@ export default function MeasurementsChart({
               Обхваты
             </Typography>
 
-           <Box sx={{ width: '100%', height: isMobile ? 200 : 280 }}>
+            <Box sx={{ width: "100%", height: isMobile ? 200 : 280 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={circumferenceData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
@@ -203,10 +202,10 @@ export default function MeasurementsChart({
                     }}
                     formatter={(value, name) => {
                       const labels: Record<string, string> = {
-                        waist: 'Талия',
-                        belly: 'Живот',
-                        chest: 'Грудь',
-                        hips: 'Бёдра',
+                        waist: "Талия",
+                        belly: "Живот",
+                        chest: "Грудь",
+                        hips: "Бёдра",
                       };
                       return [`${value} см`, labels[name as string] || name];
                     }}
@@ -214,10 +213,10 @@ export default function MeasurementsChart({
                   <Legend
                     formatter={(value) => {
                       const labels: Record<string, string> = {
-                        waist: 'Талия',
-                        belly: 'Живот',
-                        chest: 'Грудь',
-                        hips: 'Бёдра',
+                        waist: "Талия",
+                        belly: "Живот",
+                        chest: "Грудь",
+                        hips: "Бёдра",
                       };
                       return labels[value] || value;
                     }}

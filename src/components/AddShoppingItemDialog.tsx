@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   Autocomplete,
   Button,
@@ -9,12 +9,12 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useBaseIngredients, useMyIngredients } from '../hooks/useIngredients';
-import { useAddShoppingItem } from '../hooks/useShoppingLists';
-import type { ApiError, IngredientDto } from '../types/api';
+import { useBaseIngredients, useMyIngredients } from "../hooks/useIngredients";
+import { useAddShoppingItem } from "../hooks/useShoppingLists";
+import type { ApiError, IngredientDto } from "../types/api";
 
 interface Props {
   open: boolean;
@@ -23,27 +23,31 @@ interface Props {
 }
 
 const UNIT_LABELS: Record<string, string> = {
-  GRAM: 'г',
-  ML: 'мл',
-  PIECE: 'шт',
-  TBSP: 'ст.л.',
-  TSP: 'ч.л.',
-  CUP: 'чашка',
+  GRAM: "г",
+  ML: "мл",
+  PIECE: "шт",
+  TBSP: "ст.л.",
+  TSP: "ч.л.",
+  CUP: "чашка",
 };
 
-export default function AddShoppingItemDialog({ open, onClose, listId }: Props) {
+export default function AddShoppingItemDialog({
+  open,
+  onClose,
+  listId,
+}: Props) {
   const { enqueueSnackbar } = useSnackbar();
   const addMutation = useAddShoppingItem();
- const myIngredientsQuery = useMyIngredients();
- const baseIngredientsQuery = useBaseIngredients();
+  const myIngredientsQuery = useMyIngredients();
+  const baseIngredientsQuery = useBaseIngredients();
 
- const allIngredients = useMemo(
-   () => [
-     ...(myIngredientsQuery.data ?? []),
-     ...(baseIngredientsQuery.data ?? []),
-   ],
-   [myIngredientsQuery.data, baseIngredientsQuery.data],
- );
+  const allIngredients = useMemo(
+    () => [
+      ...(myIngredientsQuery.data ?? []),
+      ...(baseIngredientsQuery.data ?? []),
+    ],
+    [myIngredientsQuery.data, baseIngredientsQuery.data],
+  );
 
   const [selected, setSelected] = useState<IngredientDto | null>(null);
   const [quantity, setQuantity] = useState<number>(100);
@@ -70,11 +74,11 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
           unitType: selected.unitType,
         },
       });
-      enqueueSnackbar('Добавлено в список', { variant: 'success' });
+      enqueueSnackbar("Добавлено в список", { variant: "success" });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка', { variant: 'error' });
+      enqueueSnackbar(apiError.message || "Ошибка", { variant: "error" });
     }
   };
 
@@ -89,7 +93,9 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
             value={selected}
             onChange={(_, v) => setSelected(v)}
             isOptionEqualToValue={(o, v) => o.id === v.id}
-             loading={myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading}
+            loading={
+              myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading
+            }
             renderInput={(params) => (
               <TextField {...params} label="Ингредиент" fullWidth autoFocus />
             )}
@@ -98,27 +104,29 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
           {selected && (
             <>
               <Typography variant="body2" color="text.secondary">
-                КБЖУ на 100 г: {selected.caloriesPer100g ?? '—'} ккал
+                КБЖУ на 100 г: {selected.caloriesPer100g ?? "—"} ккал
               </Typography>
 
-           <TextField
-             label={`Количество, ${UNIT_LABELS[selected.unitType] ?? 'ед.'}`}
-             type="number"
-             fullWidth
-             value={quantity === 0 || quantity == null ? '' : quantity}
-             onChange={(e) => {
-               const raw = e.target.value;
-               if (raw === '') {
-                 setQuantity(0);
-                 return;
-               }
-               const val = Number(raw.replace(',', '.'));
-               if (!Number.isNaN(val)) setQuantity(val);
-             }}
-             onFocus={(e) => e.target.select()}
-             placeholder="0"
-             slotProps={{ htmlInput: { step: '1', min: 1, inputMode: 'decimal' } }}
-           />
+              <TextField
+                label={`Количество, ${UNIT_LABELS[selected.unitType] ?? "ед."}`}
+                type="number"
+                fullWidth
+                value={quantity === 0 || quantity == null ? "" : quantity}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  if (raw === "") {
+                    setQuantity(0);
+                    return;
+                  }
+                  const val = Number(raw.replace(",", "."));
+                  if (!Number.isNaN(val)) setQuantity(val);
+                }}
+                onFocus={(e) => e.target.select()}
+                placeholder="0"
+                slotProps={{
+                  htmlInput: { step: "1", min: 1, inputMode: "decimal" },
+                }}
+              />
             </>
           )}
         </Stack>
@@ -132,7 +140,7 @@ export default function AddShoppingItemDialog({ open, onClose, listId }: Props) 
           onClick={handleSubmit}
           disabled={!canSubmit || addMutation.isPending}
         >
-          {addMutation.isPending ? 'Добавление...' : 'Добавить'}
+          {addMutation.isPending ? "Добавление..." : "Добавить"}
         </Button>
       </DialogActions>
     </Dialog>

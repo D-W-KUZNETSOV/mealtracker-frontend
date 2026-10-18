@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Alert,
   Box,
@@ -19,53 +19,53 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ClearIcon from '@mui/icons-material/Clear';
-import { useNavigate } from 'react-router-dom';
-import { mealTypeLabel } from '../utils/mealType';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useNavigate } from "react-router-dom";
+import { mealTypeLabel } from "../utils/mealType";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
 
-import { useMyRecipes, usePublicRecipes } from '../hooks/useRecipes';
-import type { ApiError, RecipeListItemDto } from '../types/api';
-import { roundNutrient } from '../types/api';
-import { useDebounce } from '../hooks/useDebounce';
-import RecipeFormDialog from '../components/RecipeFormDialog';
+import { useMyRecipes, usePublicRecipes } from "../hooks/useRecipes";
+import type { ApiError, RecipeListItemDto } from "../types/api";
+import { roundNutrient } from "../types/api";
+import { useDebounce } from "../hooks/useDebounce";
+import RecipeFormDialog from "../components/RecipeFormDialog";
 
-type TabKey = 'my' | 'public';
+type TabKey = "my" | "public";
 type SortKey =
-  | 'name,asc'
-  | 'name,desc'
-  | 'calories,asc'
-  | 'calories,desc'
-  | 'protein,asc'
-  | 'protein,desc';
+  | "name,asc"
+  | "name,desc"
+  | "calories,asc"
+  | "calories,desc"
+  | "protein,asc"
+  | "protein,desc";
 
 const PAGE_SIZE = 10;
 
 const CATEGORIES = [
-  { value: '', label: 'Все' },
-  { value: 'BREAKFAST', label: 'Завтрак' },
-  { value: 'LUNCH', label: 'Обед' },
-  { value: 'DINNER', label: 'Ужин' },
-  { value: 'SNACK', label: 'Перекус' },
-  { value: 'DESSERT', label: 'Десерт' },
-  { value: 'DRINK', label: 'Напиток' },
+  { value: "", label: "Все" },
+  { value: "BREAKFAST", label: "Завтрак" },
+  { value: "LUNCH", label: "Обед" },
+  { value: "DINNER", label: "Ужин" },
+  { value: "SNACK", label: "Перекус" },
+  { value: "DESSERT", label: "Десерт" },
+  { value: "DRINK", label: "Напиток" },
 ];
 
 export default function RecipesPage() {
-  const [tab, setTab] = useState<TabKey>('my');
+  const [tab, setTab] = useState<TabKey>("my");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
 
   // Фильтры
-  const [queryStr, setQueryStr] = useState('');
-  const [category, setCategory] = useState<string>('');
-  const [minCalories, setMinCalories] = useState<string>('');
-  const [maxCalories, setMaxCalories] = useState<string>('');
-  const [minProtein, setMinProtein] = useState<string>('');
-  const [sort, setSort] = useState<SortKey>('name,asc');
+  const [queryStr, setQueryStr] = useState("");
+  const [category, setCategory] = useState<string>("");
+  const [minCalories, setMinCalories] = useState<string>("");
+  const [maxCalories, setMaxCalories] = useState<string>("");
+  const [minProtein, setMinProtein] = useState<string>("");
+  const [sort, setSort] = useState<SortKey>("name,asc");
   const [showFilters, setShowFilters] = useState(false);
 
   const debouncedQuery = useDebounce(queryStr, 300);
@@ -83,14 +83,14 @@ export default function RecipesPage() {
   const myQuery = useMyRecipes(page - 1, PAGE_SIZE, filters);
   const publicQuery = usePublicRecipes();
 
-  const isMyTab = tab === 'my';
+  const isMyTab = tab === "my";
   const currentQuery = isMyTab ? myQuery : publicQuery;
 
   const items: RecipeListItemDto[] = isMyTab
-    ? myQuery.data?.content ?? []
-    : publicQuery.data ?? [];
+    ? (myQuery.data?.content ?? [])
+    : (publicQuery.data ?? []);
 
-  const totalPages = isMyTab ? myQuery.data?.totalPages ?? 0 : 0;
+  const totalPages = isMyTab ? (myQuery.data?.totalPages ?? 0) : 0;
 
   const handleTabChange = (_: unknown, v: TabKey) => {
     setTab(v);
@@ -98,12 +98,12 @@ export default function RecipesPage() {
   };
 
   const handleResetFilters = () => {
-    setQueryStr('');
-    setCategory('');
-    setMinCalories('');
-    setMaxCalories('');
-    setMinProtein('');
-    setSort('name,asc');
+    setQueryStr("");
+    setCategory("");
+    setMinCalories("");
+    setMaxCalories("");
+    setMinProtein("");
+    setSort("name,asc");
     setPage(1);
   };
 
@@ -113,15 +113,15 @@ export default function RecipesPage() {
     minCalories ||
     maxCalories ||
     minProtein ||
-    sort !== 'name,asc';
+    sort !== "name,asc";
 
   return (
     <Box>
       <Stack
         sx={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <Typography variant="h4">Рецепты</Typography>
@@ -154,10 +154,10 @@ export default function RecipesPage() {
             setQueryStr(e.target.value);
             setPage(1);
           }}
-          slotProps={{ htmlInput: { inputMode: 'search' } }}
+          slotProps={{ htmlInput: { inputMode: "search" } }}
         />
         <Button
-          variant={showFilters ? 'contained' : 'outlined'}
+          variant={showFilters ? "contained" : "outlined"}
           startIcon={<FilterListIcon />}
           onClick={() => setShowFilters((v) => !v)}
           sx={{ flexShrink: 0 }}
@@ -181,10 +181,10 @@ export default function RecipesPage() {
       <Stack
         direction="row"
         spacing={1}
-        sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}
+        sx={{ mb: 2, flexWrap: "wrap", gap: 1 }}
       >
         <ToggleButtonGroup
-        sx={{ flexWrap: 'wrap', gap: 0.5 }}
+          sx={{ flexWrap: "wrap", gap: 0.5 }}
           size="small"
           exclusive
           value={category}
@@ -206,7 +206,7 @@ export default function RecipesPage() {
       {/* Панель фильтров */}
       <Collapse in={showFilters}>
         <Paper sx={{ p: 2, mb: 2 }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <TextField
               label="Калории от"
               type="number"
@@ -214,7 +214,7 @@ export default function RecipesPage() {
               value={minCalories}
               onChange={(e) => setMinCalories(e.target.value)}
               onFocus={(e) => e.target.select()}
-              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+              slotProps={{ htmlInput: { min: 0, inputMode: "numeric" } }}
             />
             <TextField
               label="Калории до"
@@ -223,7 +223,7 @@ export default function RecipesPage() {
               value={maxCalories}
               onChange={(e) => setMaxCalories(e.target.value)}
               onFocus={(e) => e.target.select()}
-              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+              slotProps={{ htmlInput: { min: 0, inputMode: "numeric" } }}
             />
             <TextField
               label="Белок от, г"
@@ -232,7 +232,7 @@ export default function RecipesPage() {
               value={minProtein}
               onChange={(e) => setMinProtein(e.target.value)}
               onFocus={(e) => e.target.select()}
-              slotProps={{ htmlInput: { min: 0, inputMode: 'numeric' } }}
+              slotProps={{ htmlInput: { min: 0, inputMode: "numeric" } }}
             />
             <TextField
               select
@@ -242,31 +242,34 @@ export default function RecipesPage() {
               onChange={(e) => setSort(e.target.value as SortKey)}
               sx={{ minWidth: 200 }}
             >
-                           <MenuItem value="name,asc">Название (А-Я)</MenuItem>
-                           <MenuItem value="name,desc">Название (Я-А)</MenuItem>
-                           <MenuItem value="calories,asc">Калории (↑)</MenuItem>
-                           <MenuItem value="calories,desc">Калории (↓)</MenuItem>
-                           <MenuItem value="protein,asc">Белок (↑)</MenuItem>
-                           <MenuItem value="protein,desc">Белок (↓)</MenuItem>
+              <MenuItem value="name,asc">Название (А-Я)</MenuItem>
+              <MenuItem value="name,desc">Название (Я-А)</MenuItem>
+              <MenuItem value="calories,asc">Калории (↑)</MenuItem>
+              <MenuItem value="calories,desc">Калории (↓)</MenuItem>
+              <MenuItem value="protein,asc">Белок (↑)</MenuItem>
+              <MenuItem value="protein,desc">Белок (↓)</MenuItem>
             </TextField>
           </Stack>
         </Paper>
       </Collapse>
 
       {currentQuery.isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       )}
 
       {currentQuery.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Ошибка загрузки: {(currentQuery.error as unknown as ApiError)?.message}
+          Ошибка загрузки:{" "}
+          {(currentQuery.error as unknown as ApiError)?.message}
         </Alert>
       )}
 
-      {!currentQuery.isLoading && !currentQuery.isError && items.length === 0 && (
-        isMyTab && hasActiveFilters ? (
+      {!currentQuery.isLoading &&
+        !currentQuery.isError &&
+        items.length === 0 &&
+        (isMyTab && hasActiveFilters ? (
           <Alert
             severity="info"
             action={
@@ -278,8 +281,10 @@ export default function RecipesPage() {
             По фильтрам ничего не найдено.
           </Alert>
         ) : isMyTab ? (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <MenuBookIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <Paper sx={{ p: 4, textAlign: "center" }}>
+            <MenuBookIcon
+              sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
+            />
             <Typography variant="h5" gutterBottom>
               Пока нет рецептов
             </Typography>
@@ -298,42 +303,41 @@ export default function RecipesPage() {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
               С чего начать:
             </Typography>
-            <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ justifyContent: "center", flexWrap: "wrap" }}
+            >
               <Chip label="Овсянка с молоком" size="small" />
               <Chip label="Курица с гречкой" size="small" />
               <Chip label="Творог с мёдом" size="small" />
             </Stack>
           </Paper>
         ) : (
-          <Alert severity="info">
-            Пока нет публичных рецептов.
-          </Alert>
-        )
-      )}
+          <Alert severity="info">Пока нет публичных рецептов.</Alert>
+        ))}
 
       {!currentQuery.isLoading && items.length > 0 && (
         <Box
           sx={{
-            display: 'grid',
+            display: "grid",
             gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
             },
             gap: 2,
           }}
         >
           {items.map((recipe) => (
             <Card key={recipe.id}>
-              <CardActionArea
-                onClick={() => navigate(`/recipes/${recipe.id}`)}
-              >
+              <CardActionArea onClick={() => navigate(`/recipes/${recipe.id}`)}>
                 <CardContent>
                   <Stack
                     direction="row"
                     sx={{
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
                       mb: 1,
                     }}
                   >
@@ -344,25 +348,25 @@ export default function RecipesPage() {
                       size="small"
                       label={recipe.visibility}
                       color={
-                        recipe.visibility === 'PUBLIC' ? 'success' : 'default'
+                        recipe.visibility === "PUBLIC" ? "success" : "default"
                       }
                     />
                   </Stack>
 
-                 {recipe.category && (
-                   <Typography
-                     variant="body2"
-                     color="text.secondary"
-                     sx={{ mb: 1 }}
-                   >
-                     {mealTypeLabel(recipe.category)}
-                   </Typography>
-                 )}
+                  {recipe.category && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      {mealTypeLabel(recipe.category)}
+                    </Typography>
+                  )}
 
                   <Typography variant="body2" color="text.secondary">
                     {recipe.totalCalories != null
                       ? `${roundNutrient(recipe.totalCalories)} ккал`
-                      : '—'}
+                      : "—"}
                   </Typography>
                 </CardContent>
               </CardActionArea>
@@ -372,7 +376,7 @@ export default function RecipesPage() {
       )}
 
       {isMyTab && totalPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <Pagination
             count={totalPages}
             page={page}
@@ -382,10 +386,7 @@ export default function RecipesPage() {
         </Box>
       )}
 
-      <RecipeFormDialog
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-      />
+      <RecipeFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
     </Box>
   );
 }

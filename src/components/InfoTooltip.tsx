@@ -1,6 +1,6 @@
-import { Tooltip, IconButton, Box } from '@mui/material';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import type { ReactNode } from 'react';
+import { Tooltip, IconButton, Box } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import type { ReactNode } from "react";
 
 interface InfoTooltipProps {
   /** Текст или JSX подсказки */
@@ -18,7 +18,7 @@ interface InfoTooltipProps {
 export default function InfoTooltip({
   title,
   size = 16,
-  color = 'text.secondary',
+  color = "text.secondary",
 }: InfoTooltipProps) {
   return (
     <Tooltip
@@ -29,7 +29,7 @@ export default function InfoTooltip({
         tooltip: {
           sx: {
             maxWidth: 320,
-            fontSize: '0.85rem',
+            fontSize: "0.85rem",
           },
         },
       }}
@@ -64,7 +64,7 @@ export const tooltips = {
       <br />
       <br />
       <b>Что делать:</b>
-      <ul style={{ margin: '4px 0', paddingLeft: 18 }}>
+      <ul style={{ margin: "4px 0", paddingLeft: 18 }}>
         <li>Следить за обхватом талии (&lt; 80 см для женщин)</li>
         <li>Сохранять мышцы (силовые 2–3 раза/нед)</li>
         <li>Белок 1.2–1.6 г/кг веса</li>
@@ -77,7 +77,7 @@ export const tooltips = {
       <b>Дневная норма калорий</b>
       <br />
       Рассчитана по формуле Миффлина–Сан Жеора с учётом:
-      <ul style={{ margin: '4px 0', paddingLeft: 18 }}>
+      <ul style={{ margin: "4px 0", paddingLeft: 18 }}>
         <li>пола, возраста, роста, веса</li>
         <li>уровня активности</li>
         <li>цели (похудеть / поддерживать / набрать)</li>
@@ -93,7 +93,7 @@ export const tooltips = {
       <br />
       <br />
       <b>Норма:</b>
-      <ul style={{ margin: '4px 0', paddingLeft: 18 }}>
+      <ul style={{ margin: "4px 0", paddingLeft: 18 }}>
         <li>Поддержание: 1.2–1.6 г/кг</li>
         <li>Похудение: 1.8–2.2 г/кг</li>
         <li>Набор массы: 1.6–2.0 г/кг</li>

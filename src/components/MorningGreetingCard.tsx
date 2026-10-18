@@ -1,18 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardContent,
-  Stack,
-  Typography,
-} from '@mui/material';
-import WbTwilightIcon from '@mui/icons-material/WbTwilight';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
-import NightsStayIcon from '@mui/icons-material/NightsStay';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useNavigate } from "react-router-dom";
+import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import WbTwilightIcon from "@mui/icons-material/WbTwilight";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import NightsStayIcon from "@mui/icons-material/NightsStay";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-import { useMealPlans } from '../hooks/useMealPlans';
-import { useCalendar } from '../hooks/useStats';
+import { useMealPlans } from "../hooks/useMealPlans";
+import { useCalendar } from "../hooks/useStats";
 
 interface Props {
   isGoalsNotFound: boolean;
@@ -21,31 +15,43 @@ interface Props {
 function getGreetingData() {
   const h = new Date().getHours();
   if (h >= 5 && h < 12) {
-    return { text: 'Доброе утро', Icon: WbTwilightIcon, color: 'warning' as const };
+    return {
+      text: "Доброе утро",
+      Icon: WbTwilightIcon,
+      color: "warning" as const,
+    };
   }
   if (h >= 12 && h < 18) {
-    return { text: 'Добрый день', Icon: WbSunnyIcon, color: 'warning' as const };
+    return {
+      text: "Добрый день",
+      Icon: WbSunnyIcon,
+      color: "warning" as const,
+    };
   }
   if (h >= 18 && h < 23) {
-    return { text: 'Добрый вечер', Icon: WbTwilightIcon, color: 'info' as const };
+    return {
+      text: "Добрый вечер",
+      Icon: WbTwilightIcon,
+      color: "info" as const,
+    };
   }
-  return { text: 'Доброй ночи', Icon: NightsStayIcon, color: 'info' as const };
+  return { text: "Доброй ночи", Icon: NightsStayIcon, color: "info" as const };
 }
 
 export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   const navigate = useNavigate();
   const getMealLabel = () => {
-      const hour = new Date().getHours();
-      if (hour >= 5 && hour < 12) return 'Записать завтрак';
-      if (hour >= 12 && hour < 18) return 'Записать обед';
-      return 'Записать ужин';
-    };
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Записать завтрак";
+    if (hour >= 12 && hour < 18) return "Записать обед";
+    return "Записать ужин";
+  };
 
   const today = (() => {
     const now = new Date();
     const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
     return { iso: `${y}-${m}-${d}`, month: `${y}-${m}` };
   })();
 
@@ -57,14 +63,22 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   );
   const streak = calendarQuery.data?.currentStreak ?? 0;
 
-  const { text: greetingText, Icon: GreetingIcon, color: iconColor } = getGreetingData();
+  const {
+    text: greetingText,
+    Icon: GreetingIcon,
+    color: iconColor,
+  } = getGreetingData();
 
   // Сценарий 1 — нет цели
   if (isGoalsNotFound) {
     return (
-      <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'primary.main' }}>
+      <Card sx={{ mb: 3, borderLeft: 4, borderColor: "primary.main" }}>
         <CardContent>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: "center", mb: 1 }}
+          >
             <GreetingIcon color={iconColor} />
             <Typography variant="h6">{greetingText}</Typography>
           </Stack>
@@ -75,7 +89,7 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
           <Button
             variant="contained"
             endIcon={<ArrowForwardIcon />}
-            onClick={() => navigate('/goals')}
+            onClick={() => navigate("/goals")}
           >
             Поставить цель
           </Button>
@@ -87,9 +101,13 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   // Сценарий 2 — есть план
   if (todayPlan && todayPlan.items?.length) {
     return (
-      <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'success.main' }}>
+      <Card sx={{ mb: 3, borderLeft: 4, borderColor: "success.main" }}>
         <CardContent>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: "center", mb: 1 }}
+          >
             <GreetingIcon color={iconColor} />
             <Typography variant="h6">{greetingText}</Typography>
           </Stack>
@@ -99,7 +117,7 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
           <Button
             variant="contained"
             endIcon={<ArrowForwardIcon />}
-                      onClick={() => navigate('/meal-plan')}
+            onClick={() => navigate("/meal-plan")}
           >
             Открыть план
           </Button>
@@ -110,16 +128,16 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
 
   // Сценарий 3 — streak / нет записей
   return (
-    <Card sx={{ mb: 3, borderLeft: 4, borderColor: 'warning.main' }}>
+    <Card sx={{ mb: 3, borderLeft: 4, borderColor: "warning.main" }}>
       <CardContent>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
           <GreetingIcon color={iconColor} />
           <Typography variant="h6">{greetingText}</Typography>
         </Stack>
         {streak > 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            🔥 {streak} {streak === 1 ? 'день' : streak < 5 ? 'дня' : 'дней'} подряд.
-            Молодец. Давай ещё один?
+            🔥 {streak} {streak === 1 ? "день" : streak < 5 ? "дня" : "дней"}{" "}
+            подряд. Молодец. Давай ещё один?
           </Typography>
         ) : (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -129,7 +147,7 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
         <Button
           variant="contained"
           endIcon={<ArrowForwardIcon />}
-          onClick={() => navigate('/diary')}
+          onClick={() => navigate("/diary")}
         >
           {getMealLabel()}
         </Button>

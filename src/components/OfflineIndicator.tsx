@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Alert } from '@mui/material';
+import { useEffect, useState } from "react";
+import { Alert } from "@mui/material";
 
 export default function OfflineIndicator() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
@@ -8,12 +8,12 @@ export default function OfflineIndicator() {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 

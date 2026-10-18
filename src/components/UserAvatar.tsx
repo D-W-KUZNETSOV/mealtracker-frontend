@@ -1,18 +1,18 @@
-import { Avatar } from '@mui/material';
-import { getImageFullUrl } from '../utils/imageUrl';
+import { Avatar } from "@mui/material";
+import { getImageFullUrl } from "../utils/imageUrl";
 
 // ============================================================
 // Утилита: подбираем цвет по username (детерминированно).
 // ============================================================
 const AVATAR_COLORS = [
-  '#2e7d32', // зелёный
-  '#1976d2', // синий
-  '#d32f2f', // красный
-  '#f57c00', // оранжевый
-  '#7b1fa2', // пурпурный
-  '#00796b', // тёмно-зелёный
-  '#5d4037', // коричневый
-  '#c2185b', // розовый
+  "#2e7d32", // зелёный
+  "#1976d2", // синий
+  "#d32f2f", // красный
+  "#f57c00", // оранжевый
+  "#7b1fa2", // пурпурный
+  "#00796b", // тёмно-зелёный
+  "#5d4037", // коричневый
+  "#c2185b", // розовый
 ];
 
 function pickColor(seed: string): string {
@@ -26,7 +26,7 @@ function pickColor(seed: string): string {
 
 function pickInitials(username: string): string {
   const trimmed = username.trim();
-  if (!trimmed) return '?';
+  if (!trimmed) return "?";
   return trimmed[0].toUpperCase();
 }
 
@@ -53,11 +53,7 @@ export default function UserAvatar({
 
   if (fullUrl) {
     return (
-      <Avatar
-        src={fullUrl}
-        alt={username}
-        sx={{ width: size, height: size }}
-      />
+      <Avatar src={fullUrl} alt={username} sx={{ width: size, height: size }} />
     );
   }
 

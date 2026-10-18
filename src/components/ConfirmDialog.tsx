@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-} from '@mui/material';
+} from "@mui/material";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -26,8 +26,8 @@ export default function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Подтвердить',
-  cancelLabel = 'Отмена',
+  confirmLabel = "Подтвердить",
+  cancelLabel = "Отмена",
   loading = false,
   onConfirm,
   onCancel,

@@ -1,5 +1,5 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
 
 // ============================================================
 // Оборачивает защищённые маршруты.

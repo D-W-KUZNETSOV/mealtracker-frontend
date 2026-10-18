@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -6,14 +6,14 @@ import {
   CircularProgress,
   Stack,
   Typography,
-} from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useSnackbar } from "notistack";
 
-import { useImageUpload } from '../hooks/useImages';
-import { getImageFullUrl } from '../utils/imageUrl';
-import type { ApiError } from '../types/api';
+import { useImageUpload } from "../hooks/useImages";
+import { getImageFullUrl } from "../utils/imageUrl";
+import type { ApiError } from "../types/api";
 
 interface ImageUploadProps {
   /** Текущий URL картинки (относительный) — из бэка */
@@ -33,7 +33,7 @@ interface ImageUploadProps {
 export default function ImageUpload({
   value,
   onChange,
-  label = 'Загрузить изображение',
+  label = "Загрузить изображение",
   previewMaxHeight = 240,
 }: ImageUploadProps) {
   const { enqueueSnackbar } = useSnackbar();
@@ -48,37 +48,35 @@ export default function ImageUpload({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     // Сброс input, чтобы повторный выбор того же файла сработал
-    e.target.value = '';
+    e.target.value = "";
 
     if (!file) return;
 
     // Проверка типа на фронте (JPG/PNG)
-    const okTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const okTypes = ["image/jpeg", "image/jpg", "image/png"];
     if (!okTypes.includes(file.type)) {
-      setError('Поддерживаются только JPG и PNG');
+      setError("Поддерживаются только JPG и PNG");
       return;
     }
 
     // Проверка размера (макс 5 МБ — на всякий случай; бэк может ограничивать меньше)
     if (file.size > 5 * 1024 * 1024) {
-      setError('Файл слишком большой (макс 5 МБ)');
+      setError("Файл слишком большой (макс 5 МБ)");
       return;
     }
 
     try {
       const result = await uploadMutation.mutateAsync(file);
       onChange(result.imageUrl);
-      enqueueSnackbar('Изображение загружено', { variant: 'success' });
+      enqueueSnackbar("Изображение загружено", { variant: "success" });
     } catch (err) {
       const apiError = err as ApiError;
-      const message = apiError?.message || 'Ошибка загрузки изображения';
+      const message = apiError?.message || "Ошибка загрузки изображения";
       setError(message);
-      enqueueSnackbar(message, { variant: 'error' });
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
@@ -92,9 +90,9 @@ export default function ImageUpload({
       {fullUrl ? (
         <Box
           sx={{
-            position: 'relative',
-            display: 'inline-block',
-            maxWidth: '100%',
+            position: "relative",
+            display: "inline-block",
+            maxWidth: "100%",
           }}
         >
           <Box
@@ -102,10 +100,10 @@ export default function ImageUpload({
             src={fullUrl}
             alt="Изображение"
             sx={{
-              maxWidth: '100%',
+              maxWidth: "100%",
               maxHeight: previewMaxHeight,
               borderRadius: 1,
-              display: 'block',
+              display: "block",
             }}
           />
           <Button
@@ -122,11 +120,11 @@ export default function ImageUpload({
       ) : (
         <Box
           sx={{
-            border: '2px dashed',
-            borderColor: 'divider',
+            border: "2px dashed",
+            borderColor: "divider",
             borderRadius: 1,
             p: 3,
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -144,7 +142,7 @@ export default function ImageUpload({
             onClick={handleChooseFile}
             disabled={uploadMutation.isPending}
           >
-            {uploadMutation.isPending ? 'Загрузка...' : label}
+            {uploadMutation.isPending ? "Загрузка..." : label}
           </Button>
         </Box>
       )}
@@ -154,7 +152,7 @@ export default function ImageUpload({
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png"
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         onChange={handleFileChange}
       />
 

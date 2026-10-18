@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useState } from "react";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Box,
   Button,
@@ -12,15 +12,15 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useAuthStore } from '../store/authStore';
-import type { ApiError } from '../types/api';
+import { useAuthStore } from "../store/authStore";
+import type { ApiError } from "../types/api";
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Введите email или имя пользователя'),
-  password: z.string().min(1, 'Введите пароль'),
+  username: z.string().min(1, "Введите email или имя пользователя"),
+  password: z.string().min(1, "Введите пароль"),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   // Куда вернуть пользователя после логина
   const from =
-    (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+    (location.state as { from?: { pathname: string } })?.from?.pathname || "/";
 
   const {
     register,
@@ -42,86 +42,89 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: '', password: '' },
+    defaultValues: { username: "", password: "" },
   });
 
-    const onSubmit = async (data: LoginForm) => {
-      setSubmitting(true);
-      try {
-        await login(data);
-        enqueueSnackbar('Вход выполнен', { variant: 'success' });
-        navigate(from, { replace: true });
-      } catch (err) {
-        const apiError = err as ApiError;
+  const onSubmit = async (data: LoginForm) => {
+    setSubmitting(true);
+    try {
+      await login(data);
+      enqueueSnackbar("Вход выполнен", { variant: "success" });
+      navigate(from, { replace: true });
+    } catch (err) {
+      const apiError = err as ApiError;
 
-        if (!navigator.onLine || apiError.code === 'NETWORK_ERROR' || apiError.code === 'OFFLINE') {
-          enqueueSnackbar('Нет интернета. Проверь соединение.', { variant: 'warning' });
-        } else {
-          enqueueSnackbar(apiError.message || 'Ошибка входа', {
-            variant: 'error',
-          });
-        }
-      } finally {
-        setSubmitting(false);
+      if (
+        !navigator.onLine ||
+        apiError.code === "NETWORK_ERROR" ||
+        apiError.code === "OFFLINE"
+      ) {
+        enqueueSnackbar("Нет интернета. Проверь соединение.", {
+          variant: "warning",
+        });
+      } else {
+        enqueueSnackbar(apiError.message || "Ошибка входа", {
+          variant: "error",
+        });
       }
-    };
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
+      <Card sx={{ maxWidth: 400, width: "100%" }}>
         <CardContent>
           <Typography variant="h4" sx={{ fontWeight: 600 }} gutterBottom>
             Баланс
           </Typography>
-         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
             Войдите в свой аккаунт
           </Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
-               <TextField
-                 label="Email"
-                 fullWidth
-                 {...register('username')}
-                 error={!!errors.username}
-                 helperText={errors.username?.message || 'Введите ваш email'}
-                 />
-                           <TextField
-                             label="Пароль"
-                             type="password"
-                             fullWidth
-                             {...register('password')}
-                             error={!!errors.password}
-                             helperText={errors.password?.message}
-                           />
-                           <Button
-                             type="submit"
-                             variant="contained"
-                             fullWidth
-                             disabled={submitting}
-                           >
-                             {submitting ? 'Вход...' : 'Войти'}
-                           </Button>
-                           <Typography
-                             variant="body2"
-                             sx={{ textAlign: 'right', mt: -1 }}
-                           >
-                             <Link component={RouterLink} to="/forgot-password">
-                               Забыли пароль?
-                             </Link>
-                           </Typography>
-                         </Stack>
-                       </form>
+              <TextField
+                label="Email"
+                fullWidth
+                {...register("username")}
+                error={!!errors.username}
+                helperText={errors.username?.message || "Введите ваш email"}
+              />
+              <TextField
+                label="Пароль"
+                type="password"
+                fullWidth
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={submitting}
+              >
+                {submitting ? "Вход..." : "Войти"}
+              </Button>
+              <Typography variant="body2" sx={{ textAlign: "right", mt: -1 }}>
+                <Link component={RouterLink} to="/forgot-password">
+                  Забыли пароль?
+                </Link>
+              </Typography>
+            </Stack>
+          </form>
 
-          <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
-            Нет аккаунта?{' '}
+          <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            Нет аккаунта?{" "}
             <Link component={RouterLink} to="/register">
               Зарегистрироваться
             </Link>
@@ -130,12 +133,12 @@ export default function LoginPage() {
             variant="body2"
             sx={{
               mt: 3,
-              textAlign: 'center',
-              fontStyle: 'italic',
+              textAlign: "center",
+              fontStyle: "italic",
               fontWeight: 400,
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              color: 'text.secondary',
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              color: "text.secondary",
             }}
           >
             Баланс в твоих руках

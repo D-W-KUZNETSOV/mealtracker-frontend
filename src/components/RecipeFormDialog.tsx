@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -22,20 +22,21 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';import { useSnackbar } from 'notistack';
-import ImageUpload from './ImageUpload';
-import IngredientFormDialog from './IngredientFormDialog';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { useSnackbar } from "notistack";
+import ImageUpload from "./ImageUpload";
+import IngredientFormDialog from "./IngredientFormDialog";
 
-import { useCreateRecipe, useUpdateRecipe } from '../hooks/useRecipes';
+import { useCreateRecipe, useUpdateRecipe } from "../hooks/useRecipes";
 import {
   useBaseIngredients,
   useCreateIngredient,
   useMyIngredients,
-} from '../hooks/useIngredients';
+} from "../hooks/useIngredients";
 import type {
   ApiError,
   IngredientDto,
@@ -43,8 +44,8 @@ import type {
   RecipeRequest,
   RecipeSummaryDto,
   UnitType,
-} from '../types/api';
-import { roundNutrient } from '../types/api';
+} from "../types/api";
+import { roundNutrient } from "../types/api";
 
 // ============================================================
 // Строка ингредиента в форме (локальная структура)
@@ -65,15 +66,13 @@ interface RecipeFormDialogProps {
 }
 
 const CATEGORIES = [
-  { value: 'BREAKFAST', label: 'Завтрак' },
-  { value: 'LUNCH', label: 'Обед' },
-  { value: 'DINNER', label: 'Ужин' },
-  { value: 'SNACK', label: 'Перекус' },
-  { value: 'DESSERT', label: 'Десерт' },
-  { value: 'DRINK', label: 'Напиток' },
+  { value: "BREAKFAST", label: "Завтрак" },
+  { value: "LUNCH", label: "Обед" },
+  { value: "DINNER", label: "Ужин" },
+  { value: "SNACK", label: "Перекус" },
+  { value: "DESSERT", label: "Десерт" },
+  { value: "DRINK", label: "Напиток" },
 ] as const;
-
-
 
 export default function RecipeFormDialog({
   open,
@@ -88,7 +87,7 @@ export default function RecipeFormDialog({
   const activeMutation = isEdit ? updateMutation : createMutation;
   const createIngredientMutation = useCreateIngredient();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Загружаем ингредиенты: мои + базовые
   const myIngredientsQuery = useMyIngredients();
@@ -103,68 +102,71 @@ export default function RecipeFormDialog({
   );
 
   // ---------- Состояние формы ----------
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [servings, setServings] = useState<number>(1);
-  const [description, setDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [visibility, setVisibility] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE');
+  const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [visibility, setVisibility] = useState<"PUBLIC" | "PRIVATE">("PRIVATE");
   const [rows, setRows] = useState<IngredientRow[]>([]);
-    const [steps, setSteps] = useState<string[]>([]);
+  const [steps, setSteps] = useState<string[]>([]);
 
   // ---------- Состояние для создания ингредиента «на лету» ----------
   const [ingredientDialogOpen, setIngredientDialogOpen] = useState(false);
-  const [newIngredientName, setNewIngredientName] = useState('');
+  const [newIngredientName, setNewIngredientName] = useState("");
   const [targetRowTempId, setTargetRowTempId] = useState<number | null>(null);
   const [inputValueByRow, setInputValueByRow] = useState<
     Record<number, string>
   >({});
 
-       // ---------- Сброс формы при открытии ----------
-       useEffect(() => {
-         if (!open) return;
+  // ---------- Сброс формы при открытии ----------
+  useEffect(() => {
+    if (!open) return;
 
-         if (isEdit && initialData) {
-           setName(initialData.name);
-           console.log('initialData.category:', initialData.category);
-           console.log('found:', CATEGORIES.find((c) => c.value === initialData.category));
-           setCategory(
-             CATEGORIES.find((c) => c.value === initialData.category)?.value ?? null
-           );
-           setDescription(initialData.description ?? '');
-           setImageUrl(initialData.imageUrl ?? '');
-           setVisibility(initialData.visibility);
-           setServings(initialData.servings ?? 1);
-           setRows(
-             initialData.ingredients.map((ing, idx) => ({
-               tempId: Date.now() + idx,
-               ingredientId: ing.ingredientId,
-               weightInGrams: ing.quantityGrams,
-               quantity: ing.quantityGrams,
-               unit: 'GRAM',
-             })),
-           );
-           setSteps(initialData.steps ?? []);
-         } else {
-           setName('');
-           setCategory(null);
-           setDescription('');
-           setImageUrl('');
-           setVisibility('PRIVATE');
-           setServings(1);
-           setRows([
-             {
-               tempId: Date.now(),
-               ingredientId: null,
-               weightInGrams: 100,
-               quantity: 100,
-               unit: 'GRAM',
-             },
-           ]);
-           setSteps([]);
-         }
-         setInputValueByRow({});
-       }, [open, isEdit, initialData]);
+    if (isEdit && initialData) {
+      setName(initialData.name);
+      console.log("initialData.category:", initialData.category);
+      console.log(
+        "found:",
+        CATEGORIES.find((c) => c.value === initialData.category),
+      );
+      setCategory(
+        CATEGORIES.find((c) => c.value === initialData.category)?.value ?? null,
+      );
+      setDescription(initialData.description ?? "");
+      setImageUrl(initialData.imageUrl ?? "");
+      setVisibility(initialData.visibility);
+      setServings(initialData.servings ?? 1);
+      setRows(
+        initialData.ingredients.map((ing, idx) => ({
+          tempId: Date.now() + idx,
+          ingredientId: ing.ingredientId,
+          weightInGrams: ing.quantityGrams,
+          quantity: ing.quantityGrams,
+          unit: "GRAM",
+        })),
+      );
+      setSteps(initialData.steps ?? []);
+    } else {
+      setName("");
+      setCategory(null);
+      setDescription("");
+      setImageUrl("");
+      setVisibility("PRIVATE");
+      setServings(1);
+      setRows([
+        {
+          tempId: Date.now(),
+          ingredientId: null,
+          weightInGrams: 100,
+          quantity: 100,
+          unit: "GRAM",
+        },
+      ]);
+      setSteps([]);
+    }
+    setInputValueByRow({});
+  }, [open, isEdit, initialData]);
   // ---------- Работа со строками ингредиентов ----------
   const handleAddRow = () => {
     setRows((prev) => [
@@ -174,7 +176,7 @@ export default function RecipeFormDialog({
         ingredientId: null,
         weightInGrams: 100,
         quantity: 100,
-        unit: 'GRAM',
+        unit: "GRAM",
       },
     ]);
   };
@@ -190,128 +192,128 @@ export default function RecipeFormDialog({
 
   const handleRowChange = (
     tempId: number,
-    patch: Partial<Omit<IngredientRow, 'tempId'>>,
+    patch: Partial<Omit<IngredientRow, "tempId">>,
   ) => {
     setRows((prev) =>
       prev.map((r) => (r.tempId === tempId ? { ...r, ...patch } : r)),
     );
   };
-    const MAX_STEPS = 30;
-    const MAX_STEP_LEN = 500;
+  const MAX_STEPS = 30;
+  const MAX_STEP_LEN = 500;
 
-    const handleAddStep = () => {
-      if (steps.length >= MAX_STEPS) {
-        enqueueSnackbar(`Максимум ${MAX_STEPS} шагов`, { variant: 'warning' });
-        return;
-      }
-      setSteps((prev) => [...prev, '']);
-    };
+  const handleAddStep = () => {
+    if (steps.length >= MAX_STEPS) {
+      enqueueSnackbar(`Максимум ${MAX_STEPS} шагов`, { variant: "warning" });
+      return;
+    }
+    setSteps((prev) => [...prev, ""]);
+  };
 
-    const handleRemoveStep = (idx: number) => {
-      setSteps((prev) => prev.filter((_, i) => i !== idx));
-    };
+  const handleRemoveStep = (idx: number) => {
+    setSteps((prev) => prev.filter((_, i) => i !== idx));
+  };
 
-    const handleStepChange = (idx: number, value: string) => {
-      if (value.length > MAX_STEP_LEN) return;
-      setSteps((prev) => prev.map((s, i) => (i === idx ? value : s)));
-    };
+  const handleStepChange = (idx: number, value: string) => {
+    if (value.length > MAX_STEP_LEN) return;
+    setSteps((prev) => prev.map((s, i) => (i === idx ? value : s)));
+  };
 
-    const handleStepMove = (idx: number, dir: -1 | 1) => {
-      const target = idx + dir;
-      if (target < 0 || target >= steps.length) return;
-      setSteps((prev) => {
-        const copy = [...prev];
-        [copy[idx], copy[target]] = [copy[target], copy[idx]];
-        return copy;
-      });
-    };
+  const handleStepMove = (idx: number, dir: -1 | 1) => {
+    const target = idx + dir;
+    if (target < 0 || target >= steps.length) return;
+    setSteps((prev) => {
+      const copy = [...prev];
+      [copy[idx], copy[target]] = [copy[target], copy[idx]];
+      return copy;
+    });
+  };
 
   // ============================================================
   // Единицы измерения
   // ============================================================
   const getUnitLabel = (row: IngredientRow, ing?: IngredientDto): string => {
-    const unit = row.unit ?? ing?.unitType ?? 'GRAM';
+    const unit = row.unit ?? ing?.unitType ?? "GRAM";
     switch (unit) {
-      case 'GRAM':
-        return 'Вес, г';
-      case 'ML':
-        return 'Объём, мл';
-      case 'PIECE':
-        return 'Кол-во, шт';
-      case 'TBSP':
-        return 'Кол-во, ст.л.';
-      case 'TSP':
-        return 'Кол-во, ч.л.';
+      case "GRAM":
+        return "Вес, г";
+      case "ML":
+        return "Объём, мл";
+      case "PIECE":
+        return "Кол-во, шт";
+      case "TBSP":
+        return "Кол-во, ст.л.";
+      case "TSP":
+        return "Кол-во, ч.л.";
       default:
-        return 'Кол-во';
+        return "Кол-во";
     }
   };
 
-   const handleQuantityChange = (
-     tempId: number,
-     quantity: number,
-     ing?: IngredientDto,
-   ) => {
-     const row = rows.find((r) => r.tempId === tempId);
-     const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
+  const handleQuantityChange = (
+    tempId: number,
+    quantity: number,
+    ing?: IngredientDto,
+  ) => {
+    const row = rows.find((r) => r.tempId === tempId);
+    const unit = row?.unit ?? ing?.unitType ?? "GRAM";
 
-     let weightInGrams = quantity;
+    let weightInGrams = quantity;
 
-     if (unit === 'PIECE' && ing?.unitWeightGrams != null) {
-       weightInGrams = quantity * ing.unitWeightGrams;
-     } else if (unit === 'TBSP' && ing?.gramsPerTbsp != null) {
-       // зачем: переводим столовые ложки в граммы
-       weightInGrams = quantity * ing.gramsPerTbsp;
-     } else if (unit === 'TSP' && ing?.gramsPerTsp != null) {
-       // зачем: переводим чайные ложки в граммы
-       weightInGrams = quantity * ing.gramsPerTsp;
-     } else if (unit === 'ML') {
-       // зачем: для мл считаем 1:1
-       weightInGrams = quantity;
-     }
+    if (unit === "PIECE" && ing?.unitWeightGrams != null) {
+      weightInGrams = quantity * ing.unitWeightGrams;
+    } else if (unit === "TBSP" && ing?.gramsPerTbsp != null) {
+      // зачем: переводим столовые ложки в граммы
+      weightInGrams = quantity * ing.gramsPerTbsp;
+    } else if (unit === "TSP" && ing?.gramsPerTsp != null) {
+      // зачем: переводим чайные ложки в граммы
+      weightInGrams = quantity * ing.gramsPerTsp;
+    } else if (unit === "ML") {
+      // зачем: для мл считаем 1:1
+      weightInGrams = quantity;
+    }
 
-     handleRowChange(tempId, {
-       quantity,
-       unit,
-       weightInGrams,
-     });
-   };
+    handleRowChange(tempId, {
+      quantity,
+      unit,
+      weightInGrams,
+    });
+  };
 
-   const handleUnitChange = (
-     tempId: number,
-     newUnit: UnitType,
-     ing?: IngredientDto,
-   ) => {
-     const row = rows.find((r) => r.tempId === tempId);
-     if (!row) return;
+  const handleUnitChange = (
+    tempId: number,
+    newUnit: UnitType,
+    ing?: IngredientDto,
+  ) => {
+    const row = rows.find((r) => r.tempId === tempId);
+    if (!row) return;
 
-     let quantity: number;
+    let quantity: number;
 
-     if (newUnit === 'GRAM') {
-       quantity = row.weightInGrams;
-     } else if (newUnit === 'PIECE' && ing?.unitWeightGrams != null) {
-       quantity = row.weightInGrams / ing.unitWeightGrams;
-       quantity = Math.round(quantity * 100) / 100;
-     } else if (newUnit === 'TBSP' && ing?.gramsPerTbsp != null) {
-       // зачем: переводим граммы в столовые ложки
-       quantity = row.weightInGrams / ing.gramsPerTbsp;
-       quantity = Math.round(quantity * 100) / 100;
-     } else if (newUnit === 'TSP' && ing?.gramsPerTsp != null) {
-       // зачем: переводим граммы в чайные ложки
-       quantity = row.weightInGrams / ing.gramsPerTsp;
-       quantity = Math.round(quantity * 100) / 100;
-     } else if (newUnit === 'ML') {
-       // зачем: для мл мы считаем 1:1 (плотность воды/молока ~ 1)
-       quantity = row.weightInGrams;
-     } else {
-       quantity = row.weightInGrams;
-     }
+    if (newUnit === "GRAM") {
+      quantity = row.weightInGrams;
+    } else if (newUnit === "PIECE" && ing?.unitWeightGrams != null) {
+      quantity = row.weightInGrams / ing.unitWeightGrams;
+      quantity = Math.round(quantity * 100) / 100;
+    } else if (newUnit === "TBSP" && ing?.gramsPerTbsp != null) {
+      // зачем: переводим граммы в столовые ложки
+      quantity = row.weightInGrams / ing.gramsPerTbsp;
+      quantity = Math.round(quantity * 100) / 100;
+    } else if (newUnit === "TSP" && ing?.gramsPerTsp != null) {
+      // зачем: переводим граммы в чайные ложки
+      quantity = row.weightInGrams / ing.gramsPerTsp;
+      quantity = Math.round(quantity * 100) / 100;
+    } else if (newUnit === "ML") {
+      // зачем: для мл мы считаем 1:1 (плотность воды/молока ~ 1)
+      quantity = row.weightInGrams;
+    } else {
+      quantity = row.weightInGrams;
+    }
 
-     handleRowChange(tempId, {
-       unit: newUnit,
-       quantity,
-     });
-   };
+    handleRowChange(tempId, {
+      unit: newUnit,
+      quantity,
+    });
+  };
 
   // ---------- Живой предпросмотр КБЖУ ----------
   const totals = useMemo(() => {
@@ -342,51 +344,53 @@ export default function RecipeFormDialog({
     rows.every((r) => r.ingredientId !== null && r.weightInGrams > 0);
 
   // ---------- Отправка ----------
-   const handleSubmit = async () => {
-     if (!canSubmit) {
-       enqueueSnackbar('Заполните название и все ингредиенты', {
-         variant: 'warning',
-       });
-       return;
-     }
+  const handleSubmit = async () => {
+    if (!canSubmit) {
+      enqueueSnackbar("Заполните название и все ингредиенты", {
+        variant: "warning",
+      });
+      return;
+    }
 
-     const ingredients: RecipeIngredientInput[] = rows.map((r) => ({
-       ingredientId: r.ingredientId!,
-       weightInGrams: r.weightInGrams,
-     }));
+    const ingredients: RecipeIngredientInput[] = rows.map((r) => ({
+      ingredientId: r.ingredientId!,
+      weightInGrams: r.weightInGrams,
+    }));
 
-         const payload: RecipeRequest = {
-           name: name.trim(),
-           category: category ?? undefined,
-           description: description.trim() || undefined,
-           imageUrl: imageUrl.trim() || undefined,
-           visibility,
-           servings,
-           steps: steps.map((s) => s.trim()).filter((s) => s.length > 0),   // 🆕
-           ingredients,
-         };
+    const payload: RecipeRequest = {
+      name: name.trim(),
+      category: category ?? undefined,
+      description: description.trim() || undefined,
+      imageUrl: imageUrl.trim() || undefined,
+      visibility,
+      servings,
+      steps: steps.map((s) => s.trim()).filter((s) => s.length > 0), // 🆕
+      ingredients,
+    };
 
-     try {
-       if (isEdit) {
-         await updateMutation.mutateAsync({ id: recipeId!, data: payload });
-         enqueueSnackbar('Рецепт обновлён', { variant: 'success' });
-       } else {
-         await createMutation.mutateAsync(payload);
-         enqueueSnackbar('Рецепт создан', { variant: 'success' });
-       }
-       onClose();
-     } catch (err) {
-       const apiError = err as ApiError;
-       enqueueSnackbar(apiError.message || 'Ошибка сохранения', {
-         variant: 'error',
-       });
-     }
-   };
+    try {
+      if (isEdit) {
+        await updateMutation.mutateAsync({ id: recipeId!, data: payload });
+        enqueueSnackbar("Рецепт обновлён", { variant: "success" });
+      } else {
+        await createMutation.mutateAsync(payload);
+        enqueueSnackbar("Рецепт создан", { variant: "success" });
+      }
+      onClose();
+    } catch (err) {
+      const apiError = err as ApiError;
+      enqueueSnackbar(apiError.message || "Ошибка сохранения", {
+        variant: "error",
+      });
+    }
+  };
 
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>{isEdit ? 'Редактировать рецепт' : 'Создать рецепт'}</DialogTitle>
+        <DialogTitle>
+          {isEdit ? "Редактировать рецепт" : "Создать рецепт"}
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             {/* Название */}
@@ -400,31 +404,33 @@ export default function RecipeFormDialog({
             />
 
             {/* Категория */}
-           <Autocomplete
-             options={CATEGORIES}
-             getOptionLabel={(o) => (typeof o === 'string' ? o : o.label)}
-             value={CATEGORIES.find((c) => c.value === category) ?? null}
-             onChange={(_, v) => {
-               if (v == null || typeof v === 'string') {
-                 setCategory(null);
-               } else {
-                 setCategory(v.value);
-               }
-             }}
-             isOptionEqualToValue={(o, v) => o.value === v.value}
-             renderInput={(params) => (
-               <TextField {...params} label="Категория" />
-             )}
-           />
-           <TextField
-             label="На сколько порций"
-             type="number"
-             fullWidth
-             value={servings}
-             onChange={(e) => setServings(Math.max(1, Number(e.target.value) || 1))}
-             onFocus={(e) => e.target.select()}
-             slotProps={{ htmlInput: { min: 1, step: 1 } }}
-           />
+            <Autocomplete
+              options={CATEGORIES}
+              getOptionLabel={(o) => (typeof o === "string" ? o : o.label)}
+              value={CATEGORIES.find((c) => c.value === category) ?? null}
+              onChange={(_, v) => {
+                if (v == null || typeof v === "string") {
+                  setCategory(null);
+                } else {
+                  setCategory(v.value);
+                }
+              }}
+              isOptionEqualToValue={(o, v) => o.value === v.value}
+              renderInput={(params) => (
+                <TextField {...params} label="Категория" />
+              )}
+            />
+            <TextField
+              label="На сколько порций"
+              type="number"
+              fullWidth
+              value={servings}
+              onChange={(e) =>
+                setServings(Math.max(1, Number(e.target.value) || 1))
+              }
+              onFocus={(e) => e.target.select()}
+              slotProps={{ htmlInput: { min: 1, step: 1 } }}
+            />
 
             {/* Описание */}
             <TextField
@@ -439,7 +445,7 @@ export default function RecipeFormDialog({
             {/* Картинка рецепта */}
             <ImageUpload
               value={imageUrl || null}
-              onChange={(url) => setImageUrl(url ?? '')}
+              onChange={(url) => setImageUrl(url ?? "")}
               label="Загрузить фото рецепта"
             />
 
@@ -450,7 +456,7 @@ export default function RecipeFormDialog({
                 row
                 value={visibility}
                 onChange={(e) =>
-                  setVisibility(e.target.value as 'PUBLIC' | 'PRIVATE')
+                  setVisibility(e.target.value as "PUBLIC" | "PRIVATE")
                 }
               >
                 <FormControlLabel
@@ -472,8 +478,8 @@ export default function RecipeFormDialog({
             <Stack
               direction="row"
               sx={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
               <Typography variant="h6">Ингредиенты</Typography>
@@ -502,29 +508,25 @@ export default function RecipeFormDialog({
                     : 0;
 
                   return (
-                    <Paper
-                      key={row.tempId}
-                      variant="outlined"
-                      sx={{ p: 1.5 }}
-                    >
+                    <Paper key={row.tempId} variant="outlined" sx={{ p: 1.5 }}>
                       <Stack
-                        direction={isMobile ? 'column' : 'row'}
+                        direction={isMobile ? "column" : "row"}
                         spacing={1}
-                        sx={{ alignItems: isMobile ? 'stretch' : 'center' }}
+                        sx={{ alignItems: isMobile ? "stretch" : "center" }}
                       >
                         <Autocomplete
                           options={allIngredients}
                           getOptionLabel={(o) => o.name}
                           value={ing ?? null}
                           onChange={(_, v) => {
-                            const initialUnit = v?.unitType ?? 'GRAM';
+                            const initialUnit = v?.unitType ?? "GRAM";
                             const initialQuantity =
-                              initialUnit === 'GRAM' ? row.weightInGrams : 1;
+                              initialUnit === "GRAM" ? row.weightInGrams : 1;
 
                             let initialWeightInGrams = row.weightInGrams;
                             if (
                               v &&
-                              initialUnit !== 'GRAM' &&
+                              initialUnit !== "GRAM" &&
                               v.unitWeightGrams != null
                             ) {
                               initialWeightInGrams =
@@ -544,7 +546,7 @@ export default function RecipeFormDialog({
                               {option.name}
                             </li>
                           )}
-                          inputValue={inputValueByRow[row.tempId] ?? ''}
+                          inputValue={inputValueByRow[row.tempId] ?? ""}
                           onInputChange={(_, value) =>
                             setInputValueByRow((prev) => ({
                               ...prev,
@@ -566,15 +568,14 @@ export default function RecipeFormDialog({
                                 startIcon={<AddIcon />}
                                 onClick={() => {
                                   setNewIngredientName(
-                                    inputValueByRow[row.tempId] ?? '',
+                                    inputValueByRow[row.tempId] ?? "",
                                   );
                                   setTargetRowTempId(row.tempId);
                                   setIngredientDialogOpen(true);
                                 }}
                               >
                                 Создать «
-                                {inputValueByRow[row.tempId] || 'новый'}
-                                »
+                                {inputValueByRow[row.tempId] || "новый"}»
                               </Button>
                             </Box>
                           }
@@ -588,19 +589,19 @@ export default function RecipeFormDialog({
                           )}
                           sx={{
                             flex: isMobile ? undefined : 2,
-                            width: '100%',
+                            width: "100%",
                           }}
                         />
 
                         <Stack
                           direction="row"
                           spacing={1}
-                          sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+                          sx={{ alignItems: "center", flexWrap: "wrap" }}
                         >
                           <Stack
                             direction="row"
                             spacing={0.5}
-                            sx={{ alignItems: 'center' }}
+                            sx={{ alignItems: "center" }}
                           >
                             <TextField
                               label={getUnitLabel(row, ing)}
@@ -608,16 +609,16 @@ export default function RecipeFormDialog({
                               size="small"
                               value={
                                 row.quantity === 0 || row.quantity == null
-                                  ? ''
+                                  ? ""
                                   : row.quantity
                               }
                               onChange={(e) => {
                                 const raw = e.target.value;
-                                if (raw === '') {
+                                if (raw === "") {
                                   handleQuantityChange(row.tempId, 0, ing);
                                   return;
                                 }
-                                const val = Number(raw.replace(',', '.'));
+                                const val = Number(raw.replace(",", "."));
                                 if (!Number.isNaN(val)) {
                                   handleQuantityChange(row.tempId, val, ing);
                                 }
@@ -625,19 +626,22 @@ export default function RecipeFormDialog({
                               onFocus={(e) => e.target.select()}
                               slotProps={{
                                 htmlInput: {
-                                  step: '0.1',
+                                  step: "0.1",
                                   min: 0.1,
-                                  inputMode: 'decimal',
+                                  inputMode: "decimal",
                                 },
                               }}
                               sx={{ width: isMobile ? 110 : 100 }}
                             />
 
-                           {(ing?.unitType === 'PIECE' || ing?.unitType === 'ML' || ing?.unitType === 'TBSP' || ing?.unitType === 'TSP') && (
+                            {(ing?.unitType === "PIECE" ||
+                              ing?.unitType === "ML" ||
+                              ing?.unitType === "TBSP" ||
+                              ing?.unitType === "TSP") && (
                               <ToggleButtonGroup
                                 size="small"
                                 exclusive
-                                value={row.unit ?? ing.unitType ?? 'GRAM'}
+                                value={row.unit ?? ing.unitType ?? "GRAM"}
                                 onChange={(_, v) => {
                                   if (v) {
                                     handleUnitChange(row.tempId, v, ing);
@@ -645,21 +649,24 @@ export default function RecipeFormDialog({
                                 }}
                               >
                                 <ToggleButton value="GRAM">г</ToggleButton>
-                                {ing.unitType === 'ML' && (
+                                {ing.unitType === "ML" && (
                                   <ToggleButton value="ML">мл</ToggleButton>
                                 )}
-                                {ing.unitType === 'PIECE' && (
+                                {ing.unitType === "PIECE" && (
                                   <ToggleButton value="PIECE">шт</ToggleButton>
                                 )}
                                 {/* Показываем ст.л., если она есть в базе (или если основная единица — TBSP) */}
-                                {(ing.gramsPerTbsp != null || ing.unitType === 'TBSP') && (
-                                  <ToggleButton value="TBSP">ст.л.</ToggleButton>
+                                {(ing.gramsPerTbsp != null ||
+                                  ing.unitType === "TBSP") && (
+                                  <ToggleButton value="TBSP">
+                                    ст.л.
+                                  </ToggleButton>
                                 )}
                                 {/* Показываем ч.л., если она есть в базе (или если основная единица — TSP) */}
-                                {(ing.gramsPerTsp != null || ing.unitType === 'TSP') && (
+                                {(ing.gramsPerTsp != null ||
+                                  ing.unitType === "TSP") && (
                                   <ToggleButton value="TSP">ч.л.</ToggleButton>
                                 )}
-
                               </ToggleButtonGroup>
                             )}
                           </Stack>
@@ -669,7 +676,7 @@ export default function RecipeFormDialog({
                             color="text.secondary"
                             sx={{
                               minWidth: 70,
-                              textAlign: 'right',
+                              textAlign: "right",
                               flexGrow: isMobile ? 1 : 0,
                             }}
                           >
@@ -689,88 +696,88 @@ export default function RecipeFormDialog({
                 })}
               </Stack>
             )}
-                        <Divider />
+            <Divider />
 
-                        {/* Шаги приготовления */}
-                        <Stack
-                          direction="row"
-                          sx={{
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography variant="h6">Шаги приготовления</Typography>
-                          <Button
-                            startIcon={<AddIcon />}
-                            onClick={handleAddStep}
-                            size="small"
-                            disabled={steps.length >= MAX_STEPS}
-                          >
-                            Добавить шаг
-                          </Button>
-                        </Stack>
+            {/* Шаги приготовления */}
+            <Stack
+              direction="row"
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6">Шаги приготовления</Typography>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handleAddStep}
+                size="small"
+                disabled={steps.length >= MAX_STEPS}
+              >
+                Добавить шаг
+              </Button>
+            </Stack>
 
-                        {steps.length === 0 ? (
-                          <Typography color="text.secondary" variant="body2">
-                            Шаги не добавлены
-                          </Typography>
-                        ) : (
-                          <Stack spacing={1}>
-                            {steps.map((step, idx) => (
-                              <Stack
-                                key={idx}
-                                direction="row"
-                                spacing={1}
-                                sx={{ alignItems: 'flex-start' }}
-                              >
-                                <Typography
-                                  sx={{
-                                    minWidth: 24,
-                                    pt: 1,
-                                    fontWeight: 600,
-                                    color: 'text.secondary',
-                                  }}
-                                >
-                                  {idx + 1}.
-                                </Typography>
-                                <TextField
-                                  size="small"
-                                  fullWidth
-                                  multiline
-                                  maxRows={4}
-                                  placeholder={`Шаг ${idx + 1}`}
-                                  value={step}
-                                  onChange={(e) => handleStepChange(idx, e.target.value)}
-                                  helperText={`${step.length} / ${MAX_STEP_LEN}`}
-                                />
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleStepMove(idx, -1)}
-                                  disabled={idx === 0}
-                                  title="Вверх"
-                                >
-                                  <ArrowUpwardIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => handleStepMove(idx, 1)}
-                                  disabled={idx === steps.length - 1}
-                                  title="Вниз"
-                                >
-                                  <ArrowDownwardIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => handleRemoveStep(idx)}
-                                  title="Удалить"
-                                >
-                                  <DeleteIcon fontSize="small" />
-                                </IconButton>
-                              </Stack>
-                            ))}
-                          </Stack>
-                        )}
+            {steps.length === 0 ? (
+              <Typography color="text.secondary" variant="body2">
+                Шаги не добавлены
+              </Typography>
+            ) : (
+              <Stack spacing={1}>
+                {steps.map((step, idx) => (
+                  <Stack
+                    key={idx}
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: "flex-start" }}
+                  >
+                    <Typography
+                      sx={{
+                        minWidth: 24,
+                        pt: 1,
+                        fontWeight: 600,
+                        color: "text.secondary",
+                      }}
+                    >
+                      {idx + 1}.
+                    </Typography>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      multiline
+                      maxRows={4}
+                      placeholder={`Шаг ${idx + 1}`}
+                      value={step}
+                      onChange={(e) => handleStepChange(idx, e.target.value)}
+                      helperText={`${step.length} / ${MAX_STEP_LEN}`}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => handleStepMove(idx, -1)}
+                      disabled={idx === 0}
+                      title="Вверх"
+                    >
+                      <ArrowUpwardIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleStepMove(idx, 1)}
+                      disabled={idx === steps.length - 1}
+                      title="Вниз"
+                    >
+                      <ArrowDownwardIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleRemoveStep(idx)}
+                      title="Удалить"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                ))}
+              </Stack>
+            )}
 
             {/* Итого КБЖУ */}
             <Paper variant="outlined" sx={{ p: 2 }}>
@@ -818,22 +825,22 @@ export default function RecipeFormDialog({
             </Paper>
           </Stack>
         </DialogContent>
-               <DialogActions>
-                 <Button onClick={onClose} disabled={activeMutation.isPending}>
-                   Отмена
-                 </Button>
-                 <Button
-                   variant="contained"
-                   onClick={handleSubmit}
-                   disabled={!canSubmit || activeMutation.isPending}
-                 >
-                   {activeMutation.isPending
-                     ? 'Сохранение...'
-                     : isEdit
-                       ? 'Сохранить'
-                       : 'Создать'}
-                 </Button>
-               </DialogActions>
+        <DialogActions>
+          <Button onClick={onClose} disabled={activeMutation.isPending}>
+            Отмена
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!canSubmit || activeMutation.isPending}
+          >
+            {activeMutation.isPending
+              ? "Сохранение..."
+              : isEdit
+                ? "Сохранить"
+                : "Создать"}
+          </Button>
+        </DialogActions>
       </Dialog>
 
       {/* Диалог создания нового ингредиента */}
@@ -843,7 +850,7 @@ export default function RecipeFormDialog({
         loading={createIngredientMutation.isPending}
         onClose={() => {
           setIngredientDialogOpen(false);
-          setNewIngredientName('');
+          setNewIngredientName("");
           setTargetRowTempId(null);
         }}
         onSubmit={async (data) => {
@@ -851,7 +858,7 @@ export default function RecipeFormDialog({
             const result = await createIngredientMutation.mutateAsync(data);
             const newIngredient = result.data;
             enqueueSnackbar(`Ингредиент «${newIngredient.name}» создан`, {
-              variant: 'success',
+              variant: "success",
             });
             if (targetRowTempId !== null) {
               handleRowChange(targetRowTempId, {
@@ -863,14 +870,13 @@ export default function RecipeFormDialog({
               }));
             }
             setIngredientDialogOpen(false);
-            setNewIngredientName('');
+            setNewIngredientName("");
             setTargetRowTempId(null);
           } catch (err) {
             const apiError = err as ApiError;
-            enqueueSnackbar(
-              apiError.message || 'Ошибка создания ингредиента',
-              { variant: 'error' },
-            );
+            enqueueSnackbar(apiError.message || "Ошибка создания ингредиента", {
+              variant: "error",
+            });
           }
         }}
       />

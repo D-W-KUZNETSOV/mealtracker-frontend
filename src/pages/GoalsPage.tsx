@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Alert,
   Box,
@@ -18,29 +18,29 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
 import {
   useGoals,
   useSaveGoals,
   useTargetProtein,
-} from '../hooks/useNutrition';
-import { useDailyCalories } from '../hooks/useProfile';
-import type { ApiError, GoalType } from '../types/api';
-import InfoTooltip, { tooltips } from '../components/InfoTooltip';
+} from "../hooks/useNutrition";
+import { useDailyCalories } from "../hooks/useProfile";
+import type { ApiError, GoalType } from "../types/api";
+import InfoTooltip, { tooltips } from "../components/InfoTooltip";
 
 // ============================================================
 // Схема валидации
 // ============================================================
 const goalsSchema = z.object({
   currentWeightKg: z
-    .number({ message: 'Введите число' })
-    .min(20, 'Минимум 20 кг')
-    .max(300, 'Максимум 300 кг'),
-  proteinPerKg: z.number().optional(),       // для совместимости
-  targetCalories: z.number().optional(),     // для совместимости
-  goalType: z.enum(['LOSE_WEIGHT', 'MAINTAIN', 'GAIN_MUSCLE']),
+    .number({ message: "Введите число" })
+    .min(20, "Минимум 20 кг")
+    .max(300, "Максимум 300 кг"),
+  proteinPerKg: z.number().optional(), // для совместимости
+  targetCalories: z.number().optional(), // для совместимости
+  goalType: z.enum(["LOSE_WEIGHT", "MAINTAIN", "GAIN_MUSCLE"]),
   targetProteinOverride: z.number().nullable(),
   targetCaloriesOverride: z.number().nullable(),
 });
@@ -48,18 +48,18 @@ const goalsSchema = z.object({
 type GoalsForm = z.infer<typeof goalsSchema>;
 
 const GOAL_LABELS: Record<GoalType, string> = {
-  LOSE_WEIGHT: 'Похудеть',
-  MAINTAIN: 'Поддерживать',
-  GAIN_MUSCLE: 'Набрать массу',
+  LOSE_WEIGHT: "Похудеть",
+  MAINTAIN: "Поддерживать",
+  GAIN_MUSCLE: "Набрать массу",
 };
 
 export default function GoalsPage() {
   const { enqueueSnackbar } = useSnackbar();
 
- const goalsQuery = useGoals();
- const targetProteinQuery = useTargetProtein();
- const dailyCaloriesQuery = useDailyCalories();
- const saveMutation = useSaveGoals();
+  const goalsQuery = useGoals();
+  const targetProteinQuery = useTargetProtein();
+  const dailyCaloriesQuery = useDailyCalories();
+  const saveMutation = useSaveGoals();
 
   const [autoCalories, setAutoCalories] = useState(true);
   const [autoProtein, setAutoProtein] = useState(true);
@@ -77,7 +77,7 @@ export default function GoalsPage() {
       currentWeightKg: 70,
       proteinPerKg: 1.6,
       targetCalories: 2000,
-      goalType: 'MAINTAIN',
+      goalType: "MAINTAIN",
       targetProteinOverride: null,
       targetCaloriesOverride: null,
     },
@@ -90,7 +90,7 @@ export default function GoalsPage() {
         currentWeightKg: g.currentWeightKg ?? 70,
         proteinPerKg: g.proteinPerKg ?? 1.6,
         targetCalories: g.targetCalories ?? 2000,
-        goalType: g.goalType ?? 'MAINTAIN',
+        goalType: g.goalType ?? "MAINTAIN",
         targetProteinOverride: g.targetProteinOverride ?? null,
         targetCaloriesOverride: g.targetCaloriesOverride ?? null,
       });
@@ -99,8 +99,8 @@ export default function GoalsPage() {
     }
   }, [goalsQuery.data, reset]);
 
-  const goalType = watch('goalType');
-  const currentWeight = watch('currentWeightKg');
+  const goalType = watch("goalType");
+  const currentWeight = watch("currentWeightKg");
 
   const onSubmit = async (data: GoalsForm) => {
     try {
@@ -110,22 +110,24 @@ export default function GoalsPage() {
         targetCalories: data.targetCalories ?? 2000,
         goalType: data.goalType,
         targetProteinOverride: autoProtein ? null : data.targetProteinOverride,
-        targetCaloriesOverride: autoCalories ? null : data.targetCaloriesOverride,
+        targetCaloriesOverride: autoCalories
+          ? null
+          : data.targetCaloriesOverride,
       };
       await saveMutation.mutateAsync(payload);
 
-      enqueueSnackbar('Цели сохранены', { variant: 'success' });
+      enqueueSnackbar("Цели сохранены", { variant: "success" });
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(apiError.message || 'Ошибка сохранения', {
-        variant: 'error',
+      enqueueSnackbar(apiError.message || "Ошибка сохранения", {
+        variant: "error",
       });
     }
   };
 
   if (goalsQuery.isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -148,244 +150,252 @@ export default function GoalsPage() {
         Цели КБЖУ
       </Typography>
 
-     {/* ============ Верхние карточки ============ */}
-     <Grid container spacing={3} sx={{ mb: 3 }}>
-       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-         <Card>
-           <CardContent>
-             <Typography variant="subtitle2" color="text.secondary">
-               Текущий вес
-             </Typography>
-             <Typography variant="h5">
-               {goalsQuery.data?.currentWeightKg ?? '—'} кг
-             </Typography>
-           </CardContent>
-         </Card>
-       </Grid>
+      {/* ============ Верхние карточки ============ */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Текущий вес
+              </Typography>
+              <Typography variant="h5">
+                {goalsQuery.data?.currentWeightKg ?? "—"} кг
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-         <Card>
-           <CardContent>
-             <Typography variant="subtitle2" color="text.secondary">
-               Дневная норма
-             </Typography>
-             <Typography variant="h5">
-               {dailyCaloriesQuery.data != null
-                 ? `${dailyCaloriesQuery.data} ккал`
-                 : '—'}
-             </Typography>
-           </CardContent>
-         </Card>
-       </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Дневная норма
+              </Typography>
+              <Typography variant="h5">
+                {dailyCaloriesQuery.data != null
+                  ? `${dailyCaloriesQuery.data} ккал`
+                  : "—"}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-         <Card>
-           <CardContent>
-             <Typography variant="subtitle2" color="text.secondary">
-               Целевой белок
-             </Typography>
-             <Typography variant="h5">
-               {targetProteinQuery.data
-                 ? `${targetProteinQuery.data.targetProteinGramsPerDay.toFixed(1)} г/день`
-                 : '—'}
-             </Typography>
-           </CardContent>
-         </Card>
-       </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Целевой белок
+              </Typography>
+              <Typography variant="h5">
+                {targetProteinQuery.data
+                  ? `${targetProteinQuery.data.targetProteinGramsPerDay.toFixed(1)} г/день`
+                  : "—"}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-         <Card>
-           <CardContent>
-             <Typography variant="subtitle2" color="text.secondary">
-               Дата обновления
-             </Typography>
-             <Typography variant="body1">
-               {goalsQuery.data?.createdAt
-                 ? new Date(goalsQuery.data.createdAt).toLocaleDateString('ru-RU')
-                 : '—'}
-             </Typography>
-           </CardContent>
-         </Card>
-       </Grid>
-     </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary">
+                Дата обновления
+              </Typography>
+              <Typography variant="body1">
+                {goalsQuery.data?.createdAt
+                  ? new Date(goalsQuery.data.createdAt).toLocaleDateString(
+                      "ru-RU",
+                    )
+                  : "—"}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
+      {/* ============ Форма ============ */}
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Настройки целей
+          </Typography>
 
-             {/* ============ Форма ============ */}
-             <Card>
-               <CardContent>
-                 <Typography variant="h6" gutterBottom>
-                   Настройки целей
-                 </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={3} sx={{ mt: 2 }}>
+              {/* Вес */}
+              <TextField
+                label="Текущий вес, кг"
+                type="number"
+                fullWidth
+                slotProps={{ htmlInput: { step: "0.1", min: 20, max: 300 } }}
+                {...register("currentWeightKg", { valueAsNumber: true })}
+                error={!!errors.currentWeightKg}
+                helperText={errors.currentWeightKg?.message}
+              />
 
-                 <form onSubmit={handleSubmit(onSubmit)}>
-                   <Stack spacing={3} sx={{ mt: 2 }}>
-                     {/* Вес */}
-                     <TextField
-                       label="Текущий вес, кг"
-                       type="number"
-                       fullWidth
-                       slotProps={{ htmlInput: { step: '0.1', min: 20, max: 300 } }}
-                       {...register('currentWeightKg', { valueAsNumber: true })}
-                       error={!!errors.currentWeightKg}
-                       helperText={errors.currentWeightKg?.message}
-                     />
+              {/* Цель */}
+              <FormControl>
+                <FormLabel>Цель</FormLabel>
+                <Controller
+                  name="goalType"
+                  control={control}
+                  render={({ field }) => (
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mt: 1, flexWrap: "wrap" }}
+                    >
+                      {(Object.keys(GOAL_LABELS) as GoalType[]).map((g) => (
+                        <Chip
+                          key={g}
+                          label={GOAL_LABELS[g]}
+                          color={field.value === g ? "primary" : "default"}
+                          onClick={() => field.onChange(g)}
+                          variant={field.value === g ? "filled" : "outlined"}
+                        />
+                      ))}
+                    </Stack>
+                  )}
+                />
+              </FormControl>
 
-                     {/* Цель */}
-                     <FormControl>
-                       <FormLabel>Цель</FormLabel>
-                       <Controller
-                         name="goalType"
-                         control={control}
-                         render={({ field }) => (
-                           <Stack
-                             direction="row"
-                             spacing={1}
-                             sx={{ mt: 1, flexWrap: 'wrap' }}
-                           >
-                             {(Object.keys(GOAL_LABELS) as GoalType[]).map((g) => (
-                               <Chip
-                                 key={g}
-                                 label={GOAL_LABELS[g]}
-                                 color={field.value === g ? 'primary' : 'default'}
-                                 onClick={() => field.onChange(g)}
-                                 variant={field.value === g ? 'filled' : 'outlined'}
-                               />
-                             ))}
-                           </Stack>
-                         )}
-                       />
-                     </FormControl>
+              {/* Калории */}
+              <Box>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ alignItems: "center" }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={autoCalories}
+                        onChange={(e) => setAutoCalories(e.target.checked)}
+                      />
+                    }
+                    label="Рассчитать калории автоматически"
+                  />
+                  <InfoTooltip title={tooltips.calories} />
+                </Stack>
+                {autoCalories ? (
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    Калории рассчитываются по формуле Миффлина–Сан Жеора с
+                    учётом вашего пола, возраста, роста, веса и уровня
+                    активности <b>из профиля</b>.
+                    {dailyCaloriesQuery.data != null && (
+                      <>
+                        {" "}
+                        → <b>~{dailyCaloriesQuery.data} ккал/день</b>
+                      </>
+                    )}
+                  </Alert>
+                ) : (
+                  <TextField
+                    label="Целевые калории, ккал/день"
+                    type="number"
+                    fullWidth
+                    sx={{ mt: 1 }}
+                    slotProps={{
+                      htmlInput: { step: "1", min: 500, max: 10000 },
+                    }}
+                    {...register("targetCaloriesOverride", {
+                      valueAsNumber: true,
+                    })}
+                    error={!!errors.targetCaloriesOverride}
+                    helperText={errors.targetCaloriesOverride?.message}
+                  />
+                )}
+              </Box>
 
-                     {/* Калории */}
-                     <Box>
-                       <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                         <FormControlLabel
-                           control={
-                             <Checkbox
-                               checked={autoCalories}
-                               onChange={(e) => setAutoCalories(e.target.checked)}
-                             />
-                           }
-                           label="Рассчитать калории автоматически"
-                         />
-                         <InfoTooltip title={tooltips.calories} />
-                       </Stack>
-                       {autoCalories ? (
-                         <Alert severity="info" sx={{ mt: 1 }}>
-                           Калории рассчитываются по формуле Миффлина–Сан Жеора
-                           с учётом вашего пола, возраста, роста, веса и уровня
-                           активности <b>из профиля</b>.
-                           {dailyCaloriesQuery.data != null && (
-                             <>
-                               {' '}
-                               → <b>~{dailyCaloriesQuery.data} ккал/день</b>
-                             </>
-                           )}
-                         </Alert>
-                       ) : (
-                         <TextField
-                           label="Целевые калории, ккал/день"
-                           type="number"
-                           fullWidth
-                           sx={{ mt: 1 }}
-                           slotProps={{
-                             htmlInput: { step: '1', min: 500, max: 10000 },
-                           }}
-                           {...register('targetCaloriesOverride', {
-                             valueAsNumber: true,
-                           })}
-                           error={!!errors.targetCaloriesOverride}
-                           helperText={errors.targetCaloriesOverride?.message}
-                         />
-                       )}
-                     </Box>
+              {/* Белок */}
+              <Box>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  sx={{ alignItems: "center" }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={autoProtein}
+                        onChange={(e) => setAutoProtein(e.target.checked)}
+                      />
+                    }
+                    label="Рассчитать белок автоматически"
+                  />
+                  <InfoTooltip title={tooltips.protein} />
+                </Stack>
+                {autoProtein ? (
+                  <Alert severity="info" sx={{ mt: 1 }}>
+                    Белок рассчитывается по цели:{" "}
+                    {goalType === "LOSE_WEIGHT" && "2.0 г/кг (сохранить мышцы)"}
+                    {goalType === "MAINTAIN" && "1.6 г/кг (поддержание)"}
+                    {goalType === "GAIN_MUSCLE" && "1.8 г/кг (набор массы)"} → ~
+                    {Math.round(
+                      (currentWeight || 0) *
+                        (goalType === "LOSE_WEIGHT"
+                          ? 2.0
+                          : goalType === "GAIN_MUSCLE"
+                            ? 1.8
+                            : 1.6),
+                    )}{" "}
+                    г/день
+                  </Alert>
+                ) : (
+                  <TextField
+                    label="Целевой белок, г/день"
+                    type="number"
+                    fullWidth
+                    sx={{ mt: 1 }}
+                    slotProps={{ htmlInput: { step: "1", min: 10, max: 500 } }}
+                    {...register("targetProteinOverride", {
+                      valueAsNumber: true,
+                    })}
+                    error={!!errors.targetProteinOverride}
+                    helperText={errors.targetProteinOverride?.message}
+                  />
+                )}
+              </Box>
 
-                     {/* Белок */}
-                     <Box>
-                       <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-                         <FormControlLabel
-                           control={
-                             <Checkbox
-                               checked={autoProtein}
-                               onChange={(e) => setAutoProtein(e.target.checked)}
-                             />
-                           }
-                           label="Рассчитать белок автоматически"
-                         />
-                         <InfoTooltip title={tooltips.protein} />
-                       </Stack>
-                       {autoProtein ? (
-                         <Alert severity="info" sx={{ mt: 1 }}>
-                           Белок рассчитывается по цели:{' '}
-                           {goalType === 'LOSE_WEIGHT' && '2.0 г/кг (сохранить мышцы)'}
-                           {goalType === 'MAINTAIN' && '1.6 г/кг (поддержание)'}
-                           {goalType === 'GAIN_MUSCLE' && '1.8 г/кг (набор массы)'}
-                           {' '}→ ~
-                           {Math.round(
-                             (currentWeight || 0) *
-                               (goalType === 'LOSE_WEIGHT'
-                                 ? 2.0
-                                 : goalType === 'GAIN_MUSCLE'
-                                   ? 1.8
-                                   : 1.6),
-                           )}{' '}
-                           г/день
-                         </Alert>
-                       ) : (
-                         <TextField
-                           label="Целевой белок, г/день"
-                           type="number"
-                           fullWidth
-                           sx={{ mt: 1 }}
-                           slotProps={{ htmlInput: { step: '1', min: 10, max: 500 } }}
-                           {...register('targetProteinOverride', {
-                             valueAsNumber: true,
-                           })}
-                           error={!!errors.targetProteinOverride}
-                           helperText={errors.targetProteinOverride?.message}
-                         />
-                       )}
-                     </Box>
+              {/* Скрытые поля для совместимости с API */}
+              <input
+                type="hidden"
+                {...register("proteinPerKg", { valueAsNumber: true })}
+              />
+              <input
+                type="hidden"
+                {...register("targetCalories", { valueAsNumber: true })}
+              />
 
-                     {/* Скрытые поля для совместимости с API */}
-                     <input
-                       type="hidden"
-                       {...register('proteinPerKg', { valueAsNumber: true })}
-                     />
-                     <input
-                       type="hidden"
-                       {...register('targetCalories', { valueAsNumber: true })}
-                     />
+              <Alert severity="info">
+                Уровень активности настраивается в разделе <b>«Профиль»</b> и
+                используется при расчёте калорий.
+              </Alert>
+            </Stack>
+          </form>
 
-                     <Alert severity="info">
-                       Уровень активности настраивается в разделе{' '}
-                       <b>«Профиль»</b> и используется при расчёте калорий.
-                     </Alert>
-                   </Stack>
-                 </form>
-
-                          {/* Fixed-кнопка внизу справа */}
-                          <Box
-                            sx={{
-                              position: 'fixed',
-                              bottom: 16,
-                              right: 16,
-                              zIndex: 1200,
-                            }}
-                          >
-                            <Button
-                              type="submit"
-                              variant="contained"
-                              size="large"
-                              disabled={saveMutation.isPending}
-                              onClick={handleSubmit(onSubmit)}
-                              sx={{ boxShadow: 3 }}
-                            >
-                              {saveMutation.isPending ? 'Сохранение...' : 'Сохранить цели'}
-                            </Button>
-                          </Box>
-               </CardContent>
-             </Card>
-           </Box>
-         );
+          {/* Fixed-кнопка внизу справа */}
+          <Box
+            sx={{
+              position: "fixed",
+              bottom: 16,
+              right: 16,
+              zIndex: 1200,
+            }}
+          >
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={saveMutation.isPending}
+              onClick={handleSubmit(onSubmit)}
+              sx={{ boxShadow: 3 }}
+            >
+              {saveMutation.isPending ? "Сохранение..." : "Сохранить цели"}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
+  );
 }

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Box,
   Button,
@@ -14,11 +14,15 @@ import {
   Typography,
   MenuItem,
   Alert,
-} from '@mui/material';
+} from "@mui/material";
 
-import type { IngredientDto, IngredientRequest,UnitType  } from '../types/api';
-import { calcCaloriesFromMacros, roundNutrient, INGREDIENT_CATEGORIES } from '../types/api';
-import { isValidNumberInput, normalizeNumberInput } from '../utils/numberInput';
+import type { IngredientDto, IngredientRequest, UnitType } from "../types/api";
+import {
+  calcCaloriesFromMacros,
+  roundNutrient,
+  INGREDIENT_CATEGORIES,
+} from "../types/api";
+import { isValidNumberInput, normalizeNumberInput } from "../utils/numberInput";
 
 // ============================================================
 // Схема валидации формы ингредиента.
@@ -26,15 +30,15 @@ import { isValidNumberInput, normalizeNumberInput } from '../utils/numberInput';
 const numberString = (min: number, max: number, required = false) =>
   z.string().refine(
     (val) => {
-      if (val === '' || val == null) return !required;
-      const n = Number(val.replace(',', '.'));
+      if (val === "" || val == null) return !required;
+      const n = Number(val.replace(",", "."));
       return !Number.isNaN(n) && n >= min && n <= max;
     },
     { message: `Введите число от ${min} до ${max}` },
   );
 
 const ingredientSchema = z.object({
-  name: z.string().min(1, 'Введите название').max(100, 'Максимум 100 символов'),
+  name: z.string().min(1, "Введите название").max(100, "Максимум 100 символов"),
   category: z.string().optional(),
   proteinsPer100g: numberString(0, 100, true),
   fatsPer100g: numberString(0, 100, true),
@@ -80,16 +84,16 @@ export default function IngredientFormDialog({
   } = useForm<IngredientForm>({
     resolver: zodResolver(ingredientSchema),
     defaultValues: {
-      name: '',
-      category: 'OTHER',
-      proteinsPer100g: '',
-      fatsPer100g: '',
-      carbsPer100g: '',
-      caloriesPer100g: '',
-      unitType: 'GRAM',
-      unitWeightGrams: '',
-      gramsPerTbsp: '',
-      gramsPerTsp: '',
+      name: "",
+      category: "OTHER",
+      proteinsPer100g: "",
+      fatsPer100g: "",
+      carbsPer100g: "",
+      caloriesPer100g: "",
+      unitType: "GRAM",
+      unitWeightGrams: "",
+      gramsPerTbsp: "",
+      gramsPerTsp: "",
     },
   });
 
@@ -99,31 +103,40 @@ export default function IngredientFormDialog({
       if (ingredient) {
         reset({
           name: ingredient.name,
-          category: ingredient.category ?? 'OTHER',
-          proteinsPer100g: String(ingredient.proteinsPer100g ?? ''),
-          fatsPer100g: String(ingredient.fatsPer100g ?? ''),
-          carbsPer100g: String(ingredient.carbsPer100g ?? ''),
+          category: ingredient.category ?? "OTHER",
+          proteinsPer100g: String(ingredient.proteinsPer100g ?? ""),
+          fatsPer100g: String(ingredient.fatsPer100g ?? ""),
+          carbsPer100g: String(ingredient.carbsPer100g ?? ""),
           caloriesPer100g:
             ingredient.caloriesPer100g != null
               ? String(ingredient.caloriesPer100g)
-              : '',
-          unitType: ingredient.unitType ?? 'GRAM',
-          unitWeightGrams: ingredient.unitWeightGrams != null ? String(ingredient.unitWeightGrams) : '',
-          gramsPerTbsp: ingredient.gramsPerTbsp != null ? String(ingredient.gramsPerTbsp) : '',
-          gramsPerTsp: ingredient.gramsPerTsp != null ? String(ingredient.gramsPerTsp) : '',
+              : "",
+          unitType: ingredient.unitType ?? "GRAM",
+          unitWeightGrams:
+            ingredient.unitWeightGrams != null
+              ? String(ingredient.unitWeightGrams)
+              : "",
+          gramsPerTbsp:
+            ingredient.gramsPerTbsp != null
+              ? String(ingredient.gramsPerTbsp)
+              : "",
+          gramsPerTsp:
+            ingredient.gramsPerTsp != null
+              ? String(ingredient.gramsPerTsp)
+              : "",
         });
       } else {
         reset({
-          name: initialName ?? '',
-          category: 'OTHER',
-          proteinsPer100g: '',
-          fatsPer100g: '',
-          carbsPer100g: '',
-          caloriesPer100g: '',
-          unitType: 'GRAM',
-          unitWeightGrams: '',
-          gramsPerTbsp: '',
-          gramsPerTsp: '',
+          name: initialName ?? "",
+          category: "OTHER",
+          proteinsPer100g: "",
+          fatsPer100g: "",
+          carbsPer100g: "",
+          caloriesPer100g: "",
+          unitType: "GRAM",
+          unitWeightGrams: "",
+          gramsPerTbsp: "",
+          gramsPerTsp: "",
         });
       }
     }
@@ -131,15 +144,15 @@ export default function IngredientFormDialog({
 
   // Живой предпросмотр калорий
   const [p, f, c, cal] = watch([
-    'proteinsPer100g',
-    'fatsPer100g',
-    'carbsPer100g',
-    'caloriesPer100g',
+    "proteinsPer100g",
+    "fatsPer100g",
+    "carbsPer100g",
+    "caloriesPer100g",
   ]);
 
   const parseNum = (v: unknown): number => {
-    if (v == null || v === '') return 0;
-    const n = Number(String(v).replace(',', '.'));
+    if (v == null || v === "") return 0;
+    const n = Number(String(v).replace(",", "."));
     return Number.isNaN(n) ? 0 : n;
   };
 
@@ -152,11 +165,10 @@ export default function IngredientFormDialog({
     calNum > 0 ? calNum : calcCaloriesFromMacros(pNum, fNum, cNum);
 
   const handleFormSubmit = (data: IngredientForm) => {
-    const toNum = (v: string): number =>
-      Number(v.replace(',', '.')) || 0;
+    const toNum = (v: string): number => Number(v.replace(",", ".")) || 0;
 
-    const calStr = data.caloriesPer100g ?? '';
-    const calParsed = calStr === '' ? null : Number(calStr.replace(',', '.'));
+    const calStr = data.caloriesPer100g ?? "";
+    const calParsed = calStr === "" ? null : Number(calStr.replace(",", "."));
 
     onSubmit({
       name: data.name.trim(),
@@ -164,11 +176,18 @@ export default function IngredientFormDialog({
       proteinsPer100g: toNum(data.proteinsPer100g),
       fatsPer100g: toNum(data.fatsPer100g),
       carbsPer100g: toNum(data.carbsPer100g),
-      caloriesPer100g: calParsed != null && !Number.isNaN(calParsed) ? calParsed : null,
-      unitType: (data.unitType as UnitType) || 'GRAM',
-      unitWeightGrams: data.unitWeightGrams ? Number(data.unitWeightGrams.replace(',', '.')) : null,
-      gramsPerTbsp: data.gramsPerTbsp ? Number(data.gramsPerTbsp.replace(',', '.')) : null,
-      gramsPerTsp: data.gramsPerTsp ? Number(data.gramsPerTsp.replace(',', '.')) : null,
+      caloriesPer100g:
+        calParsed != null && !Number.isNaN(calParsed) ? calParsed : null,
+      unitType: (data.unitType as UnitType) || "GRAM",
+      unitWeightGrams: data.unitWeightGrams
+        ? Number(data.unitWeightGrams.replace(",", "."))
+        : null,
+      gramsPerTbsp: data.gramsPerTbsp
+        ? Number(data.gramsPerTbsp.replace(",", "."))
+        : null,
+      gramsPerTsp: data.gramsPerTsp
+        ? Number(data.gramsPerTsp.replace(",", "."))
+        : null,
     });
   };
 
@@ -176,7 +195,7 @@ export default function IngredientFormDialog({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <DialogTitle>
-          {isEdit ? 'Редактировать ингредиент' : 'Новый ингредиент'}
+          {isEdit ? "Редактировать ингредиент" : "Новый ингредиент"}
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
@@ -184,7 +203,7 @@ export default function IngredientFormDialog({
               label="Название"
               fullWidth
               autoFocus
-              {...register('name')}
+              {...register("name")}
               error={!!errors.name}
               helperText={errors.name?.message}
             />
@@ -197,14 +216,16 @@ export default function IngredientFormDialog({
                   select
                   label="Категория"
                   fullWidth
-                  value={field.value ?? 'OTHER'}
+                  value={field.value ?? "OTHER"}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
-                  {Object.entries(INGREDIENT_CATEGORIES).map(([value, { label, emoji }]) => (
-                    <MenuItem key={value} value={value}>
-                      {emoji} {label}
-                    </MenuItem>
-                  ))}
+                  {Object.entries(INGREDIENT_CATEGORIES).map(
+                    ([value, { label, emoji }]) => (
+                      <MenuItem key={value} value={value}>
+                        {emoji} {label}
+                      </MenuItem>
+                    ),
+                  )}
                 </TextField>
               )}
             />
@@ -219,7 +240,7 @@ export default function IngredientFormDialog({
                     label="Б"
                     type="text"
                     fullWidth
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={(e) => {
                       const raw = e.target.value;
                       if (isValidNumberInput(raw)) {
@@ -228,7 +249,7 @@ export default function IngredientFormDialog({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="0"
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                     error={!!errors.proteinsPer100g}
                     helperText={errors.proteinsPer100g?.message}
                   />
@@ -243,7 +264,7 @@ export default function IngredientFormDialog({
                     label="Ж"
                     type="text"
                     fullWidth
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={(e) => {
                       const raw = e.target.value;
                       if (isValidNumberInput(raw)) {
@@ -252,7 +273,7 @@ export default function IngredientFormDialog({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="0"
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                     error={!!errors.fatsPer100g}
                     helperText={errors.fatsPer100g?.message}
                   />
@@ -267,7 +288,7 @@ export default function IngredientFormDialog({
                     label="У"
                     type="text"
                     fullWidth
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={(e) => {
                       const raw = e.target.value;
                       if (isValidNumberInput(raw)) {
@@ -276,7 +297,7 @@ export default function IngredientFormDialog({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="0"
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                     error={!!errors.carbsPer100g}
                     helperText={errors.carbsPer100g?.message}
                   />
@@ -293,7 +314,7 @@ export default function IngredientFormDialog({
                   label="Ккал"
                   type="text"
                   fullWidth
-                  value={field.value ?? ''}
+                  value={field.value ?? ""}
                   onChange={(e) => {
                     const raw = e.target.value;
                     if (isValidNumberInput(raw)) {
@@ -302,7 +323,7 @@ export default function IngredientFormDialog({
                   }}
                   onFocus={(e) => e.target.select()}
                   placeholder="0"
-                  slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                  slotProps={{ htmlInput: { inputMode: "decimal" } }}
                   error={!!errors.caloriesPer100g}
                   helperText={errors.caloriesPer100g?.message}
                 />
@@ -311,16 +332,17 @@ export default function IngredientFormDialog({
 
             {/* Плашка с подсказкой */}
             <Alert severity="info" sx={{ mt: -1 }}>
-              Если поле «Ккал» пустое — калорийность посчитается автоматически из БЖУ.
+              Если поле «Ккал» пустое — калорийность посчитается автоматически
+              из БЖУ.
             </Alert>
 
             {/* Серый блок с калориями */}
             <Box
               sx={{
                 p: 2,
-                bgcolor: 'action.hover',
+                bgcolor: "action.hover",
                 borderRadius: 1,
-                textAlign: 'center',
+                textAlign: "center",
               }}
             >
               <Typography variant="body2" color="text.secondary">
@@ -330,12 +352,16 @@ export default function IngredientFormDialog({
                 {roundNutrient(previewCalories)} ккал
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {calNum > 0 ? 'Указано вручную' : 'Считается автоматически...'}
+                {calNum > 0 ? "Указано вручную" : "Считается автоматически..."}
               </Typography>
             </Box>
 
             {/* ============ Единицы измерения ============ */}
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mt: 1, mb: 1 }}
+            >
               Единицы измерения (необязательно)
             </Typography>
 
@@ -348,7 +374,7 @@ export default function IngredientFormDialog({
                   label="Основная единица"
                   fullWidth
                   sx={{ mb: 1 }}
-                  value={field.value ?? 'GRAM'}
+                  value={field.value ?? "GRAM"}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
                   <MenuItem value="GRAM">Граммы (г)</MenuItem>
@@ -362,7 +388,7 @@ export default function IngredientFormDialog({
             />
 
             {/* Вес 1 штуки (показываем, если выбраны штуки) */}
-            {watch('unitType') === 'PIECE' && (
+            {watch("unitType") === "PIECE" && (
               <Controller
                 name="unitWeightGrams"
                 control={control}
@@ -371,7 +397,7 @@ export default function IngredientFormDialog({
                     label="Вес 1 штуки, г"
                     type="text"
                     fullWidth
-                    value={field.value ?? ''}
+                    value={field.value ?? ""}
                     onChange={(e) => {
                       const raw = e.target.value;
                       if (isValidNumberInput(raw)) {
@@ -379,17 +405,19 @@ export default function IngredientFormDialog({
                       }
                     }}
                     placeholder="Например, 50"
-                    slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                    slotProps={{ htmlInput: { inputMode: "decimal" } }}
                   />
                 )}
               />
             )}
 
             {/* Коэффициенты для ложек (показываем только если выбраны ложки) */}
-            {(watch('unitType') === 'TBSP' || watch('unitType') === 'TSP') && (
+            {(watch("unitType") === "TBSP" || watch("unitType") === "TSP") && (
               <Stack spacing={2}>
                 <Alert severity="info" variant="outlined" sx={{ py: 0 }}>
-                  Укажи, сколько грамм в 1 ложке. Например, 1 ст.л. сахара = 25 г. Это нужно, чтобы при добавлении в рецепт было удобно считать.
+                  Укажи, сколько грамм в 1 ложке. Например, 1 ст.л. сахара = 25
+                  г. Это нужно, чтобы при добавлении в рецепт было удобно
+                  считать.
                 </Alert>
                 <Stack direction="row" spacing={3}>
                   <Controller
@@ -400,7 +428,7 @@ export default function IngredientFormDialog({
                         label="1 ст.л., г"
                         type="text"
                         fullWidth
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                         onChange={(e) => {
                           const raw = e.target.value;
                           if (isValidNumberInput(raw)) {
@@ -408,7 +436,7 @@ export default function IngredientFormDialog({
                           }
                         }}
                         placeholder="Например, 25"
-                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                        slotProps={{ htmlInput: { inputMode: "decimal" } }}
                       />
                     )}
                   />
@@ -420,7 +448,7 @@ export default function IngredientFormDialog({
                         label="1 ч.л., г"
                         type="text"
                         fullWidth
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                         onChange={(e) => {
                           const raw = e.target.value;
                           if (isValidNumberInput(raw)) {
@@ -428,7 +456,7 @@ export default function IngredientFormDialog({
                           }
                         }}
                         placeholder="Например, 8"
-                        slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+                        slotProps={{ htmlInput: { inputMode: "decimal" } }}
                       />
                     )}
                   />
@@ -442,7 +470,7 @@ export default function IngredientFormDialog({
             Отмена
           </Button>
           <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? 'Сохранение...' : isEdit ? 'Сохранить' : 'Создать'}
+            {loading ? "Сохранение..." : isEdit ? "Сохранить" : "Создать"}
           </Button>
         </DialogActions>
       </form>

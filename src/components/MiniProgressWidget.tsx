@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Box,
   Card,
@@ -7,21 +7,15 @@ import {
   Stack,
   Typography,
   Button,
-} from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
-import {
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  YAxis,
-} from 'recharts';
+} from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import { Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from "recharts";
 
-import { useMeasurements } from '../hooks/useMeasurements';
-import InfoTooltip, { tooltips } from './InfoTooltip';
+import { useMeasurements } from "../hooks/useMeasurements";
+import InfoTooltip, { tooltips } from "./InfoTooltip";
 
 // ============================================================
 // Мини-виджет прогресса веса для дашборда.
@@ -38,16 +32,15 @@ export default function MiniProgressWidget() {
       .filter((m) => m.weightKg != null)
       .sort(
         (a, b) =>
-          new Date(a.measuredAt).getTime() -
-          new Date(b.measuredAt).getTime(),
+          new Date(a.measuredAt).getTime() - new Date(b.measuredAt).getTime(),
       );
 
     const last7 = withWeight.slice(-7);
 
     return last7.map((m) => ({
-      date: new Date(m.measuredAt).toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
+      date: new Date(m.measuredAt).toLocaleDateString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
       }),
       weight: m.weightKg,
     }));
@@ -62,7 +55,7 @@ export default function MiniProgressWidget() {
   }, [weightData]);
 
   if (measurementsQuery.isLoading) {
-    return null;   // тихо скрываем, пока грузится
+    return null; // тихо скрываем, пока грузится
   }
 
   // Нет замеров с весом — показываем CTA
@@ -73,25 +66,29 @@ export default function MiniProgressWidget() {
           <Stack
             direction="row"
             sx={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
               gap: 2,
             }}
           >
-           <Box>
-             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-               <Typography variant="h6">Твой прогресс</Typography>
-               <InfoTooltip title={tooltips.weightProgress} />
-             </Stack>
-             <Typography variant="caption" color="text.secondary">
-               Добавь первый замер, чтобы видеть прогресс
-             </Typography>
-           </Box>
+            <Box>
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{ alignItems: "center" }}
+              >
+                <Typography variant="h6">Твой прогресс</Typography>
+                <InfoTooltip title={tooltips.weightProgress} />
+              </Stack>
+              <Typography variant="caption" color="text.secondary">
+                Добавь первый замер, чтобы видеть прогресс
+              </Typography>
+            </Box>
             <Button
               variant="contained"
               endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate('/measurements')}
+              onClick={() => navigate("/measurements")}
             >
               Добавить замер
             </Button>
@@ -111,41 +108,41 @@ export default function MiniProgressWidget() {
 
   const trendColor =
     diff == null || Math.abs(diff) < 0.1
-      ? 'text.secondary'
+      ? "text.secondary"
       : diff < 0
-        ? 'success.main'
-        : 'error.main';
+        ? "success.main"
+        : "error.main";
 
   return (
     <Card
       sx={{
         mb: 3,
-        cursor: 'pointer',
-        transition: 'box-shadow 0.2s',
-        '&:hover': { boxShadow: 4 },
+        cursor: "pointer",
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: 4 },
       }}
-      onClick={() => navigate('/measurements')}
+      onClick={() => navigate("/measurements")}
     >
       <CardContent>
         <Stack
           direction="row"
           sx={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: "space-between",
+            alignItems: "center",
             mb: 1,
-            flexWrap: 'wrap',
+            flexWrap: "wrap",
             gap: 1,
           }}
         >
           <Box>
-            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
               <Typography variant="h6">Твой прогресс</Typography>
               <InfoTooltip title={tooltips.weightProgress} />
             </Stack>
             {/* caption убираем — при 0 замерах он не нужен */}
           </Box>
 
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             {diff != null && (
               <>
                 <TrendIcon sx={{ color: trendColor, fontSize: 20 }} />
@@ -153,7 +150,7 @@ export default function MiniProgressWidget() {
                   variant="h6"
                   sx={{ color: trendColor, fontWeight: 600 }}
                 >
-                  {diff > 0 ? '+' : ''}
+                  {diff > 0 ? "+" : ""}
                   {diff.toFixed(1)} кг
                 </Typography>
               </>
@@ -161,15 +158,12 @@ export default function MiniProgressWidget() {
           </Stack>
         </Stack>
 
-        <Box sx={{ width: '100%', height: 120 }}>
+        <Box sx={{ width: "100%", height: 120 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={weightData}>
-              <YAxis
-                domain={['dataMin - 1', 'dataMax + 1']}
-                hide
-              />
+              <YAxis domain={["dataMin - 1", "dataMax + 1"]} hide />
               <Tooltip
-                formatter={(value) => [`${value} кг`, 'Вес']}
+                formatter={(value) => [`${value} кг`, "Вес"]}
                 labelFormatter={(label) => `Дата: ${label}`}
               />
               <Line
@@ -187,8 +181,8 @@ export default function MiniProgressWidget() {
         <Stack
           direction="row"
           sx={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: "space-between",
+            alignItems: "center",
             mt: 1,
           }}
         >
@@ -198,7 +192,7 @@ export default function MiniProgressWidget() {
           <Stack
             direction="row"
             spacing={0.5}
-            sx={{ alignItems: 'center', color: 'primary.main' }}
+            sx={{ alignItems: "center", color: "primary.main" }}
           >
             <Typography variant="caption">Подробнее</Typography>
             <ArrowForwardIcon sx={{ fontSize: 14 }} />

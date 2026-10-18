@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -13,17 +13,17 @@ import {
   Typography,
   CircularProgress,
   Alert,
-} from '@mui/material';
-import { useSnackbar } from 'notistack';
+} from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { useSuggestFillers, useAddPortion } from '../hooks/useStats';
-import { roundNutrient } from '../types/api';
-import type { ApiError, FillerSuggestionDto } from '../types/api';
+import { useSuggestFillers, useAddPortion } from "../hooks/useStats";
+import { roundNutrient } from "../types/api";
+import type { ApiError, FillerSuggestionDto } from "../types/api";
 
 interface SuggestFillersDialogProps {
   open: boolean;
   onClose: () => void;
-  date: string;   // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
 }
 
 export default function SuggestFillersDialog({
@@ -84,14 +84,13 @@ export default function SuggestFillersDialog({
         });
         added++;
       }
-      enqueueSnackbar(`Добавлено: ${added}`, { variant: 'success' });
+      enqueueSnackbar(`Добавлено: ${added}`, { variant: "success" });
       onClose();
     } catch (err) {
       const apiError = err as ApiError;
-      enqueueSnackbar(
-        apiError.message || `Ошибка (добавлено: ${added})`,
-        { variant: 'error' },
-      );
+      enqueueSnackbar(apiError.message || `Ошибка (добавлено: ${added})`, {
+        variant: "error",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -102,22 +101,26 @@ export default function SuggestFillersDialog({
       <DialogTitle>Подсказать добор</DialogTitle>
       <DialogContent>
         {query.isLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress />
           </Box>
         )}
 
         {query.isError && (
           <Alert severity="error">
-            {(query.error as unknown as ApiError)?.message || 'Ошибка загрузки'}
+            {(query.error as unknown as ApiError)?.message || "Ошибка загрузки"}
           </Alert>
         )}
 
         {query.data && (
           <Stack spacing={2} sx={{ mt: 1 }}>
             {/* Дельта */}
-            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            <Paper variant="outlined" sx={{ p: 2, bgcolor: "action.hover" }}>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                gutterBottom
+              >
                 Не хватает до цели
               </Typography>
               <Stack direction="row" spacing={3}>
@@ -136,9 +139,7 @@ export default function SuggestFillersDialog({
 
             {/* Список предложений */}
             {suggestions.length === 0 ? (
-              <Alert severity="info">
-                Цель достигнута — добор не нужен 🎉
-              </Alert>
+              <Alert severity="info">Цель достигнута — добор не нужен 🎉</Alert>
             ) : (
               <Stack spacing={1}>
                 <Typography variant="subtitle2" color="text.secondary">
@@ -159,13 +160,13 @@ export default function SuggestFillersDialog({
                             {s.ingredientName}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {roundNutrient(s.weightInGrams)} г ·{' '}
-                            {roundNutrient(s.calories)} ккал ·{' '}
-                            Б: {roundNutrient(s.proteins)} г
+                            {roundNutrient(s.weightInGrams)} г ·{" "}
+                            {roundNutrient(s.calories)} ккал · Б:{" "}
+                            {roundNutrient(s.proteins)} г
                           </Typography>
                         </Box>
                       }
-                      sx={{ width: '100%', m: 0 }}
+                      sx={{ width: "100%", m: 0 }}
                     />
                   </Paper>
                 ))}
@@ -179,7 +180,8 @@ export default function SuggestFillersDialog({
                   Выбрано: {selectedIds.size}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  ~{roundNutrient(totals.calories)} ккал · ~{roundNutrient(totals.proteins)} г белка
+                  ~{roundNutrient(totals.calories)} ккал · ~
+                  {roundNutrient(totals.proteins)} г белка
                 </Typography>
               </Paper>
             )}
@@ -195,7 +197,7 @@ export default function SuggestFillersDialog({
           onClick={handleSubmit}
           disabled={selectedIds.size === 0 || submitting}
         >
-          {submitting ? 'Добавление...' : `Добавить (${selectedIds.size})`}
+          {submitting ? "Добавление..." : `Добавить (${selectedIds.size})`}
         </Button>
       </DialogActions>
     </Dialog>
