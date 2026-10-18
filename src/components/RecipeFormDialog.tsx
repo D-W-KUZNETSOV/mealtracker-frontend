@@ -247,51 +247,71 @@ export default function RecipeFormDialog({
     }
   };
 
-  const handleQuantityChange = (
-    tempId: number,
-    quantity: number,
-    ing?: IngredientDto,
-  ) => {
-    const row = rows.find((r) => r.tempId === tempId);
-    const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
+   const handleQuantityChange = (
+     tempId: number,
+     quantity: number,
+     ing?: IngredientDto,
+   ) => {
+     const row = rows.find((r) => r.tempId === tempId);
+     const unit = row?.unit ?? ing?.unitType ?? 'GRAM';
 
-    let weightInGrams = quantity;
+     let weightInGrams = quantity;
 
-    if (unit !== 'GRAM' && ing?.unitWeightGrams != null) {
-      weightInGrams = quantity * ing.unitWeightGrams;
-    }
+     if (unit === 'PIECE' && ing?.unitWeightGrams != null) {
+       weightInGrams = quantity * ing.unitWeightGrams;
+     } else if (unit === 'TBSP' && ing?.gramsPerTbsp != null) {
+       // зачем: переводим столовые ложки в граммы
+       weightInGrams = quantity * ing.gramsPerTbsp;
+     } else if (unit === 'TSP' && ing?.gramsPerTsp != null) {
+       // зачем: переводим чайные ложки в граммы
+       weightInGrams = quantity * ing.gramsPerTsp;
+     } else if (unit === 'ML') {
+       // зачем: для мл считаем 1:1
+       weightInGrams = quantity;
+     }
 
-    handleRowChange(tempId, {
-      quantity,
-      unit,
-      weightInGrams,
-    });
-  };
+     handleRowChange(tempId, {
+       quantity,
+       unit,
+       weightInGrams,
+     });
+   };
 
-  const handleUnitChange = (
-    tempId: number,
-    newUnit: UnitType,
-    ing?: IngredientDto,
-  ) => {
-    const row = rows.find((r) => r.tempId === tempId);
-    if (!row) return;
+   const handleUnitChange = (
+     tempId: number,
+     newUnit: UnitType,
+     ing?: IngredientDto,
+   ) => {
+     const row = rows.find((r) => r.tempId === tempId);
+     if (!row) return;
 
-    let quantity: number;
+     let quantity: number;
 
-    if (newUnit === 'GRAM') {
-      quantity = row.weightInGrams;
-    } else if (ing?.unitWeightGrams != null) {
-      quantity = row.weightInGrams / ing.unitWeightGrams;
-      quantity = Math.round(quantity * 100) / 100;
-    } else {
-      quantity = row.weightInGrams;
-    }
+     if (newUnit === 'GRAM') {
+       quantity = row.weightInGrams;
+     } else if (newUnit === 'PIECE' && ing?.unitWeightGrams != null) {
+       quantity = row.weightInGrams / ing.unitWeightGrams;
+       quantity = Math.round(quantity * 100) / 100;
+     } else if (newUnit === 'TBSP' && ing?.gramsPerTbsp != null) {
+       // зачем: переводим граммы в столовые ложки
+       quantity = row.weightInGrams / ing.gramsPerTbsp;
+       quantity = Math.round(quantity * 100) / 100;
+     } else if (newUnit === 'TSP' && ing?.gramsPerTsp != null) {
+       // зачем: переводим граммы в чайные ложки
+       quantity = row.weightInGrams / ing.gramsPerTsp;
+       quantity = Math.round(quantity * 100) / 100;
+     } else if (newUnit === 'ML') {
+       // зачем: для мл мы считаем 1:1 (плотность воды/молока ~ 1)
+       quantity = row.weightInGrams;
+     } else {
+       quantity = row.weightInGrams;
+     }
 
-    handleRowChange(tempId, {
-      unit: newUnit,
-      quantity,
-    });
-  };
+     handleRowChange(tempId, {
+       unit: newUnit,
+       quantity,
+     });
+   };
 
   // ---------- Живой предпросмотр КБЖУ ----------
   const totals = useMemo(() => {
@@ -613,7 +633,7 @@ export default function RecipeFormDialog({
                               sx={{ width: isMobile ? 110 : 100 }}
                             />
 
-                            {ing?.unitWeightGrams != null && (
+                           {(ing?.unitType === 'PIECE' || ing?.unitType === 'ML' || ing?.unitType === 'TBSP' || ing?.unitType === 'TSP') && (
                               <ToggleButtonGroup
                                 size="small"
                                 exclusive
@@ -631,12 +651,15 @@ export default function RecipeFormDialog({
                                 {ing.unitType === 'PIECE' && (
                                   <ToggleButton value="PIECE">шт</ToggleButton>
                                 )}
-                                {ing.unitType === 'TBSP' && (
+                                {/* Показываем ст.л., если она есть в базе (или если основная единица — TBSP) */}
+                                {(ing.gramsPerTbsp != null || ing.unitType === 'TBSP') && (
                                   <ToggleButton value="TBSP">ст.л.</ToggleButton>
                                 )}
-                                {ing.unitType === 'TSP' && (
+                                {/* Показываем ч.л., если она есть в базе (или если основная единица — TSP) */}
+                                {(ing.gramsPerTsp != null || ing.unitType === 'TSP') && (
                                   <ToggleButton value="TSP">ч.л.</ToggleButton>
                                 )}
+
                               </ToggleButtonGroup>
                             )}
                           </Stack>

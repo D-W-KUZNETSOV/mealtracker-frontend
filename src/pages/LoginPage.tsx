@@ -87,11 +87,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={2}>
                <TextField
-                 label="Email или имя пользователя"
+                 label="Email"
                  fullWidth
                  {...register('username')}
                  error={!!errors.username}
-                 helperText={errors.username?.message || 'Можно ввести email'}
+                 helperText={errors.username?.message || 'Введите ваш email'}
                  />
                            <TextField
                              label="Пароль"

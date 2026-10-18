@@ -88,6 +88,8 @@ export interface IngredientDto {
   unitType: UnitType;
   unitWeightGrams: number | null;
   category?: string;
+    gramsPerTbsp?: number | null;
+    gramsPerTsp?: number | null;
 }
 
 export interface IngredientRequest {
@@ -99,6 +101,8 @@ export interface IngredientRequest {
   category?: string;
   unitType?: UnitType;
   unitWeightGrams?: number | null;
+    gramsPerTbsp?: number | null;
+    gramsPerTsp?: number | null;
 }
 
 // ---------- Recipes ----------
