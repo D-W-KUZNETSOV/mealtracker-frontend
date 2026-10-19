@@ -24,22 +24,6 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/mealtrackerapi-d-w-kuznetsov\.msk1\.amvera\.tech\/api\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 50, // вернули как было (50, а не 200)
-                maxAgeSeconds: 24 * 60 * 60, // вернули 1 день (а не 7)
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-        ],
       },
     }),
   ],
