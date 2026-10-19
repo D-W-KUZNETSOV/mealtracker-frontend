@@ -23,6 +23,11 @@ const queryClient = new QueryClient({
     },
   },
 });
+const updateSW = registerSW({
+  onNeedRefresh() {
+    updateSW(true); // зачем: принудительно активируем новый SW
+  },
+});
 
 
         // Авто-перезагрузка, когда новый SW активируется
