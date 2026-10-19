@@ -23,6 +23,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // зачем: заставляем Service Worker обновляться сразу (без ожидания)
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
@@ -31,8 +34,8 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 200, // зачем: кэшируем больше запросов
-                maxAgeSeconds: 7 * 24 * 60 * 60, // зачем: храним 7 дней
+                maxEntries: 200,
+                maxAgeSeconds: 7 * 24 * 60 * 60,
               },
               cacheableResponse: {
                 statuses: [0, 200],
@@ -40,7 +43,7 @@ export default defineConfig({
             },
           },
         ],
-      }, // зачем: закрываем VitePWA
+      },
     }),
-  ], // зачем: закрываем plugins
-}); // зачем: закрываем defineConfig
+  ],
+});
