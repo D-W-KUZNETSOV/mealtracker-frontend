@@ -23,9 +23,6 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // зачем: заставляем Service Worker обновляться сразу (без ожидания)
-        skipWaiting: true,
-        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
@@ -34,8 +31,8 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 200,
-                maxAgeSeconds: 7 * 24 * 60 * 60,
+                maxEntries: 50, // вернули как было (50, а не 200)
+                maxAgeSeconds: 24 * 60 * 60, // вернули 1 день (а не 7)
               },
               cacheableResponse: {
                 statuses: [0, 200],
