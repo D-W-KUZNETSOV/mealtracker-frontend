@@ -33,6 +33,7 @@ import { useAuthStore } from "../store/authStore";
 import UserAvatar from "./UserAvatar";
 import FeedbackDialog from "./FeedbackDialog"; // 🆕
 import OfflineIndicator from "./OfflineIndicator";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 // Основное меню (везде)
 const navItems = [
@@ -44,11 +45,10 @@ const navItems = [
   { label: "Покупки", path: "/shopping" },
   { label: "Замеры", path: "/measurements" },
   { label: "Цели", path: "/goals" },
-  { label: "Профиль", path: "/profile" },
 ];
 
-// Доп. меню (только в Drawer + в меню аватара)
-const extraNavItems = [{ label: "Справочник", path: "/guide" }];
+
+
 
 export default function Layout() {
   const user = useAuthStore((s) => s.user);
@@ -145,20 +145,30 @@ export default function Layout() {
             spacing={1}
             sx={{ alignItems: "center", ml: "auto" }}
           >
+           <IconButton
+                        onClick={() => navigate('/guide')}
+                        color="inherit"
+                        size="small"
+                        title="Справочник"
+                      >
+                        <MenuBookIcon />
+                      </IconButton>
             <IconButton
               onClick={handleUserMenuOpen}
               color="inherit"
               size="small"
             >
-              <UserAvatar
-                username={user?.username ?? "?"}
-                avatarUrl={user?.avatarUrl}
-                size={32}
-              />
+                            <UserAvatar
+                              username={user?.displayName || user?.username || "?"}
+                              avatarUrl={user?.avatarUrl}
+                              size={32}
+                            />
             </IconButton>
-            {!isMobile && (
-              <Typography variant="body2">{user?.username}</Typography>
-            )}
+                        {!isMobile && (
+                          <Typography variant="body2">
+                            {user?.displayName || user?.username}
+                          </Typography>
+                        )}
           </Stack>
         </Toolbar>
       </AppBar>
@@ -197,37 +207,9 @@ export default function Layout() {
           <Divider />
 
           {/* Доп. меню */}
-          <List>
-            {extraNavItems.map((item) => (
-              <ListItem key={item.path} disablePadding>
-                <ListItemButton
-                  component={RouterLink}
-                  to={item.path}
-                  selected={location.pathname === item.path}
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <ListItemText primary={item.label} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
 
-          {/* Обратная связь */}
-          <List>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => {
-                  setDrawerOpen(false);
-                  setFeedbackOpen(true);
-                }}
-              >
-                <FeedbackIcon sx={{ mr: 1 }} />
-                <ListItemText primary="Обратная связь" />
-              </ListItemButton>
-            </ListItem>
-          </List>
-          <Divider />
+
+
 
           {/* Выйти */}
           <List>
@@ -252,11 +234,24 @@ export default function Layout() {
         open={Boolean(userMenuAnchor)}
         onClose={handleUserMenuClose}
       >
-        <MenuItem disabled>
-          <Typography variant="body2" color="text.secondary">
-            {user?.username}
-          </Typography>
-        </MenuItem>
+                                                <MenuItem
+                                                  disabled
+                                                  sx={{
+                                                    bgcolor: 'primary.main',
+                                                    color: 'primary.contrastText',
+                                                    mb: 1,
+                                                    borderRadius: 1,
+                                                    opacity: 1, // зачем: убираем бледность disabled
+                                                    '&.Mui-disabled': { opacity: 1 } // зачем: принудительно убираем прозрачность
+                                                  }}
+                                                >
+                                                  <Typography
+                                                    variant="subtitle2"
+                                                    sx={{ fontWeight: 600, color: 'inherit' }}
+                                                  >
+                                                    {user?.displayName || user?.username}
+                                                  </Typography>
+                                                </MenuItem>
         <Divider />
         <MenuItem
           onClick={() => {
@@ -275,6 +270,17 @@ export default function Layout() {
           <FeedbackIcon fontSize="small" sx={{ mr: 1 }} />
           Обратная связь
         </MenuItem>
+        {/* 🆕 Админ-панель (только для админа) */}
+                {user?.role === 'ADMIN' && (
+                  <MenuItem
+                    onClick={() => {
+                      handleUserMenuClose();
+                      navigate('/admin');
+                    }}
+                  >
+                    Админ-панель
+                  </MenuItem>
+                )}
         {!isMobile && (
           <MenuItem
             onClick={() => {

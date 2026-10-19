@@ -10,6 +10,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage"; // 🆕
 import DashboardPage from "./pages/DashboardPage";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminPage from './pages/AdminPage';
 // Ленивые
 const RecipesPage = lazy(() => import("./pages/RecipesPage"));
 const RecipeDetailPage = lazy(() => import("./pages/RecipeDetailPage"));
@@ -62,6 +63,7 @@ function App() {
             <Route path="/guide" element={<GuidePage />} />
             <Route path="/meal-plan" element={<MealPlanPage />} />
             <Route path="/shopping" element={<ShoppingPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Route>
         {/* Catch-all */}
