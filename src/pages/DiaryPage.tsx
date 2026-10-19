@@ -31,6 +31,8 @@ import { useGoals } from "../hooks/useNutrition";
 import { useProfile } from "../hooks/useProfile";
 import SuggestFillersDialog from "../components/SuggestFillersDialog";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { useSnackbar } from 'notistack'; // если ещё нет
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -68,6 +70,9 @@ export default function DiaryPage() {
   const dateQuery = useStatsByDate(
     isTodaySelected ? null : toApiDate(selectedDate),
   );
+  const { enqueueSnackbar } = useSnackbar();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState<{ id: number; name: string } | null>(null);
 
   const currentQuery = isTodaySelected ? todayQuery : dateQuery;
 
@@ -404,10 +409,10 @@ export default function DiaryPage() {
                   size="small"
                   color="error"
                   onClick={() => {
-                    if (window.confirm(`Удалить "${entry.itemName}"?`)) {
-                      deleteEntry.mutate(entry.id);
-                    }
+                    setEntryToDelete({ id: entry.id, name: entry.itemName });
+                    setConfirmOpen(true);
                   }}
+
                   title="Удалить запись"
                 >
                   <DeleteIcon fontSize="small" />
@@ -443,6 +448,36 @@ export default function DiaryPage() {
         onClose={() => setSuggestFillersOpen(false)}
         date={toApiDate(selectedDate)}
       />
+            {/* Модалка подтверждения удаления */}
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+              <DialogTitle>Удалить запись?</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Вы уверены, что хотите удалить «{entryToDelete?.name}»? Это действие нельзя отменить.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setConfirmOpen(false)}>Отмена</Button>
+                <Button
+                  color="error"
+                  onClick={() => {
+                    if (entryToDelete) {
+                      deleteEntry.mutate(entryToDelete.id, {
+                        onSuccess: () => {
+                          enqueueSnackbar('Запись удалена', { variant: 'success' });
+                        },
+                        onError: () => {
+                          enqueueSnackbar('Ошибка удаления', { variant: 'error' });
+                        },
+                      });
+                    }
+                    setConfirmOpen(false);
+                  }}
+                >
+                  Удалить
+                </Button>
+              </DialogActions>
+            </Dialog>
     </Box>
   );
 }
