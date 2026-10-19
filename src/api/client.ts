@@ -26,6 +26,10 @@ apiClient.interceptors.response.use(
   (error: AxiosError<ApiError>) => {
     if (error.response?.status === 401) {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
+      const url = error.config?.url ?? '';
+            if (!url.includes('/auth/login')) {
+              window.location.href = '/login';
+            }
     }
 
     const backendData = error.response?.data;

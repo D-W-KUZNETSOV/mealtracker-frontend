@@ -24,32 +24,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Регистрация Service Worker для PWA
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((registration) => {
-        console.log("SW registered:", registration.scope);
-
-        // Проверяем обновления каждые 60 секунд
-        setInterval(() => {
-          registration.update();
-        }, 60 * 1000);
-
-        // Проверка обновлений при возврате на вкладку (мобильный фикс)
-        document.addEventListener("visibilitychange", () => {
-          if (document.visibilityState === "visible") {
-            console.log("[SW] Visibility change → check update");
-            registration.update();
-          }
-        });
-
-        // Проверка обновлений при фокусе окна
-        window.addEventListener("focus", () => {
-          console.log("[SW] Focus → check update");
-          registration.update();
-        });
 
         // Авто-перезагрузка, когда новый SW активируется
         let refreshing = false;
@@ -59,12 +33,7 @@ if ("serviceWorker" in navigator) {
             window.location.reload();
           }
         });
-      })
-      .catch((error) => {
-        console.error("SW registration failed:", error);
-      });
-  });
-}
+
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
