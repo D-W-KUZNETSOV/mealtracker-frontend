@@ -449,6 +449,24 @@ export default function MealPlanPage() {
                     );
                   })}
                 </Stack>
+                                {/* 🆕 Итого за день */}
+                                <Box sx={{ mt: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                                    Итого за день:{' '}
+                                    {(() => {
+                                      let totalCal = 0;
+                                      let totalProt = 0;
+                                      MEAL_TYPES.forEach((mt) => {
+                                        const slotItems = getItemsForSlot(day, mt.value);
+                                        slotItems.forEach((item) => {
+                                          if (item.calories) totalCal += item.calories;
+                                          if (item.proteins) totalProt += item.proteins;
+                                        });
+                                      });
+                                      return `${Math.round(totalCal)} ккал · Б ${Math.round(totalProt)}`;
+                                    })()}
+                                  </Typography>
+                                </Box>
               </Box>
             ))}
           </Box>
