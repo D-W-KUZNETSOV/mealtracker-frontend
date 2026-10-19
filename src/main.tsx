@@ -5,9 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { SnackbarProvider } from "notistack";
 
+
+
 import App from "./App";
 import { theme } from "./theme";
 import "./index.css";
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({ immediate: true });
 
 const queryClient = new QueryClient({
   defaultOptions: {
