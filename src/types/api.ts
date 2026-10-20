@@ -488,6 +488,7 @@ export interface GenerateShoppingListRequest {
 
 export const INGREDIENT_CATEGORIES: Record<string, { label: string; emoji: string }> = {
   MEAT:       { label: 'Мясо',       emoji: '🥩' },
+  POULTRY: { label: 'Птица', emoji: '🍗' },
   FISH:       { label: 'Рыба',       emoji: '🐟' },
   VEGETABLES: { label: 'Овощи',      emoji: '🥬' },
   FRUITS:     { label: 'Фрукты',     emoji: '🍎' },
