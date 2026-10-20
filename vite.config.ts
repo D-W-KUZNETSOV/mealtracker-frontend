@@ -27,4 +27,21 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor-react';
+            if (id.includes('@mui')) return 'vendor-mui';
+            if (id.includes('@tanstack')) return 'vendor-query';
+            if (id.includes('axios') || id.includes('zustand') || id.includes('notistack')) {
+              return 'vendor-utils';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });
