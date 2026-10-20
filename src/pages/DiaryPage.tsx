@@ -31,8 +31,8 @@ import { useGoals } from "../hooks/useNutrition";
 import { useProfile } from "../hooks/useProfile";
 import SuggestFillersDialog from "../components/SuggestFillersDialog";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { useSnackbar } from 'notistack'; // если ещё нет
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // Утилита: форматирует Date в YYYY-MM-DD (как ждёт бэк)
 function toApiDate(d: Date): string {
@@ -73,6 +73,8 @@ export default function DiaryPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState<{ id: number; name: string } | null>(null);
+
+
 
   const currentQuery = isTodaySelected ? todayQuery : dateQuery;
 
@@ -449,35 +451,34 @@ export default function DiaryPage() {
         date={toApiDate(selectedDate)}
       />
             {/* Модалка подтверждения удаления */}
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-              <DialogTitle>Удалить запись?</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  Вы уверены, что хотите удалить «{entryToDelete?.name}»? Это действие нельзя отменить.
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setConfirmOpen(false)}>Отмена</Button>
-                <Button
-                  color="error"
-                  onClick={() => {
-                    if (entryToDelete) {
-                      deleteEntry.mutate(entryToDelete.id, {
-                        onSuccess: () => {
-                          enqueueSnackbar('Запись удалена', { variant: 'success' });
-                        },
-                        onError: () => {
-                          enqueueSnackbar('Ошибка удаления', { variant: 'error' });
-                        },
-                      });
-                    }
-                    setConfirmOpen(false);
-                  }}
-                >
-                  Удалить
-                </Button>
-              </DialogActions>
-            </Dialog>
+           <ConfirmDialog
+             open={confirmOpen}
+             title="Удалить запись?"
+             message={entryToDelete ? `Запись "${entryToDelete.name}" будет удалена безвозвратно.` : ''}
+             confirmLabel="Удалить"
+             loading={deleteEntry.isPending}
+             onConfirm={() => {
+               if (entryToDelete) {
+                 deleteEntry.mutate(entryToDelete.id, {
+                   onSuccess: () => {
+                     enqueueSnackbar('Запись удалена', { variant: 'success' });
+                     setConfirmOpen(false);
+                     setEntryToDelete(null);
+                   },
+                   onError: () => {
+                     enqueueSnackbar('Ошибка удаления', { variant: 'error' });
+                     setConfirmOpen(false);
+                     setEntryToDelete(null);
+                   },
+                 });
+               }
+             }}
+             onCancel={() => {
+               setConfirmOpen(false);
+               setEntryToDelete(null);
+             }}
+           />
+
     </Box>
   );
 }
