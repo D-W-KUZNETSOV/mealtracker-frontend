@@ -13,7 +13,8 @@ export default defineConfig({
         short_name: 'Баланс',
         description: 'Твой дневник питания и планов',
         theme_color: '#2e7d32',
-        background_color: '#ffffff',
+        background_color: '#2E7D32',
+        lang: 'ru',
         display: 'standalone',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
