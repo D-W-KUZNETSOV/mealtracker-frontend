@@ -155,10 +155,15 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
     }
   };
 
-  const handleCreate = () => {
-    onClose();
-    navigate(`/ingredients?barcode=${searchCode}`);
-  };
+   const handleCreate = async () => {
+     // 1. Сначала полностью закрываем сканер (и камеру)
+     await handleClose();
+
+     // 2. Ждем микрозадержку, чтобы React успел размонтировать сканер
+     setTimeout(() => {
+       navigate(`/ingredients?barcode=${searchCode}`);
+     }, 50);
+   };
 
   const handleClose = async() => {
     if (scannerRef.current) {
