@@ -34,6 +34,8 @@ import UserAvatar from "./UserAvatar";
 import FeedbackDialog from "./FeedbackDialog"; // 🆕
 import OfflineIndicator from "./OfflineIndicator";
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import BarcodeScannerDialog from './BarcodeScannerDialog';
 
 // Основное меню (везде)
 const navItems = [
@@ -65,6 +67,7 @@ export default function Layout() {
     null,
   );
   const [feedbackOpen, setFeedbackOpen] = useState(false); // 🆕
+  const [scannerOpen, setScannerOpen] = useState(false); // 🆕 для сканера
 
   const handleLogout = () => {
     logout();
@@ -139,13 +142,24 @@ export default function Layout() {
             </Stack>
           )}
 
-          {/* Аватар + имя: на десктопе показываем имя, на мобильном только аватар */}
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ alignItems: "center", ml: "auto" }}
-          >
-           <IconButton
+                    {/* Аватар + имя: на десктопе показываем имя, на мобильном только аватар */}
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ alignItems: "center", ml: "auto" }}
+                    >
+                      {/* Кнопка Сканера */}
+                      <IconButton
+                        onClick={() => setScannerOpen(true)}
+                        color="inherit"
+                        size="small"
+                        title="Сканировать штрихкод"
+                      >
+                        <QrCodeScannerIcon />
+                      </IconButton>
+
+                      {/* Кнопка Справочника */}
+                      <IconButton
                         onClick={() => navigate('/guide')}
                         color="inherit"
                         size="small"
@@ -153,23 +167,26 @@ export default function Layout() {
                       >
                         <MenuBookIcon />
                       </IconButton>
-            <IconButton
-              onClick={handleUserMenuOpen}
-              color="inherit"
-              size="small"
-            >
-                            <UserAvatar
-                              username={user?.displayName || user?.username || "?"}
-                              avatarUrl={user?.avatarUrl}
-                              size={32}
-                            />
-            </IconButton>
-                        {!isMobile && (
-                          <Typography variant="body2">
-                            {user?.displayName || user?.username}
-                          </Typography>
-                        )}
-          </Stack>
+
+                      {/* Аватар */}
+                      <IconButton
+                        onClick={handleUserMenuOpen}
+                        color="inherit"
+                        size="small"
+                      >
+                        <UserAvatar
+                          username={user?.displayName || user?.username || "?"}
+                          avatarUrl={user?.avatarUrl}
+                          size={32}
+                        />
+                      </IconButton>
+
+                      {!isMobile && (
+                        <Typography variant="body2">
+                          {user?.displayName || user?.username}
+                        </Typography>
+                      )}
+                    </Stack>
         </Toolbar>
       </AppBar>
 
@@ -327,6 +344,7 @@ export default function Layout() {
         open={feedbackOpen}
         onClose={() => setFeedbackOpen(false)}
       />
+      <BarcodeScannerDialog open={scannerOpen} onClose={() => setScannerOpen(false)} />
     </Box>
   );
 }

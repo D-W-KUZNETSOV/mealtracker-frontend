@@ -25,6 +25,8 @@ import type { ApiError, IngredientDto, RecipeListItemDto } from "../types/api";
 interface AddPortionDialogProps {
   open: boolean;
   onClose: () => void;
+  initialIngredient?: IngredientDto | null;
+  onSuccess?: () => void;
 }
 
 type UnitMode = "GRAM" | "PORTION";
@@ -33,6 +35,8 @@ type SourceType = "recipe" | "ingredient";
 export default function AddPortionDialog({
   open,
   onClose,
+  initialIngredient, // 🆕
+  onSuccess,
 }: AddPortionDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const addMutation = useAddPortion();
@@ -66,7 +70,7 @@ export default function AddPortionDialog({
       setMode("GRAM");
       setInputStr("100");
     }
-  }, [open]);
+  },  [open, initialIngredient]); // 🆕 добавили зависимость
 
   const inputNum = Number(inputStr.replace(",", ".")) || 0;
 
@@ -139,6 +143,7 @@ export default function AddPortionDialog({
       }
       enqueueSnackbar("Порция добавлена", { variant: "success" });
       onClose();
+      onSuccess?.();
     } catch (err) {
       const apiError = err as ApiError;
       enqueueSnackbar(apiError.message || "Ошибка добавления порции", {
@@ -313,5 +318,6 @@ export default function AddPortionDialog({
         </Button>
       </DialogActions>
     </Dialog>
+
   );
 }

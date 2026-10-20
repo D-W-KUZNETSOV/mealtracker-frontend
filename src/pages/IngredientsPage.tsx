@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react"; // 👈 добавили useEffect
 import {
   Alert,
   Box,
@@ -17,6 +17,8 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+
+import { useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -41,9 +43,15 @@ type TabKey = "my" | "base";
 export default function IngredientsPage() {
   const [tab, setTab] = useState<TabKey>("my");
   const [formOpen, setFormOpen] = useState(false);
+   // 🆕 Хук для чтения URL
+    const [searchParams, setSearchParams] = useSearchParams();
+    // 🆕 Состояние для хранения штрихкода, который прилетел из URL
+    const [initialBarcode, setInitialBarcode] = useState<string | null>(null);
   const [editing, setEditing] = useState<IngredientDto | null>(null);
   const [deleting, setDeleting] = useState<IngredientDto | null>(null);
   const [selected, setSelected] = useState<IngredientDto | null>(null);
+
+
 
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
@@ -59,6 +67,19 @@ export default function IngredientsPage() {
   const currentQuery = isMyTab ? myQuery : baseQuery;
   const items = currentQuery.data ?? [];
 
+    // 🆕 Срабатывает при монтировании или изменении URL
+    useEffect(() => {
+      const barcodeFromUrl = searchParams.get("barcode");
+      if (barcodeFromUrl) {
+        setEditing(null); // Сбрасываем редактирование (чтобы создать новый)
+        setInitialBarcode(barcodeFromUrl); // Запоминаем штрихкод
+        setFormOpen(true); // Открываем модалку
+
+        // Очищаем URL, чтобы при F5 форма не открывалась снова
+        setSearchParams({}, { replace: true });
+      }
+    }, [searchParams, setSearchParams]);
+
   // ---------- Открытие формы ----------
   const handleOpenCreate = () => {
     setEditing(null);
@@ -72,14 +93,20 @@ export default function IngredientsPage() {
 
   // ---------- Сохранение ----------
   const handleSubmit = async (data: IngredientRequest) => {
-    try {
-      if (editing) {
-        await updateMutation.mutateAsync({ id: editing.id, data });
-        enqueueSnackbar("Ингредиент обновлён", { variant: "success" });
-      } else {
-        await createMutation.mutateAsync(data);
-        enqueueSnackbar("Ингредиент создан", { variant: "success" });
-      }
+      // 🆕 Если есть штрихкод из URL (или формы), добавляем его в запрос
+      const payload: IngredientRequest = {
+        ...data,
+        barcode: initialBarcode ?? data.barcode,
+      };
+
+      try {
+        if (editing) {
+          await updateMutation.mutateAsync({ id: editing.id, data: payload });
+          enqueueSnackbar("Ингредиент обновлён", { variant: "success" });
+        } else {
+          await createMutation.mutateAsync(payload);
+          enqueueSnackbar("Ингредиент создан", { variant: "success" });
+        }
       setFormOpen(false);
       setEditing(null);
     } catch (err) {
@@ -233,17 +260,19 @@ export default function IngredientsPage() {
         </TableContainer>
       )}
 
-      {/* Модалка создания/редактирования */}
-      <IngredientFormDialog
-        open={formOpen}
-        ingredient={editing}
-        loading={createMutation.isPending || updateMutation.isPending}
-        onSubmit={handleSubmit}
-        onClose={() => {
-          setFormOpen(false);
-          setEditing(null);
-        }}
-      />
+            {/* Модалка создания/редактирования */}
+            <IngredientFormDialog
+              open={formOpen}
+              ingredient={editing}
+              initialBarcode={initialBarcode} // 🆕 Передаем штрихкод из URL
+              loading={createMutation.isPending || updateMutation.isPending}
+              onSubmit={handleSubmit}
+              onClose={() => {
+                setFormOpen(false);
+                setEditing(null);
+                setInitialBarcode(null); // 🆕 Очищаем при закрытии
+              }}
+            />
 
       {/* Подтверждение удаления */}
       <ConfirmDialog

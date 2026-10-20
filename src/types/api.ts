@@ -90,6 +90,7 @@ export interface IngredientDto {
   category?: string;
     gramsPerTbsp?: number | null;
     gramsPerTsp?: number | null;
+    barcode?: string | null;
 }
 
 export interface IngredientRequest {
@@ -103,6 +104,7 @@ export interface IngredientRequest {
   unitWeightGrams?: number | null;
     gramsPerTbsp?: number | null;
     gramsPerTsp?: number | null;
+     barcode?: string | null;
 }
 
 // ---------- Recipes ----------

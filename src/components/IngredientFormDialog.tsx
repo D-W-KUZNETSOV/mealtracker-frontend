@@ -56,10 +56,12 @@ interface IngredientFormDialogProps {
   open: boolean;
   ingredient?: IngredientDto | null;
   initialName?: string;
+  initialBarcode?: string | null;
   loading?: boolean;
   onSubmit: (data: IngredientRequest) => void;
   onClose: () => void;
 }
+
 
 // ============================================================
 // Модалка создания / редактирования ингредиента.
@@ -68,6 +70,7 @@ export default function IngredientFormDialog({
   open,
   ingredient,
   initialName,
+  initialBarcode,
   loading = false,
   onSubmit,
   onClose,
@@ -188,6 +191,7 @@ export default function IngredientFormDialog({
       gramsPerTsp: data.gramsPerTsp
         ? Number(data.gramsPerTsp.replace(",", "."))
         : null,
+         barcode: initialBarcode ?? ingredient?.barcode ?? null,
     });
   };
 
@@ -198,6 +202,11 @@ export default function IngredientFormDialog({
           {isEdit ? "Редактировать ингредиент" : "Новый ингредиент"}
         </DialogTitle>
         <DialogContent>
+                    {initialBarcode && !ingredient && (
+                      <Alert severity="info" sx={{ mb: 2 }}>
+                        Штрихкод: <strong>{initialBarcode}</strong> (будет сохранён)
+                      </Alert>
+                    )}
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label="Название"
