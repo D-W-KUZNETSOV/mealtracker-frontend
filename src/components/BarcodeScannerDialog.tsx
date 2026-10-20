@@ -61,6 +61,13 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
       scannerRef.current = null;
       setIsCameraActive(false);
     }
+ // Cleanup: если компонент удаляется из DOM, тоже стопим камеру
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(console.error);
+        scannerRef.current = null;
+      }
+    };
   }, [open]);
 
 
