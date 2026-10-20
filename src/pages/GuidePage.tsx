@@ -606,6 +606,42 @@ export default function GuidePage() {
             </Stack>
           </AccordionDetails>
         </Accordion>
+                {/* ============ Сканер штрихкодов ============ */}
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="h6">Сканер штрихкодов</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack spacing={2}>
+                      <Typography variant="body2">
+                        <b>Что это:</b> кнопка в верхней панели приложения (иконка со штрихкодом). Позволяет мгновенно находить продукты в вашей базе, наводя камеру телефона на упаковку или вводя цифры вручную.
+                      </Typography>
+
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom>
+                          Как это работает
+                        </Typography>
+                        <Typography variant="body2" sx={{ pl: 2 }}>
+                          • <b>Наведи камеру</b> на штрихкод продукта или введи 13 цифр вручную.
+                          <br />• Если продукт <b>уже есть в базе</b> — появится зелёная плашка с его КБЖУ. Ты можешь сразу добавить его в дневник.
+                          <br />• Если продукта <b>нет в базе</b> — нажми «Создать», заполни КБЖУ с упаковки, и он сохранится.
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom>
+                          💡 Важно знать: База пополняется пользователями
+                        </Typography>
+                        <Typography variant="body2" sx={{ pl: 2 }}>
+                          Мы не используем внешние сервисы и открытые базы (вроде Open Food Facts), потому что они часто работают со сбоями в РФ и не всегда содержат точные данные. Вместо этого <b>база штрихкодов пополняется самими пользователями «Баланса»</b>.
+                          <br />
+                          <br />
+                          Если ты отсканировал продукт, которого нет в базе — создай его. В следующий раз он найдётся моментально, и ты поможешь другим пользователям, которые тоже его сканируют.
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
       </Stack>
     </Box>
   );
