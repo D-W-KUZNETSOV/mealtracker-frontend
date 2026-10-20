@@ -147,11 +147,15 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
     navigate(`/ingredients?barcode=${searchCode}`);
   };
 
-  const handleClose = () => {
+  const handleClose = async() => {
     if (scannerRef.current) {
-      scannerRef.current.stop().catch(console.error);
-      scannerRef.current = null;
-    }
+    try {
+            await scannerRef.current.stop(); // 👈 ЖДЕМ, пока камера реально выключится
+          } catch (e) {
+            console.error("Ошибка при остановке камеры:", e);
+          }
+          scannerRef.current = null;
+        }
     setCode("");
     setSearchCode("");
     setResult(null);
@@ -281,13 +285,16 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
         <Button onClick={handleClose}>Закрыть</Button>
       </DialogActions>
     </Dialog>
- {/* 🆕 Диалог добавления порции (рядом со сканером!) */}
-      <AddPortionDialog
-        open={portionDialogOpen}
-        onClose={() => setPortionDialogOpen(false)}
-        initialIngredient={selectedIngredient}
-        onSuccess={() => navigate("/diary")}
-     />
+       {/* 🆕 Диалог добавления порции (рядом со сканером!) */}
+       <AddPortionDialog
+         open={portionDialogOpen}
+         onClose={() => setPortionDialogOpen(false)}
+         initialIngredient={selectedIngredient}
+         onSuccess={async () => {
+           await handleClose(); // 1. Ждем, пока сканер и камера полностью закроются
+           navigate("/diary");  // 2. Только потом переходим в дневник
+         }}
+       />
   </>
   );
 }
