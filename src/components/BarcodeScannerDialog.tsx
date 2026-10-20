@@ -14,11 +14,12 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Html5Qrcode } from "html5-qrcode";
+
 import { apiClient } from "../api/client";
 import type { ApiError } from "../types/api";
 import AddPortionDialog from "./AddPortionDialog";
 import type { IngredientDto } from "../types/api";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 // Тип ответа от бэка (совпадает с ProductLookupResponse.java)
 interface ProductLookupResponse {
@@ -93,42 +94,54 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
   };
 
   // 🆕 Запуск камеры
-  const startCamera = async () => {
-    setIsCameraActive(true);
-    setCameraError(null);
-    setResult(null);
+   const startCamera = async () => {
+     setIsCameraActive(true);
+     setCameraError(null);
+     setResult(null);
 
-    // Ждем, пока отрендерится div для камеры
-    setTimeout(async () => {
-      try {
-        const html5QrCode = new Html5Qrcode("reader");
-        scannerRef.current = html5QrCode;
+     // Ждем, пока отрендерится div для камеры
+     setTimeout(async () => {
+       try {
+         const html5QrCode = new Html5Qrcode("reader", {
+           formatsToSupport: [
+             Html5QrcodeSupportedFormats.EAN_13,
+             Html5QrcodeSupportedFormats.EAN_8,
+             Html5QrcodeSupportedFormats.CODE_128,
+           ],
+        verbose: false,
+         });
+         scannerRef.current = html5QrCode;
 
-        await html5QrCode.start(
-          { facingMode: "environment" }, // Задняя камера на телефоне
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 150 }, // Прямоугольник под штрихкод
-          },
-          (decodedText) => {
-            // Успешно отсканировали
-            html5QrCode.stop().then(() => {
-              setIsCameraActive(false);
-              setCode(decodedText);
-              handleSearch(decodedText); // Автоматически ищем
-            }).catch(console.error);
-          },
-          (_errorMessage) => {
-            // Игнорируем ошибки сканирования (когда просто водят камерой)
-          }
-        );
-      } catch (err: any) {
-        console.error(err);
-        setCameraError("Не удалось включить камеру. Разрешите доступ в браузере.");
-        setIsCameraActive(false);
-      }
-    }, 100);
-  };
+         await html5QrCode.start(
+           { facingMode: "environment" },
+           {
+             fps: 10,
+             qrbox: { width: 250, height: 150 },
+           },
+           (decodedText) => {
+             // Успешно отсканировали
+             html5QrCode
+               .stop()
+               .then(() => {
+                 setIsCameraActive(false);
+                 setCode(decodedText);
+                 handleSearch(decodedText); // Автоматически ищем
+               })
+               .catch(console.error);
+           },
+           (_errorMessage) => {
+             // Игнорируем ошибки сканирования (когда просто водят камерой)
+           }
+         );
+       } catch (err: any) {
+         console.error(err);
+         setCameraError(
+           "Не удалось включить камеру. Разрешите доступ в браузере."
+         );
+         setIsCameraActive(false);
+       }
+     }, 100);
+   };
 
   // 🆕 Остановка камеры вручную
   const stopCamera = () => {
