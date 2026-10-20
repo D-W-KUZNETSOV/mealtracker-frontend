@@ -23,6 +23,7 @@ const GuidePage = lazy(() => import("./pages/GuidePage"));
 const MealPlanPage = lazy(() => import("./pages/MealPlanPage"));
 const ShoppingPage = lazy(() => import("./pages/ShoppingPage"));
 
+
 function PageLoader() {
   return (
     <Box
@@ -70,6 +71,7 @@ function App() {
         <Route path="*" element={<Navigate to="/recipes" replace />} />
       </Routes>
     </Suspense>
+
   );
 }
 

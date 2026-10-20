@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { SnackbarProvider } from "notistack";
 import { registerSW } from 'virtual:pwa-register';
+import ErrorBoundary from './components/ErrorBoundary';
 
 import App from "./App";
 import { theme } from "./theme";
@@ -42,9 +43,11 @@ createRoot(document.getElementById("root")!).render(
           autoHideDuration={3000}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+         <BrowserRouter>
+           <ErrorBoundary>
+             <App />
+           </ErrorBoundary>
+         </BrowserRouter>
         </SnackbarProvider>
       </ThemeProvider>
     </QueryClientProvider>
