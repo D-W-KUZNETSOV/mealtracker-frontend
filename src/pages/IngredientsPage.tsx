@@ -68,17 +68,16 @@ export default function IngredientsPage() {
   const items = currentQuery.data ?? [];
 
     // 🆕 Срабатывает при монтировании или изменении URL
-    useEffect(() => {
-      const barcodeFromUrl = searchParams.get("barcode");
-      if (barcodeFromUrl) {
-        setEditing(null); // Сбрасываем редактирование (чтобы создать новый)
-        setInitialBarcode(barcodeFromUrl); // Запоминаем штрихкод
-        setFormOpen(true); // Открываем модалку
-
-        // Очищаем URL, чтобы при F5 форма не открывалась снова
-        setSearchParams({}, { replace: true });
-      }
-    }, [searchParams, setSearchParams]);
+     useEffect(() => {
+       const barcodeFromUrl = searchParams.get("barcode");
+       if (barcodeFromUrl) {
+         setEditing(null);
+         setInitialBarcode(barcodeFromUrl);
+         setFormOpen(true);
+         setSearchParams({}, { replace: true });
+       }
+       // eslint-disable-next-line react-hooks/exhaustive-deps
+     }, []); // 👈 ПУСТОЙ МАССИВ
 
   // ---------- Открытие формы ----------
   const handleOpenCreate = () => {
