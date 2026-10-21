@@ -21,6 +21,7 @@ import AddPortionDialog from "./AddPortionDialog";
 import type { IngredientDto } from "../types/api";
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
+
 // Тип ответа от бэка (совпадает с ProductLookupResponse.java)
 interface ProductLookupResponse {
     id?: number | null;
@@ -68,6 +69,7 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
         scannerRef.current.stop().catch(console.error);
         scannerRef.current = null;
       }
+
     };
   }, [open]);
 
@@ -247,49 +249,85 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
             <>
               {result.found ? (
                 <Box sx={{ p: 2, bgcolor: "success.light", borderRadius: 1 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ color: "success.contrastText" }}
-                  >
+                  <Typography variant="subtitle2" sx={{ color: "success.contrastText" }}>
                     Найдено: {result.name}
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "success.contrastText" }}
-                  >
+                  <Typography variant="body2" sx={{ color: "success.contrastText", mb: 2 }}>
                     {result.caloriesPer100g ?? "?"} ккал / 100 г
                   </Typography>
-                                    <Button
-                                      size="small"
-                                      sx={{ mt: 1, color: "success.contrastText" }}
-                                      onClick={() => {
-                                        // Формируем объект IngredientDto из ответа бэка
-                                        const ing: IngredientDto = {
-                                          id: result.id!,
-                                          name: result.name || "Без названия",
-                                          caloriesPer100g: result.caloriesPer100g,
-                                          proteinsPer100g: result.proteinsPer100g || 0,
-                                          fatsPer100g: result.fatsPer100g || 0,
-                                          carbsPer100g: result.carbsPer100g || 0,
-                                          unitType: "GRAM",
-                                          unitWeightGrams: null,
-                                          barcode: result.barcode,
-                                        };
-                                        setSelectedIngredient(ing);
-                                        setPortionDialogOpen(true);
-                                        handleClose(); // Закрываем сканер, чтобы открылся дневник
-                                      }}
-                                    >
-                                      Добавить в дневник
-                                    </Button>
+
+                  {/* 🆕 Две кнопки */}
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{
+                        bgcolor: "success.contrastText",
+                        color: "success.main",
+                        "&:hover": { bgcolor: "success.contrastText", opacity: 0.9 }
+                      }}
+                      onClick={() => {
+                        // Логика добавления в дневник (уже есть)
+                        const ing: IngredientDto = {
+                          id: result.id!,
+                          name: result.name || "Без названия",
+                          caloriesPer100g: result.caloriesPer100g,
+                          proteinsPer100g: result.proteinsPer100g || 0,
+                          fatsPer100g: result.fatsPer100g || 0,
+                          carbsPer100g: result.carbsPer100g || 0,
+                          unitType: "GRAM",
+                          unitWeightGrams: null,
+                          barcode: result.barcode,
+                        };
+                        setSelectedIngredient(ing);
+                        setPortionDialogOpen(true);
+                        handleClose();
+                      }}
+                    >
+                      Съесть сейчас
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{
+                        color: "success.contrastText",
+                        borderColor: "success.contrastText",
+                        "&:hover": { borderColor: "success.contrastText", bgcolor: "rgba(255,255,255,0.1)" }
+                      }}
+                      onClick={() => {
+                        // 🆕 Логика: продукт уже в базе (found), значит, он уже сохранен.
+                        // Просто показываем снекбар и закрываем.
+                        // (Если это базовый продукт, он и так доступен).
+
+                        handleClose();
+                      }}
+                    >
+                      В ингредиенты
+                    </Button>
+                  </Stack>
                 </Box>
               ) : (
+
                 <Alert
                   severity="warning"
                   action={
-                    <Button color="inherit" size="small" onClick={handleCreate}>
-                      Создать
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button color="inherit" size="small" onClick={handleCreate}>
+                        Создать
+                      </Button>
+                      <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                          // Открываем форму создания ингредиента напрямую (без перехода по URL)
+                          navigate('/ingredients'); // Или можно передать в Layout сигнал
+                          handleClose();
+                        }}
+                      >
+                        Вручную
+                      </Button>
+                    </Stack>
                   }
                 >
                   Продукт не найден. Создать новый?
