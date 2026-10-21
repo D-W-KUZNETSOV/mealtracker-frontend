@@ -148,40 +148,44 @@ export default function RecipeFormDialog({
           })),
         );
         setSteps(initialData.steps ?? []);
-      } else {
-        setName("");
-        setCategory(null);
-        setDescription("");
-        setImageUrl("");
-        setVisibility("PRIVATE");
-        setServings(1);
+       } else {
+            setName("");
+            setCategory(null);
+            setDescription("");
+            setImageUrl("");
+            setVisibility("PRIVATE");
+            setServings(1);
 
-        // 🆕 Если есть prefilledIngredientId, добавляем его в первую строку
-        if (prefilledIngredientId) {
-          setRows([
-            {
-              tempId: Date.now(),
-              ingredientId: prefilledIngredientId,
-              weightInGrams: 100,
-              quantity: 100,
-              unit: "GRAM",
-            },
-          ]);
-        } else {
-          setRows([
-            {
-              tempId: Date.now(),
-              ingredientId: null,
-              weightInGrams: 100,
-              quantity: 100,
-              unit: "GRAM",
-            },
-          ]);
-        }
-        setSteps([]);
-      }
-      setInputValueByRow({});
-    }, [open, isEdit, initialData, prefilledIngredientId]); // 🆕 добавили prefilledIngredientId
+            // 🆕 Если есть prefilledIngredientId, но ингредиенты ЕЩЕ НЕ загрузились — ждем
+            if (prefilledIngredientId && allIngredients.length === 0) {
+              return; // 👈 Выходим, не трогаем rows (покажем лоадер)
+            }
+
+            if (prefilledIngredientId) {
+              setRows([
+                {
+                  tempId: Date.now(),
+                  ingredientId: prefilledIngredientId,
+                  weightInGrams: 100,
+                  quantity: 100,
+                  unit: "GRAM",
+                },
+              ]);
+            } else {
+              setRows([
+                {
+                  tempId: Date.now(),
+                  ingredientId: null,
+                  weightInGrams: 100,
+                  quantity: 100,
+                  unit: "GRAM",
+                },
+              ]);
+            }
+            setSteps([]);
+          }
+          setInputValueByRow({});
+        }, [open, isEdit, initialData, prefilledIngredientId, allIngredients]); // 🆕 добавили allIngredie
   // ---------- Работа со строками ингредиентов ----------
   const handleAddRow = () => {
     setRows((prev) => [
@@ -550,7 +554,11 @@ export default function RecipeFormDialog({
                         sx={{ alignItems: isMobile ? "stretch" : "center" }}
                       >
                         <Autocomplete
-                          options={allIngredients}
+                          options={
+                            inputValueByRow[row.tempId]?.trim()
+                              ? allIngredients // Если юзер вводит текст — показываем все (для поиска)
+                              : allIngredients.slice(0, 50) // Если просто открыл список — только 50
+                          }
                           getOptionLabel={(o) => o.name}
                           value={ing ?? null}
                           onChange={(_, v) => {
