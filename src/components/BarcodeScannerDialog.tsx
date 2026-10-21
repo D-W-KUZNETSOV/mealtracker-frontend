@@ -37,9 +37,10 @@ interface ProductLookupResponse {
 interface Props {
   open: boolean;
   onClose: () => void;
+  onScanned?: (ingredient: IngredientDto) => void;
 }
 
-export default function BarcodeScannerDialog({ open, onClose }: Props) {
+export default function BarcodeScannerDialog({ open, onClose, onScanned }: Props) {
   const [code, setCode] = useState("");
   const [searchCode, setSearchCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -284,22 +285,34 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
                       Добавить в дневник
                     </Button>
 
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{
-                        color: "success.contrastText",
-                        borderColor: "success.contrastText",
-                        "&:hover": { borderColor: "success.contrastText", bgcolor: "rgba(255,255,255,0.1)" }
-                      }}
-                      onClick={() => {
+                   <Button
+                     variant="outlined"
+                     size="small"
+                    onClick={() => {
+                      if (onScanned) {
+                        // 🆕 Собираем объект IngredientDto из ответа бэка
+                        const ing: IngredientDto = {
+                          id: result.id!,
+                          name: result.name || "Без названия",
+                          caloriesPer100g: result.caloriesPer100g,
+                          proteinsPer100g: result.proteinsPer100g || 0,
+                          fatsPer100g: result.fatsPer100g || 0,
+                          carbsPer100g: result.carbsPer100g || 0,
+                          unitType: "GRAM",
+                          unitWeightGrams: null,
+                          barcode: result.barcode,
+                        };
+                        onScanned(ing);
                         onClose();
-                        // Переходим на рецепты с ID ингредиента
+                      } else {
+                        // Режим "из шапки": переход в рецепты
+                        onClose();
                         window.location.href = `/recipes?addIngredientId=${result.id}`;
-                      }}
-                    >
-                      Добавить в рецепт
-                    </Button>
+                      }
+                    }}
+                   >
+                     {onScanned ? "Добавить в этот рецепт" : "Добавить в рецепт"}
+                   </Button>
                   </Stack>
                 </Box>
               ) : (

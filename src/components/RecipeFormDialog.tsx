@@ -30,6 +30,8 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useSnackbar } from "notistack";
 import ImageUpload from "./ImageUpload";
 import IngredientFormDialog from "./IngredientFormDialog";
+import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import BarcodeScannerDialog from "./BarcodeScannerDialog";
 
 import { useCreateRecipe, useUpdateRecipe } from "../hooks/useRecipes";
 import {
@@ -90,6 +92,7 @@ export default function RecipeFormDialog({
   const createIngredientMutation = useCreateIngredient();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   // Загружаем ингредиенты: мои + базовые
   const myIngredientsQuery = useMyIngredients();
@@ -486,6 +489,7 @@ export default function RecipeFormDialog({
             <Divider />
 
             {/* Заголовок ингредиентов */}
+
             <Stack
               direction="row"
               sx={{
@@ -494,13 +498,26 @@ export default function RecipeFormDialog({
               }}
             >
               <Typography variant="h6">Ингредиенты</Typography>
-              <Button
-                startIcon={<AddIcon />}
-                onClick={handleAddRow}
-                size="small"
-              >
-                Добавить ингредиент
-              </Button>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                {/* 🆕 Кнопка-иконка без текста */}
+                <IconButton
+                  onClick={() => setScannerOpen(true)}
+                  color="primary" // или "success", чтобы была зелёной
+                  size="medium"
+                  title="Сканировать штрихкод"
+                >
+                  <QrCodeScannerIcon />
+                </IconButton>
+
+                {/* Кнопка "Добавить" */}
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={handleAddRow}
+                  size="small"
+                >
+                  Добавить
+                </Button>
+              </Stack>
             </Stack>
 
             {/* Строки ингредиентов */}
@@ -889,6 +906,23 @@ export default function RecipeFormDialog({
               variant: "error",
             });
           }
+        }}
+      />
+      <BarcodeScannerDialog
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onScanned={(ing) => {
+          // 🆕 Добавляем найденный ингредиент в список rows
+          setRows((prev) => [
+            ...prev,
+            {
+              tempId: Date.now() + Math.random(),
+              ingredientId: ing.id,
+              weightInGrams: 100,
+              quantity: 100,
+              unit: "GRAM",
+            },
+          ]);
         }}
       />
     </>
