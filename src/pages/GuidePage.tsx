@@ -3,11 +3,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Chip,
   Stack,
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Link as RouterLink } from "react-router-dom";
 
 // ============================================================
 // Справочник пользователя MealTracker
@@ -32,52 +34,69 @@ export default function GuidePage() {
           <AccordionDetails>
             <Stack spacing={1.5}>
               <Typography>
-                <b>1. Заполни профиль</b> → раздел «Профиль». Укажи рост, вес,
-                дату рождения, пол, уровень активности.
+                <b>1. Заполни профиль</b> → перейди в{" "}
+                <RouterLink to="/profile" style={{ color: "#2E7D32" }}>Профиль</RouterLink>.
+                Укажи рост, вес, дату рождения, пол, уровень активности.
               </Typography>
               <Typography>
-                <b>2. Поставь цели</b> → раздел «Цели». Выбери цель: похудеть /
-                поддерживать / набрать массу. Калории и белок рассчитаются
+                <b>2. Поставь цели</b> → перейди в{" "}
+                <RouterLink to="/goals" style={{ color: "#2E7D32" }}>Цели</RouterLink>.
+                Выбери цель: похудеть / поддерживать / набрать массу. Калории и белок рассчитаются
                 автоматически.
               </Typography>
               <Typography>
-                <b>3. Создай рецепты</b> → раздел «Рецепты». Добавь ингредиенты
-                (в граммах, штуках, мл или ложках).
+                <b>3. Создай рецепты</b> → перейди в{" "}
+                <RouterLink to="/recipes" style={{ color: "#2E7D32" }}>Рецепты</RouterLink>.
+                Добавь ингредиенты (в граммах, штуках, мл или ложках).
               </Typography>
               <Typography>
-                <b>4. Веди дневник</b> → раздел «Дневник». Выбирай рецепт и вес
-                порции — КБЖУ посчитается сам. Можно добавлять порции прямо из
+                <b>4. Веди дневник</b> → перейди в{" "}
+                <RouterLink to="/diary" style={{ color: "#2E7D32" }}>Дневник</RouterLink>.
+                Выбирай рецепт и вес порции — КБЖУ посчитается сам. Можно добавлять порции прямо из
                 плана меню (кнопка «Из плана»).
               </Typography>
               <Typography>
-                <b>5. Планируй меню</b> → раздел «Меню». Составь меню на день
-                или неделю: завтрак, обед, ужин, перекус. КБЖУ за день считается
+                <b>5. Планируй питание</b> → перейди в{" "}
+                <RouterLink to="/meal-plan" style={{ color: "#2E7D32" }}>План</RouterLink>.
+                Составь меню на день или неделю: завтрак, обед, ужин, перекус. КБЖУ за день считается
                 автоматически.
               </Typography>
               <Typography>
-                <b>6. Составляй список покупок</b> → раздел «Покупки».
-                Сгенерируй список из плана меню — ингредиенты агрегируются
-                автоматически. Или добавь продукты вручную.
+                <b>6. Составляй список покупок</b> → перейди в{" "}
+                <RouterLink to="/shopping" style={{ color: "#2E7D32" }}>Покупки</RouterLink>.
+                Сгенерируй список из плана меню — ингредиенты агрегируются автоматически. Или добавь
+                продукты вручную.
               </Typography>
               <Typography>
-                <b>7. Отслеживай прогресс</b> → раздел «Замеры». Записывай вес и
-                обхваты — увидишь графики.
+                <b>7. Отслеживай прогресс</b> → перейди в{" "}
+                <RouterLink to="/measurements" style={{ color: "#2E7D32" }}>Замеры</RouterLink>.
+                Записывай вес и обхваты — увидишь графики.
               </Typography>
             </Stack>
           </AccordionDetails>
         </Accordion>
-
         {/* ============ Меню (планировщик) ============ */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Меню — планировщик питания</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Stack spacing={2}>
-              <Typography variant="body2">
-                <b>Что это:</b> раздел для планирования приёмов пищи на день или
-                неделю вперёд.
-              </Typography>
+           <Stack spacing={2}>
+             <Box>
+               <Typography variant="body2">
+                 <b>Что это:</b> раздел для планирования приёмов пищи на день или
+                 неделю вперёд.
+               </Typography>
+               <Button
+                 component={RouterLink}
+                 to="/meal-plan"
+                 variant="outlined"
+                 size="small"
+                 sx={{ mt: 1, textTransform: "none", color: "#2E7D32", borderColor: "#2E7D32" }}
+               >
+                 Перейти в раздел «План»
+               </Button>
+             </Box>
 
               <Box>
                 <Typography variant="subtitle2" gutterBottom>
@@ -136,10 +155,21 @@ export default function GuidePage() {
           </AccordionSummary>
           <AccordionDetails>
             <Stack spacing={2}>
-              <Typography variant="body2">
-                <b>Что это:</b> списки продуктов, которые нужно купить. Можно
-                создавать автоматически из плана меню или добавлять вручную.
-              </Typography>
+              <Box>
+                <Typography variant="body2">
+                  <b>Что это:</b> списки продуктов, которые нужно купить. Можно
+                  создавать автоматически из плана меню или добавлять вручную.
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to="/shopping"
+                  variant="outlined"
+                  size="small"
+                  sx={{ mt: 1, textTransform: "none", color: "#2E7D32", borderColor: "#2E7D32" }}
+                >
+                  Перейти в раздел «Покупки»
+                </Button>
+              </Box>
 
               <Box>
                 <Typography variant="subtitle2" gutterBottom>
@@ -201,9 +231,20 @@ export default function GuidePage() {
           </AccordionSummary>
           <AccordionDetails>
             <Stack spacing={2}>
-              <Typography variant="body2">
-                В дневнике есть <b>две кнопки</b> для добавления еды:
-              </Typography>
+              <Box>
+                <Typography variant="body2">
+                  В дневнике есть <b>две кнопки</b> для добавления еды:
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to="/diary"
+                  variant="outlined"
+                  size="small"
+                  sx={{ mt: 1, textTransform: "none", color: "#2E7D32", borderColor: "#2E7D32" }}
+                >
+                  Перейти в раздел «Дневник»
+                </Button>
+              </Box>
 
               <Box>
                 <Typography variant="subtitle2" gutterBottom>
@@ -607,41 +648,52 @@ export default function GuidePage() {
           </AccordionDetails>
         </Accordion>
                 {/* ============ Сканер штрихкодов ============ */}
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="h6">Сканер штрихкодов</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Stack spacing={2}>
-                      <Typography variant="body2">
-                        <b>Что это:</b> кнопка в верхней панели приложения (иконка со штрихкодом). Позволяет мгновенно находить продукты в вашей базе, наводя камеру телефона на упаковку или вводя цифры вручную.
-                      </Typography>
+               <Accordion>
+                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                   <Typography variant="h6">Сканер штрихкодов</Typography>
+                 </AccordionSummary>
+                 <AccordionDetails>
+                   <Stack spacing={2}>
+                     <Typography variant="body2">
+                       <b>Что это:</b> кнопка в верхней панели приложения (иконка со штрихкодом).
+                       Позволяет мгновенно находить продукты в вашей базе, наводя камеру телефона на
+                       упаковку или вводя цифры вручную.
+                     </Typography>
 
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom>
-                          Как это работает
-                        </Typography>
-                        <Typography variant="body2" sx={{ pl: 2 }}>
-                          • <b>Наведи камеру</b> на штрихкод продукта или введи 13 цифр вручную.
-                          <br />• Если продукт <b>уже есть в базе</b> — появится зелёная плашка с его КБЖУ. Ты можешь сразу добавить его в дневник.
-                          <br />• Если продукта <b>нет в базе</b> — нажми «Создать», заполни КБЖУ с упаковки, и он сохранится.
-                        </Typography>
-                      </Box>
+                     <Box>
+                       <Typography variant="subtitle2" gutterBottom>
+                         Как это работает
+                       </Typography>
+                       <Typography variant="body2" sx={{ pl: 2 }}>
+                         • <b>Наведи камеру</b> на штрихкод продукта или введи 13 цифр вручную.
+                         <br />• Если продукт <b>уже есть в базе</b> — появится зелёная плашка с его КБЖУ.
+                         Ты можешь сразу добавить его в{" "}
+                         <RouterLink to="/diary" style={{ color: "#2E7D32" }}>дневник</RouterLink>{" "}
+                         или оставить в{" "}
+                         <RouterLink to="/ingredients" style={{ color: "#2E7D32" }}>ингредиентах</RouterLink>.
+                         <br />• Если продукта <b>нет в базе</b> — нажми «Создать», заполни КБЖУ с упаковки,
+                         и он сохранится.
+                       </Typography>
+                     </Box>
 
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom>
-                          💡 Важно знать: База пополняется пользователями
-                        </Typography>
-                        <Typography variant="body2" sx={{ pl: 2 }}>
-                          Мы не используем внешние сервисы и открытые базы (вроде Open Food Facts), потому что они часто работают со сбоями в РФ и не всегда содержат точные данные. Вместо этого <b>база штрихкодов пополняется самими пользователями «Баланса»</b>.
-                          <br />
-                          <br />
-                          Если ты отсканировал продукт, которого нет в базе — создай его. В следующий раз он найдётся моментально, и ты поможешь другим пользователям, которые тоже его сканируют.
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </AccordionDetails>
-                </Accordion>
+                     <Box>
+                       <Typography variant="subtitle2" gutterBottom>
+                         💡 Важно знать: База пополняется пользователями
+                       </Typography>
+                       <Typography variant="body2" sx={{ pl: 2 }}>
+                         Мы не используем внешние сервисы и открытые базы (вроде Open Food Facts), потому
+                         что они часто работают со сбоями в РФ и не всегда содержат точные данные. Вместо
+                         этого <b>база штрихкодов пополняется самими пользователями «Баланса»</b>.
+                         <br />
+                         <br />
+                         Если ты отсканировал продукт, которого нет в базе — создай его. В следующий раз он
+                         найдётся моментально, и ты поможешь другим пользователям, которые тоже его
+                         сканируют.
+                       </Typography>
+                     </Box>
+                   </Stack>
+                 </AccordionDetails>
+               </Accordion>
       </Stack>
     </Box>
   );
