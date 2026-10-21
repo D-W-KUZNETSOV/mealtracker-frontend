@@ -157,15 +157,12 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
     }
   };
 
-   const handleCreate = async () => {
-     // 1. Сначала полностью закрываем сканер (и камеру)
-     await handleClose();
-
-     // 2. Ждем микрозадержку, чтобы React успел размонтировать сканер
-     setTimeout(() => {
-       navigate(`/ingredients?barcode=${searchCode}`);
-     }, 50);
-   };
+  const handleCreate = async () => {
+    await handleClose();
+    setTimeout(() => {
+      window.location.href = `/ingredients?barcode=${searchCode}`;
+    }, 50);
+  };
 
   const handleClose = async() => {
     if (scannerRef.current) {
@@ -284,7 +281,7 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
                         handleClose();
                       }}
                     >
-                      Съесть сейчас
+                      Добавить в дневник
                     </Button>
 
                     <Button
@@ -308,26 +305,12 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
                   </Stack>
                 </Box>
               ) : (
-
                 <Alert
                   severity="warning"
                   action={
-                    <Stack direction="row" spacing={1}>
-                      <Button color="inherit" size="small" onClick={handleCreate}>
-                        Создать
-                      </Button>
-                      <Button
-                        color="inherit"
-                        size="small"
-                        onClick={() => {
-                          // Открываем форму создания ингредиента напрямую (без перехода по URL)
-                          navigate('/ingredients'); // Или можно передать в Layout сигнал
-                          handleClose();
-                        }}
-                      >
-                        Вручную
-                      </Button>
-                    </Stack>
+                    <Button color="inherit" size="small" onClick={handleCreate}>
+                      Создать
+                    </Button>
                   }
                 >
                   Продукт не найден. Создать новый?
