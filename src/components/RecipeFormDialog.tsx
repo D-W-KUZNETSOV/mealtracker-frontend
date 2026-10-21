@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -406,6 +407,12 @@ export default function RecipeFormDialog({
           {isEdit ? "Редактировать рецепт" : "Создать рецепт"}
         </DialogTitle>
         <DialogContent>
+          {/* 🆕 Если ингредиенты еще грузятся — показываем лоадер */}
+          {!isEdit && (myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading) ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
           <Stack spacing={2} sx={{ mt: 1 }}>
             {/* Название */}
             <TextField
@@ -852,6 +859,7 @@ export default function RecipeFormDialog({
               </Stack>
             </Paper>
           </Stack>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={activeMutation.isPending}>
