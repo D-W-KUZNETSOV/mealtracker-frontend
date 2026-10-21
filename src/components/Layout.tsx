@@ -148,15 +148,23 @@ export default function Layout() {
                       spacing={1}
                       sx={{ alignItems: "center", ml: "auto" }}
                     >
-                      {/* Кнопка Сканера */}
-                      <IconButton
-                        onClick={() => setScannerOpen(true)}
-                        color="inherit"
-                        size="small"
-                        title="Сканировать штрихкод"
-                      >
-                        <QrCodeScannerIcon />
-                      </IconButton>
+                     {/* Кнопка Сканера */}
+                     <IconButton
+                       onClick={() => {
+                         // 🆕 Если мы на странице ингредиентов и есть открытая форма (barcode в URL),
+                         // принудительно закрываем её, чтобы сканер мог открыться
+                         if (window.location.pathname === '/ingredients' && window.location.search.includes('barcode=')) {
+                           window.history.replaceState({}, '', '/ingredients');
+                           window.location.reload(); // Простой способ сбросить форму
+                         }
+                         setScannerOpen(true);
+                       }}
+                       color="inherit"
+                       size="small"
+                       title="Сканировать штрихкод"
+                     >
+                       <QrCodeScannerIcon />
+                     </IconButton>
 
                       {/* Кнопка Справочника */}
                       <IconButton
