@@ -63,6 +63,7 @@ interface RecipeFormDialogProps {
   onClose: () => void;
   recipeId?: number;
   initialData?: RecipeSummaryDto | null;
+  prefilledIngredientId?: number | null;
 }
 
 const CATEGORIES = [
@@ -79,6 +80,7 @@ export default function RecipeFormDialog({
   onClose,
   recipeId,
   initialData,
+  prefilledIngredientId,
 }: RecipeFormDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const isEdit = recipeId != null;
@@ -120,53 +122,62 @@ export default function RecipeFormDialog({
   >({});
 
   // ---------- Сброс формы при открытии ----------
-  useEffect(() => {
-    if (!open) return;
+    useEffect(() => {
+      if (!open) return;
 
-    if (isEdit && initialData) {
-      setName(initialData.name);
-      console.log("initialData.category:", initialData.category);
-      console.log(
-        "found:",
-        CATEGORIES.find((c) => c.value === initialData.category),
-      );
-      setCategory(
-        CATEGORIES.find((c) => c.value === initialData.category)?.value ?? null,
-      );
-      setDescription(initialData.description ?? "");
-      setImageUrl(initialData.imageUrl ?? "");
-      setVisibility(initialData.visibility);
-      setServings(initialData.servings ?? 1);
-      setRows(
-        initialData.ingredients.map((ing, idx) => ({
-          tempId: Date.now() + idx,
-          ingredientId: ing.ingredientId,
-          weightInGrams: ing.quantityGrams,
-          quantity: ing.quantityGrams,
-          unit: "GRAM",
-        })),
-      );
-      setSteps(initialData.steps ?? []);
-    } else {
-      setName("");
-      setCategory(null);
-      setDescription("");
-      setImageUrl("");
-      setVisibility("PRIVATE");
-      setServings(1);
-      setRows([
-        {
-          tempId: Date.now(),
-          ingredientId: null,
-          weightInGrams: 100,
-          quantity: 100,
-          unit: "GRAM",
-        },
-      ]);
-      setSteps([]);
-    }
-    setInputValueByRow({});
-  }, [open, isEdit, initialData]);
+      if (isEdit && initialData) {
+        setName(initialData.name);
+        setCategory(
+          CATEGORIES.find((c) => c.value === initialData.category)?.value ?? null,
+        );
+        setDescription(initialData.description ?? "");
+        setImageUrl(initialData.imageUrl ?? "");
+        setVisibility(initialData.visibility);
+        setServings(initialData.servings ?? 1);
+        setRows(
+          initialData.ingredients.map((ing, idx) => ({
+            tempId: Date.now() + idx,
+            ingredientId: ing.ingredientId,
+            weightInGrams: ing.quantityGrams,
+            quantity: ing.quantityGrams,
+            unit: "GRAM",
+          })),
+        );
+        setSteps(initialData.steps ?? []);
+      } else {
+        setName("");
+        setCategory(null);
+        setDescription("");
+        setImageUrl("");
+        setVisibility("PRIVATE");
+        setServings(1);
+
+        // 🆕 Если есть prefilledIngredientId, добавляем его в первую строку
+        if (prefilledIngredientId) {
+          setRows([
+            {
+              tempId: Date.now(),
+              ingredientId: prefilledIngredientId,
+              weightInGrams: 100,
+              quantity: 100,
+              unit: "GRAM",
+            },
+          ]);
+        } else {
+          setRows([
+            {
+              tempId: Date.now(),
+              ingredientId: null,
+              weightInGrams: 100,
+              quantity: 100,
+              unit: "GRAM",
+            },
+          ]);
+        }
+        setSteps([]);
+      }
+      setInputValueByRow({});
+    }, [open, isEdit, initialData, prefilledIngredientId]); // 🆕 добавили prefilledIngredientId
   // ---------- Работа со строками ингредиентов ----------
   const handleAddRow = () => {
     setRows((prev) => [

@@ -293,14 +293,12 @@ export default function BarcodeScannerDialog({ open, onClose }: Props) {
                         "&:hover": { borderColor: "success.contrastText", bgcolor: "rgba(255,255,255,0.1)" }
                       }}
                       onClick={() => {
-                        // 🆕 Логика: продукт уже в базе (found), значит, он уже сохранен.
-                        // Просто показываем снекбар и закрываем.
-                        // (Если это базовый продукт, он и так доступен).
-
-                        handleClose();
+                        onClose();
+                        // Переходим на рецепты с ID ингредиента
+                        window.location.href = `/recipes?addIngredientId=${result.id}`;
                       }}
                     >
-                      В ингредиенты
+                      Добавить в рецепт
                     </Button>
                   </Stack>
                 </Box>

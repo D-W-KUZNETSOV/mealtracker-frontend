@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
@@ -32,6 +32,7 @@ import type { ApiError, RecipeListItemDto } from "../types/api";
 import { roundNutrient } from "../types/api";
 import { useDebounce } from "../hooks/useDebounce";
 import RecipeFormDialog from "../components/RecipeFormDialog";
+import { useSearchParams } from "react-router-dom";
 
 type TabKey = "my" | "public";
 type SortKey =
@@ -58,6 +59,8 @@ export default function RecipesPage() {
   const [tab, setTab] = useState<TabKey>("my");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [prefilledIngredientId, setPrefilledIngredientId] = useState<number | null>(null);
 
   // Фильтры
   const [queryStr, setQueryStr] = useState("");
@@ -70,6 +73,14 @@ export default function RecipesPage() {
 
   const debouncedQuery = useDebounce(queryStr, 300);
   const navigate = useNavigate();
+  useEffect(() => {
+    const addId = searchParams.get("addIngredientId");
+    if (addId) {
+      setPrefilledIngredientId(Number(addId));
+      setFormOpen(true);
+      setSearchParams({}, { replace: true }); // Очищаем URL
+    }
+  }, [searchParams, setSearchParams]);
 
   const filters = {
     query: debouncedQuery || undefined,
@@ -386,7 +397,14 @@ export default function RecipesPage() {
         </Box>
       )}
 
-      <RecipeFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+     <RecipeFormDialog
+       open={formOpen}
+       onClose={() => {
+         setFormOpen(false);
+         setPrefilledIngredientId(null); // 🆕 сбрасываем ID при закрытии
+       }}
+       prefilledIngredientId={prefilledIngredientId} // 🆕 передаем ID
+     />
     </Box>
   );
 }
