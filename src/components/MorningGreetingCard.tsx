@@ -40,8 +40,12 @@ function getGreetingData() {
 
 export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
   const navigate = useNavigate();
+
+  // 🆕 Проверяем, сейчас ночь или нет (с 23:00 до 05:00)
+  const hour = new Date().getHours();
+  const isNight = hour >= 23 || hour < 5;
+
   const getMealLabel = () => {
-    const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "Записать завтрак";
     if (hour >= 12 && hour < 18) return "Записать обед";
     return "Записать ужин";
@@ -82,17 +86,23 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
             <GreetingIcon color={iconColor} />
             <Typography variant="h6">{greetingText}</Typography>
           </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Давай начнём с простого — поставим цель. Это поможет рассчитать
-            норму калорий и белка.
-          </Typography>
-          <Button
-            variant="contained"
-            endIcon={<ArrowForwardIcon />}
-            onClick={() => navigate("/goals")}
-          >
-            Поставить цель
-          </Button>
+
+          {/* 🆕 Ночью не предлагаем ставить цель */}
+          {!isNight && (
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Давай начнём с простого — поставим цель. Это поможет рассчитать
+                норму калорий и белка.
+              </Typography>
+              <Button
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => navigate("/goals")}
+              >
+                Поставить цель
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
     );
@@ -111,16 +121,22 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
             <GreetingIcon color={iconColor} />
             <Typography variant="h6">{greetingText}</Typography>
           </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            План на сегодня готов.
-          </Typography>
-          <Button
-            variant="contained"
-            endIcon={<ArrowForwardIcon />}
-            onClick={() => navigate("/meal-plan")}
-          >
-            Открыть план
-          </Button>
+
+          {/* 🆕 Ночью просто говорим "Доброй ночи", без плана */}
+          {!isNight && (
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                План на сегодня готов.
+              </Typography>
+              <Button
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => navigate("/meal-plan")}
+              >
+                Открыть план
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
     );
@@ -134,23 +150,29 @@ export default function MorningGreetingCard({ isGoalsNotFound }: Props) {
           <GreetingIcon color={iconColor} />
           <Typography variant="h6">{greetingText}</Typography>
         </Stack>
-        {streak > 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            🔥 {streak} {streak === 1 ? "день" : streak < 5 ? "дня" : "дней"}{" "}
-            подряд. Молодец. Давай ещё один?
-          </Typography>
-        ) : (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Начнём сегодня? С одного шага.
-          </Typography>
+
+        {/* 🆕 Ночью не показываем кнопку "Записать ужин" и текст про streak */}
+        {!isNight && (
+          <>
+            {streak > 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                🔥 {streak} {streak === 1 ? "день" : streak < 5 ? "дня" : "дней"}{" "}
+                подряд. Молодец. Давай ещё один?
+              </Typography>
+            ) : (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Начнём сегодня? С одного шага.
+              </Typography>
+            )}
+            <Button
+              variant="contained"
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => navigate("/diary")}
+            >
+              {getMealLabel()}
+            </Button>
+          </>
         )}
-        <Button
-          variant="contained"
-          endIcon={<ArrowForwardIcon />}
-          onClick={() => navigate("/diary")}
-        >
-          {getMealLabel()}
-        </Button>
       </CardContent>
     </Card>
   );
