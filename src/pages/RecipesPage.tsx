@@ -59,7 +59,7 @@ export default function RecipesPage() {
   const [tab, setTab] = useState<TabKey>("my");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+const [searchParams] = useSearchParams();
   const [prefilledIngredientId, setPrefilledIngredientId] = useState<number | null>(null);
 
   // Фильтры
@@ -78,9 +78,11 @@ export default function RecipesPage() {
     if (addId) {
       setPrefilledIngredientId(Number(addId));
       setFormOpen(true);
-      setSearchParams({}, { replace: true }); // Очищаем URL
+      // 🆕 Очищаем URL без вызова ре-рендера React Router
+      window.history.replaceState({}, "", "/recipes");
     }
-  }, [searchParams, setSearchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filters = {
     query: debouncedQuery || undefined,
