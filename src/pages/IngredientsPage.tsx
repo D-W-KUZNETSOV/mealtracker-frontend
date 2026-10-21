@@ -92,10 +92,12 @@ export default function IngredientsPage() {
 
   // ---------- Сохранение ----------
   const handleSubmit = async (data: IngredientRequest) => {
+       console.log("🔍 handleSubmit data:", data); // 👈 ВРЕМЕННО
+          console.log("🔍 initialBarcode:", initialBarcode); // 👈 ВРЕМЕННО
       // 🆕 Если есть штрихкод из URL (или формы), добавляем его в запрос
       const payload: IngredientRequest = {
         ...data,
-        barcode: initialBarcode ?? data.barcode,
+        barcode: data.barcode ?? initialBarcode ?? null,
       };
 
       try {
