@@ -18,7 +18,7 @@ import { apiClient } from "../api/client";
 import type { ApiError } from "../types/api";
 import AddPortionDialog from "./AddPortionDialog";
 import type { IngredientDto } from "../types/api";
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import { Html5Qrcode} from "html5-qrcode";
 
 // Тип ответа от бэка (совпадает с ProductLookupResponse.java)
 interface ProductLookupResponse {
@@ -111,11 +111,7 @@ export default function BarcodeScannerDialog({ open, onClose, onScanned }: Props
     setTimeout(async () => {
       try {
         const html5QrCode = new Html5Qrcode("reader", {
-          formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.CODE_128,
-          ],
+          // 🆕 Убрали formatsToSupport — ищем все форматы, включая QR
           verbose: false,
         });
         scannerRef.current = html5QrCode;
@@ -126,24 +122,30 @@ export default function BarcodeScannerDialog({ open, onClose, onScanned }: Props
             fps: 10,
             qrbox: { width: 250, height: 150 },
           },
-          (decodedText) => {
-            // Успешно отсканировали
-            try {
-              html5QrCode
-                .stop()
-                .then(() => {
-                  // камера уже остановлена — не даём effect'у дергать stop() ещё раз
-                  scannerRef.current = null;
-                  setIsCameraActive(false);
-                  setCode(decodedText);
-                  handleSearch(decodedText); // Автоматически ищем
-                })
-                .catch(console.error);
-            } catch (e) {
-              // повторный распознанный кадр до завершения остановки — игнорируем
-              console.warn("Сканер уже останавливается:", e);
-            }
-          },
+                   (decodedText) => {
+                     // 🆕 Проверяем, что это похоже на штрихкод (только цифры, длина 8–14)
+                     if (!/^\d{8,14}$/.test(decodedText)) {
+                       console.warn("Распознан не штрихкод (возможно, QR):", decodedText);
+                       return; // Игнорируем и продолжаем сканировать
+                     }
+
+                     // Успешно отсканировали
+                     try {
+                       html5QrCode
+                         .stop()
+                         .then(() => {
+                           // камера уже остановлена — не даём effect'у дергать stop() ещё раз
+                           scannerRef.current = null;
+                           setIsCameraActive(false);
+                           setCode(decodedText);
+                           handleSearch(decodedText); // Автоматически ищем
+                         })
+                         .catch(console.error);
+                     } catch (e) {
+                       // повторный распознанный кадр до завершения остановки — игнорируем
+                       console.warn("Сканер уже останавливается:", e);
+                     }
+                   },
           () => {
             // Игнорируем ошибки сканирования (когда просто водят камерой)
           }
