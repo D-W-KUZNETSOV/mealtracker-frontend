@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+     Alert,
   Autocomplete,
   Box,
   Button,
@@ -62,15 +63,25 @@ export default function AddPortionDialog({
   const [sourceType, setSourceType] = useState<SourceType>("recipe");
 
   // Сброс при открытии
-  useEffect(() => {
-    if (open) {
-      setSourceType("recipe");
-      setSelected(null);
-      setSelectedIngredient(null);
-      setMode("GRAM");
-      setInputStr("100");
-    }
-  },  [open, initialIngredient]); // 🆕 добавили зависимость
+   useEffect(() => {
+     if (open) {
+       if (initialIngredient) {
+         // 🆕 Если передан ингредиент из сканера — открываем вкладку "Ингредиент"
+         setSourceType("ingredient");
+         setSelectedIngredient(initialIngredient);
+         setSelected(null);
+         setMode("GRAM");
+         setInputStr("100");
+       } else {
+         // Обычное открытие (без сканера) — вкладка "Рецепт"
+         setSourceType("recipe");
+         setSelected(null);
+         setSelectedIngredient(null);
+         setMode("GRAM");
+         setInputStr("100");
+       }
+     }
+   }, [open, initialIngredient]);
 
   const inputNum = Number(inputStr.replace(",", ".")) || 0;
 
@@ -184,33 +195,43 @@ export default function AddPortionDialog({
             <ToggleButton value="ingredient">Ингредиент</ToggleButton>
           </ToggleButtonGroup>
 
-          {sourceType === "recipe" ? (
-            <Autocomplete
-              options={recipes}
-              getOptionLabel={(o) => o.name}
-              value={selected}
-              onChange={(_, v) => setSelected(v)}
-              isOptionEqualToValue={(o, v) => o.id === v.id}
-              loading={myRecipesQuery.isLoading}
-              renderInput={(params) => (
-                <TextField {...params} label="Рецепт" fullWidth autoFocus />
-              )}
-            />
-          ) : (
-            <Autocomplete
-              options={ingredients}
-              getOptionLabel={(o) => o.name}
-              value={selectedIngredient}
-              onChange={(_, v) => setSelectedIngredient(v)}
-              isOptionEqualToValue={(o, v) => o.id === v.id}
-              loading={
-                myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Ингредиент" fullWidth autoFocus />
-              )}
-            />
-          )}
+                   {sourceType === "recipe" ? (
+                     <Autocomplete
+                       options={recipes}
+                       getOptionLabel={(o) => o.name}
+                       value={selected}
+                       onChange={(_, v) => setSelected(v)}
+                       isOptionEqualToValue={(o, v) => o.id === v.id}
+                       loading={myRecipesQuery.isLoading}
+                       renderInput={(params) => (
+                         <TextField {...params} label="Рецепт" fullWidth autoFocus />
+                       )}
+                     />
+                   ) : (
+                     <> {/* 🆕 Фрагмент, чтобы вернуть два элемента */}
+                       <Autocomplete
+                         options={ingredients}
+                         getOptionLabel={(o) => o.name}
+                         value={selectedIngredient}
+                         onChange={(_, v) => setSelectedIngredient(v)}
+                         isOptionEqualToValue={(o, v) => o.id === v.id}
+                         loading={
+                           myIngredientsQuery.isLoading || baseIngredientsQuery.isLoading
+                         }
+                         renderInput={(params) => (
+                           <TextField {...params} label="Ингредиент" fullWidth autoFocus />
+                         )}
+                       />
+
+                       {/* 🆕 Предупреждение про сырое мясо */}
+                       {selectedIngredient &&
+                        ["MEAT", "POULTRY", "FISH"].includes(selectedIngredient.category ?? "") && (
+                         <Alert severity="warning" sx={{ mt: 1 }}>
+                           Вы добавляете сырой продукт. Убедитесь, что взвесили его до готовки.
+                         </Alert>
+                       )}
+                     </>
+                   )}
 
           {/* Подсказка по порции */}
           {selected && selected.servingSizeGrams > 0 && (
