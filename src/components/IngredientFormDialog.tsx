@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
+    Autocomplete,
   Box,
   Button,
   Dialog,
@@ -20,9 +21,9 @@ import type { IngredientDto, IngredientRequest, UnitType } from "../types/api";
 import {
   calcCaloriesFromMacros,
   roundNutrient,
-  INGREDIENT_CATEGORIES,
 } from "../types/api";
 import { isValidNumberInput, normalizeNumberInput } from "../utils/numberInput";
+import { useBaseIngredients } from "../hooks/useIngredients";
 
 // ============================================================
 // Схема валидации формы ингредиента.
@@ -76,13 +77,15 @@ export default function IngredientFormDialog({
   onClose,
 }: IngredientFormDialogProps) {
   const isEdit = !!ingredient;
+  const baseIngredientsQuery = useBaseIngredients();
+  const baseIngredients = baseIngredientsQuery.data ?? [];
 
   const {
-    register,
     control,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<IngredientForm>({
     resolver: zodResolver(ingredientSchema),
@@ -207,38 +210,74 @@ export default function IngredientFormDialog({
                         Штрихкод: <strong>{initialBarcode}</strong> (будет сохранён)
                       </Alert>
                     )}
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label="Название"
-              fullWidth
-              autoFocus
-              {...register("name")}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
+                <Stack spacing={2} sx={{ mt: 1 }}>
+                   <Controller
+                     name="name"
+                     control={control}
+                     render={({ field }) => {
+                       const selectedBase = baseIngredients.find(
+                         (i) => i.name === field.value
+                       );
 
-            <Controller
-              name="category"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  select
-                  label="Категория"
-                  fullWidth
-                  value={field.value ?? "OTHER"}
-                  onChange={(e) => field.onChange(e.target.value)}
-                >
-                  {Object.entries(INGREDIENT_CATEGORIES).map(
-                    ([value, { label, emoji }]) => (
-                      <MenuItem key={value} value={value}>
-                        {emoji} {label}
-                      </MenuItem>
-                    ),
-                  )}
-                </TextField>
-              )}
-            />
-
+                       return (
+                         <Autocomplete
+                           freeSolo
+                           options={baseIngredients}
+                           getOptionLabel={(o) => (typeof o === "string" ? o : o.name)}
+                           value={selectedBase ?? field.value}
+                           onChange={(_, v) => {
+                             if (v == null) {
+                               field.onChange("");
+                             } else if (typeof v === "string") {
+                               field.onChange(v);
+                             } else {
+                               field.onChange(v.name);
+                               setValue("category", v.category ?? "OTHER");
+                               setValue("proteinsPer100g", String(v.proteinsPer100g ?? ""));
+                               setValue("fatsPer100g", String(v.fatsPer100g ?? ""));
+                               setValue("carbsPer100g", String(v.carbsPer100g ?? ""));
+                               setValue(
+                                 "caloriesPer100g",
+                                 v.caloriesPer100g != null
+                                   ? String(v.caloriesPer100g)
+                                   : ""
+                               );
+                               setValue("unitType", v.unitType ?? "GRAM");
+                               setValue(
+                                 "unitWeightGrams",
+                                 v.unitWeightGrams != null
+                                   ? String(v.unitWeightGrams)
+                                   : ""
+                               );
+                               setValue(
+                                 "gramsPerTbsp",
+                                 v.gramsPerTbsp != null ? String(v.gramsPerTbsp) : ""
+                               );
+                               setValue(
+                                 "gramsPerTsp",
+                                 v.gramsPerTsp != null ? String(v.gramsPerTsp) : ""
+                               );
+                             }
+                           }}
+                           onInputChange={(_, val) => {
+                             if (typeof field.value === "string") {
+                               field.onChange(val);
+                             }
+                           }}
+                           renderInput={(params) => (
+                             <TextField
+                               {...params}
+                               label="Название"
+                               fullWidth
+                               autoFocus
+                               error={!!errors.name}
+                               helperText={errors.name?.message}
+                             />
+                           )}
+                         />
+                       );
+                     }}
+                   />
             {/* Ряд БЖУ */}
             <Stack direction="row" spacing={2}>
               <Controller
