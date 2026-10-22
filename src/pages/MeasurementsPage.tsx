@@ -193,7 +193,7 @@ export default function MeasurementsPage() {
                   <TextField
                     label="Вес, кг"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("weightKg", { valueAsNumber: true })}
                     error={!!errors.weightKg}
@@ -202,14 +202,14 @@ export default function MeasurementsPage() {
                   <TextField
                     label="Шея, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("neckCm", { valueAsNumber: true })}
                   />
                   <TextField
                     label="Грудь, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("chestCm", { valueAsNumber: true })}
                   />
@@ -219,21 +219,21 @@ export default function MeasurementsPage() {
                   <TextField
                     label="Талия, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("waistCm", { valueAsNumber: true })}
                   />
                   <TextField
                     label="Живот, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("bellyCm", { valueAsNumber: true })}
                   />
                   <TextField
                     label="Бёдра, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("hipsCm", { valueAsNumber: true })}
                   />
@@ -243,14 +243,14 @@ export default function MeasurementsPage() {
                   <TextField
                     label="Бедро, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("thighCm", { valueAsNumber: true })}
                   />
                   <TextField
                     label="Рука, см"
                     type="number"
-                    sx={{ minWidth: 120, flex: 1 }}
+                    sx={{ flex: "1 1 140px", minWidth: "140px" }}
                     slotProps={{ htmlInput: { step: "0.1", min: 0 } }}
                     {...register("armCm", { valueAsNumber: true })}
                   />

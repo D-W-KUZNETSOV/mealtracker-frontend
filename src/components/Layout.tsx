@@ -85,7 +85,7 @@ export default function Layout() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       {/* ============ AppBar ============ */}
-      <AppBar position="static">
+     <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
         <Toolbar>
           {/* Бургер только на мобильных */}
           {isMobile && (
