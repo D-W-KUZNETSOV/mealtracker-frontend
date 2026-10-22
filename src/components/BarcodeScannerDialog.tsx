@@ -144,11 +144,11 @@ export default function BarcodeScannerDialog({ open, onClose, onScanned }: Props
               console.warn("Сканер уже останавливается:", e);
             }
           },
-          (_errorMessage) => {
+          () => {
             // Игнорируем ошибки сканирования (когда просто водят камерой)
           }
         );
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
         setCameraError("Не удалось включить камеру. Разрешите доступ в браузере.");
         setIsCameraActive(false);
